@@ -101,4 +101,5 @@ export function generateUniverseData(count: number, seed: number) {
         colors[i * 3 + 2] = random() * 0.5 + 0.3;
     }
   
-    
+    return { positions, seeds, sizes, colors };
+}

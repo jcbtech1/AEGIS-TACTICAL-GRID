@@ -41,7 +41,7 @@ export default function CelestialWeaver() {
     if ('error' in result) {
       toast({
         variant: "destructive",
-        title: "AI Error",
+        title: "Error de IA",
         description: result.error,
       });
     } else if (result?.colors) {
@@ -51,7 +51,7 @@ export default function CelestialWeaver() {
         outColor: result.colors[4],
       }));
       toast({
-        title: "AI Colors Generated",
+        title: "Colores generados por IA",
         description: result.description,
       });
     }
@@ -64,7 +64,7 @@ export default function CelestialWeaver() {
     if ('error' in result) {
       toast({
         variant: "destructive",
-        title: "AI Error",
+        title: "Error de IA",
         description: result.error,
       });
     } else if (result?.uniformsConfig) {
@@ -77,7 +77,7 @@ export default function CelestialWeaver() {
         timeScale: uTimeScale ?? prev.timeScale,
       }));
        toast({
-        title: "AI Animation Suggested",
+        title: "Animación sugerida por IA",
         description: result.explanation,
       });
     }
@@ -93,7 +93,7 @@ export default function CelestialWeaver() {
     a.download = 'celestial-weaver-config.json';
     a.click();
     URL.revokeObjectURL(url);
-    toast({ title: "Configuration Saved" });
+    toast({ title: "Configuración guardada" });
   };
 
   const handleLoadConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,12 +105,12 @@ export default function CelestialWeaver() {
           const loadedConfig = JSON.parse(e.target?.result as string);
           // Add validation here if needed
           setConfig(prev => ({ ...prev, ...loadedConfig }));
-          toast({ title: "Configuration Loaded" });
+          toast({ title: "Configuración cargada" });
         } catch (error) {
           toast({
             variant: "destructive",
-            title: "Error Loading Config",
-            description: "Invalid configuration file.",
+            title: "Error al cargar la configuración",
+            description: "Archivo de configuración no válido.",
           });
         }
       };
@@ -127,8 +127,8 @@ export default function CelestialWeaver() {
         {loading && (
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-background transition-opacity duration-1000">
             <div className="text-center">
-              <h1 className="text-4xl font-headline text-primary-foreground mb-2">Celestial Weaver</h1>
-              <p className="text-lg text-muted-foreground">Weaving the cosmos...</p>
+              <h1 className="text-4xl font-headline text-primary-foreground mb-2">Tejedor Celestial</h1>
+              <p className="text-lg text-muted-foreground">Tejiendo el cosmos...</p>
             </div>
           </div>
         )}
