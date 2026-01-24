@@ -105,7 +105,7 @@ export const galaxyFragmentShader = `
     a *= flicker;
 
     vec3 baseColor = mix(uInnColor, uOutColor, vDistance);
-    vec3 finalColor = mix(baseColor, vColor, 0.3);
+    vec3 finalColor = mix(baseColor, vColor, 0.6);
 
     float glow = 1.0 - vDistance * 0.5;
     finalColor += vec3(0.2, 0.1, 0.3) * glow;

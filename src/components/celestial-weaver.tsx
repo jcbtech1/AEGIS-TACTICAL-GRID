@@ -10,15 +10,15 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 
 const INITIAL_CONFIG: GalaxyConfig = {
   seed: 1,
-  particles: 150 ** 2,
+  particles: 200 ** 2,
   branches: 4,
   radius: 0,
   spin: 0,
   randomness: 0,
   pulse: 0,
   timeScale: 0.3,
-  innColor: '#336666',
-  outColor: '#631886',
+  innColor: '#ffeeaa',
+  outColor: '#aaaaff',
 };
 
 export default function CelestialWeaver() {

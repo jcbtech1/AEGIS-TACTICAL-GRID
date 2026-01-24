@@ -53,16 +53,35 @@ export function generateGalaxyData(count: number, seed: number) {
     seeds[i * 3 + 0] = random();
     seeds[i * 3 + 1] = random();
     seeds[i * 3 + 2] = random();
-    sizes[i] = random() * 0.3 + 0.5;
 
-    if (random() > 0.9) {
-      colors[i * 3 + 0] = random() * 0.5 + 0.5;
-      colors[i * 3 + 1] = random() * 0.3 + 0.2;
-      colors[i * 3 + 2] = random() * 0.5 + 0.5;
+    // Make some stars bigger and brighter
+    if (random() > 0.99) {
+      sizes[i] = random() * 1.5 + 1.0; // Very large stars (1% chance)
+    } else if (random() > 0.9) {
+      sizes[i] = random() * 0.8 + 0.7; // Large stars (9% chance)
     } else {
-      colors[i * 3 + 0] = 1.0;
-      colors[i * 3 + 1] = 1.0;
-      colors[i * 3 + 2] = 1.0;
+      sizes[i] = random() * 0.4 + 0.3; // Normal stars
+    }
+
+    // Add more color variation
+    if (random() > 0.8) {
+        // 20% of stars will be colored (blueish or reddish)
+        const isBlue = random() > 0.5;
+        if (isBlue) {
+            colors[i * 3 + 0] = 0.6 + random() * 0.2; // R
+            colors[i * 3 + 1] = 0.8 + random() * 0.2; // G
+            colors[i * 3 + 2] = 1.0;                  // B
+        } else {
+            colors[i * 3 + 0] = 1.0;                  // R
+            colors[i * 3 + 1] = 0.7 + random() * 0.2; // G
+            colors[i * 3 + 2] = 0.4 + random() * 0.2; // B
+        }
+    } else {
+        // 80% are whitish/pale yellow
+        const tone = 0.8 + random() * 0.2;
+        colors[i * 3 + 0] = tone;
+        colors[i * 3 + 1] = tone;
+        colors[i * 3 + 2] = tone * 0.9;
     }
   }
 

@@ -176,7 +176,7 @@ export default function CelestialWeaverCanvas({ config, galaxyData, setLoading }
 
     // Initial Animation
     new TWEEN.Tween({ radius: 0, spin: 0, randomness: 0, pulse: 0, rotate: 0, cameraZ: 5 })
-      .to({ radius: 2.0, spin: Math.PI * 3, randomness: 0.7, pulse: 0.5, rotate: Math.PI * 6, cameraZ: 8 }, 8000)
+      .to({ radius: 3.0, spin: Math.PI * 3, randomness: 0.7, pulse: 0.5, rotate: Math.PI * 6, cameraZ: 10 }, 8000)
       .easing(TWEEN.Easing.Exponential.Out)
       .onUpdate(({ radius, spin, randomness, pulse, rotate, cameraZ }) => {
         galaxyMaterial.uniforms.uRadius.value = radius;
