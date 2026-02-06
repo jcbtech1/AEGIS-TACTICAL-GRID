@@ -12,18 +12,22 @@
     --primary-foreground: 185 100% 10%;
     --accent: 340 100% 60%;
     --border: 185 100% 20%;
-    --radius: 0.5rem;
+    --radius: 0.2rem;
   }
 }
 
 @layer base {
   body {
-    @apply bg-[#050a10] text-[#00f2ff] font-mono overflow-hidden h-screen w-screen selection:bg-[#00f2ff]/30;
-    background: radial-gradient(circle at center, #0a1520 0%, #050a10 100%);
+    @apply bg-[#020617] text-[#00f2ff] font-mono overflow-hidden h-screen w-screen selection:bg-[#00f2ff]/30;
+    background: radial-gradient(circle at center, #050b1a 0%, #020617 100%);
   }
 }
 
-/* Scrollbar técnica */
+.dot-matrix {
+  background-image: radial-gradient(rgba(0, 242, 255, 0.1) 1px, transparent 0px);
+  background-size: 20px 20px;
+}
+
 .terminal-scroll::-webkit-scrollbar {
   width: 2px;
 }
@@ -34,21 +38,44 @@
   @apply bg-[#00f2ff]/20 rounded-full;
 }
 
-@keyframes scan-vertical {
+@keyframes scan-line {
   from { transform: translateY(-100%); }
-  to { transform: translateY(1000%); }
+  to { transform: translateY(100%); }
 }
 
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.scanline-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(0, 242, 255, 0.1);
+  animation: scan-line 4s linear infinite;
+  pointer-events: none;
+  z-index: 10;
 }
 
-.animate-spin-slow {
-  animation: spin-slow 10s linear infinite;
+.fui-corner-brackets::before,
+.fui-corner-brackets::after,
+.fui-corner-brackets-inner::before,
+.fui-corner-brackets-inner::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: #00f2ff;
+  pointer-events: none;
 }
 
-.glow-border:hover {
-  box-shadow: 0 0 15px rgba(0, 242, 255, 0.1);
-  border-color: rgba(0, 242, 255, 0.4);
+.fui-corner-brackets::before { top: 0; left: 0; border-top: 1px solid; border-left: 1px solid; }
+.fui-corner-brackets::after { top: 0; right: 0; border-top: 1px solid; border-right: 1px solid; }
+.fui-corner-brackets-inner::before { bottom: 0; left: 0; border-bottom: 1px solid; border-left: 1px solid; }
+.fui-corner-brackets-inner::after { bottom: 0; right: 0; border-bottom: 1px solid; border-right: 1px solid; }
+
+.neon-glow {
+  box-shadow: 0 0 10px rgba(0, 242, 255, 0.2);
+}
+
+.neon-glow-red {
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.3);
 }
