@@ -1,5 +1,5 @@
-import CyberDashboard from '@/components/cyber-grid/dashboard';
+import CelestialWeaver from '@/components/celestial-weaver';
 
 export default function Home() {
-  return <CyberDashboard />;
+  return <CelestialWeaver />;
 }
