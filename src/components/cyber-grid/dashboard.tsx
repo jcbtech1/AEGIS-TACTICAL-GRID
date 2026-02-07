@@ -8,10 +8,11 @@ import {
   Lock, Zap, Radio, RefreshCw,
   Terminal as TerminalIcon, Cpu, Smartphone,
   Database, Globe, Wifi, User, Brain, Sparkles,
-  Mic, Send, Volume2, Command
+  Mic, Send, Volume2, Command, Loader2
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import NetMap from './net-map';
+import { sendTacticalCommand } from '@/app/actions';
 
 interface VPNStatus {
   id: string;
@@ -66,8 +67,9 @@ export default function AegisUltimateDashboard() {
 
   // AI Chat State
   const [chatInput, setChatInput] = useState("");
+  const [isAILoading, setIsAILoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
-    { role: 'ai', text: 'SISTEMA AEGIS ACTIVO. ESPERANDO ÓRDENES DEL OPERADOR.', timestamp: '00:00:00' }
+    { role: 'ai', text: 'SISTEMA AEGIS ACTIVO. NÚCLEO DE RAZONAMIENTO GEMINI 2.5 OPERACIONAL.', timestamp: '00:00:00' }
   ]);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -97,43 +99,50 @@ export default function AegisUltimateDashboard() {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory]);
 
-  const handleSendMessage = (e?: React.FormEvent) => {
+  const handleSendMessage = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || isAILoading) return;
 
-    const newMsg: ChatMessage = {
+    const operatorMsg: ChatMessage = {
       role: 'operator',
       text: chatInput.toUpperCase(),
-      timestamp: time.split(':')[0] + ':' + time.split(':')[1] + ':' + time.split(':')[2]
+      timestamp: time.split(':').slice(0, 3).join(':')
     };
 
-    setChatHistory(prev => [...prev, newMsg]);
+    setChatHistory(prev => [...prev, operatorMsg]);
     setChatInput("");
+    setIsAILoading(true);
 
-    // Simulate AI Response
-    setTimeout(() => {
-      const responses = [
-        "ANALIZANDO PATRONES DE RED... ESTADO ÓPTIMO.",
-        "ENCRIPTACIÓN REFORZADA. TÚNELES ESTABLES.",
-        "NO SE DETECTAN ANOMALÍAS EN LOS NODOS ACTIVOS.",
-        "ADVERTENCIA: TRÁFICO INUSUAL DETECTADO EN TNL-A1. MONITOREANDO.",
-        "COORDENADAS DE LOS NODOS VERIFICADAS."
-      ];
+    try {
+      const result = await sendTacticalCommand({
+        message: operatorMsg.text,
+        systemStatus: {
+          threatLevel,
+          activeNodes: vpns.length,
+          throughput: stats.throughput,
+        }
+      });
+
       const aiMsg: ChatMessage = {
         role: 'ai',
-        text: responses[Math.floor(Math.random() * responses.length)],
-        timestamp: time.split(':')[0] + ':' + time.split(':')[1] + ':' + time.split(':')[2]
+        text: result.response,
+        timestamp: time.split(':').slice(0, 3).join(':')
       };
+
       setChatHistory(prev => [...prev, aiMsg]);
       
-      // Simple TTS (Opcional)
+      // TTS
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(aiMsg.text);
         utterance.rate = 1.1;
         utterance.pitch = 0.8;
         window.speechSynthesis.speak(utterance);
       }
-    }, 800);
+    } catch (error) {
+      console.error("AI Error:", error);
+    } finally {
+      setIsAILoading(false);
+    }
   };
 
   if (!isMounted) return <div className="bg-[#020617] w-screen h-screen" />;
@@ -261,7 +270,7 @@ export default function AegisUltimateDashboard() {
                       <div className="flex items-center gap-1 mb-0.5">
                         <span className="text-[5px] opacity-30">{msg.timestamp}</span>
                         <span className={`text-[6px] font-bold uppercase ${msg.role === 'ai' ? 'text-[#00f2ff]' : 'text-[#f43f5e]'}`}>
-                          {msg.role === 'ai' ? 'GEMINI_AI' : 'OPERATOR'}
+                          {msg.role === 'ai' ? 'AEGIS_AI' : 'OPERATOR'}
                         </span>
                       </div>
                       <div className={`max-w-[85%] p-1.5 border rounded-sm ${
@@ -275,6 +284,12 @@ export default function AegisUltimateDashboard() {
                     </motion.div>
                   ))}
                 </AnimatePresence>
+                {isAILoading && (
+                  <div className="flex items-center gap-2 text-[#00f2ff]/40">
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                    <span className="text-[6px] uppercase animate-pulse">Procesando_Respuesta...</span>
+                  </div>
+                )}
                 <div ref={chatEndRef} />
               </div>
               
@@ -292,12 +307,17 @@ export default function AegisUltimateDashboard() {
                   <input 
                     type="text"
                     value={chatInput}
+                    disabled={isAILoading}
                     onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="COMMAND_PROMPT..."
-                    className="w-full bg-transparent border-none focus:ring-0 text-[7px] text-[#00f2ff] font-mono pl-4 placeholder:text-[#00f2ff]/10"
+                    placeholder={isAILoading ? "SISTEMA_OCUPADO..." : "COMMAND_PROMPT..."}
+                    className="w-full bg-transparent border-none focus:ring-0 text-[7px] text-[#00f2ff] font-mono pl-4 placeholder:text-[#00f2ff]/10 disabled:opacity-50"
                   />
                 </div>
-                <button type="submit" className="p-1 text-[#00f2ff] hover:scale-110 transition-transform">
+                <button 
+                  type="submit" 
+                  disabled={isAILoading || !chatInput.trim()} 
+                  className="p-1 text-[#00f2ff] hover:scale-110 transition-transform disabled:opacity-30"
+                >
                   <Send className="w-3 h-3" />
                 </button>
               </form>
@@ -394,4 +414,3 @@ export default function AegisUltimateDashboard() {
     </div>
   );
 }
-
