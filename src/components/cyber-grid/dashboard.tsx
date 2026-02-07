@@ -7,7 +7,7 @@ import {
   Shield, Activity, AlertTriangle, 
   Lock, Zap, Radio, RefreshCw,
   Terminal as TerminalIcon, Cpu, Smartphone,
-  Database, Globe, Wifi, User
+  Database, Globe, Wifi, User, Brain, Sparkles
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import NetMap from './net-map';
@@ -49,6 +49,7 @@ export default function AegisUltimateDashboard() {
   const [isMounted, setIsMounted] = useState(false);
   const [traffic, setTraffic] = useState<{time: number, pps: number}[]>([]);
   const [terminalLines, setTerminalLines] = useState<string[]>(["[SYSTEM] INITIALIZING AEGIS_V2_CORE...", "[SEC] KERNEL_LOAD_OK", "[NET] SCANNING_TOPOLOGY..."]);
+  const [aiAnalysis, setAiAnalysis] = useState<string[]>(["[AI] MODEL_LOADED: GEMINI_TACTICAL", "[AI] MONITORING_ANOMALIES...", "[AI] NEURAL_MESH_ACTIVE"]);
   const [threatLevel, setThreatLevel] = useState("LEVEL_1_SAFE");
   const [stats, setStats] = useState({ throughput: "442.1", peak: "892.4", avg: "512.1", encryption: "MIL-SPEC AES-256" });
   const [vpns, setVpns] = useState<VPNStatus[]>([
@@ -59,7 +60,6 @@ export default function AegisUltimateDashboard() {
 
   useEffect(() => {
     setIsMounted(true);
-    // Inicializar tráfico solo en cliente para evitar error de hidratación
     setTraffic(Array.from({ length: 30 }, (_, i) => ({ time: i, pps: 20 + Math.random() * 40 })));
 
     const updateTime = () => {
@@ -73,7 +73,17 @@ export default function AegisUltimateDashboard() {
       
       if (Math.random() > 0.8) {
         const logs = ["[DPI] PKT_INSPECTED", "[AUTH] NODE_VERIFIED", "[NET] MESH_STABLE", "[SEC] ROTATING_KEYS"];
-        setTerminalLines(prev => [...prev.slice(-15), logs[Math.floor(Math.random() * logs.length)]]);
+        setTerminalLines(prev => [...prev.slice(-10), logs[Math.floor(Math.random() * logs.length)]]);
+      }
+
+      if (Math.random() > 0.95) {
+        const insights = [
+          "[AI] PATTERN_DETECTED: BEHAVIOR_ANOMALY",
+          "[AI] HEURISTIC_SCAN: 0% MALWARE",
+          "[AI] PREDICTIVE_ANALYSIS: LOAD_BALANCED",
+          "[AI] ENCRYPTION_HEALTH: OPTIMAL"
+        ];
+        setAiAnalysis(prev => [...prev.slice(-8), insights[Math.floor(Math.random() * insights.length)]]);
       }
     }, 100);
 
@@ -87,7 +97,6 @@ export default function AegisUltimateDashboard() {
       <div className="scanline-effect opacity-10" />
       <div className="vignette" />
 
-      {/* HEADER TÁCTICO - Ajustado a la izquierda con login icon */}
       <header className="flex justify-between items-end mb-3 px-1 z-20 shrink-0">
         <div className="flex items-center gap-4">
           <div className="flex flex-col">
@@ -115,7 +124,6 @@ export default function AegisUltimateDashboard() {
               <span className="text-[6px] opacity-40 uppercase tracking-widest mb-0.5">System_Time_UTC</span>
               <span className="text-[10px] font-bold tracking-[0.1em] font-mono whitespace-nowrap">{time || "--:--:--:---"}</span>
             </div>
-            {/* ICONO DE LOGIN / USER */}
             <button className="flex items-center justify-center w-8 h-8 rounded border border-[#00f2ff]/20 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/20 transition-all group">
               <User className="w-4 h-4 text-[#00f2ff] group-hover:scale-110 transition-transform" />
             </button>
@@ -123,10 +131,7 @@ export default function AegisUltimateDashboard() {
         </div>
       </header>
 
-      {/* REJILLA MODULAR - 10 Columnas Estrictas */}
       <main className="flex-1 grid grid-cols-10 gap-3 min-h-0 z-20">
-        
-        {/* COLUMNA IZQUIERDA (20% - 2/10) */}
         <div className="col-span-2 flex flex-col gap-3 min-h-0">
           <TacticalPanel title="VISUAL_MONITOR" id="CAM_01" className="flex-[3]">
             <div className="w-full h-full relative bg-black overflow-hidden group">
@@ -146,9 +151,6 @@ export default function AegisUltimateDashboard() {
                   <span className="absolute -top-4 left-0 text-[6px] text-[#f43f5e] font-bold whitespace-nowrap">OBJ_LOCKED: 89.4%</span>
                 </div>
               </div>
-              <div className="absolute bottom-2 left-2 text-[6px] text-[#00f2ff]/60 font-mono">
-                X: 42.12 | Y: 88.01<br/>Z: 1.04_ALPHA
-              </div>
             </div>
           </TacticalPanel>
 
@@ -167,7 +169,6 @@ export default function AegisUltimateDashboard() {
           </TacticalPanel>
         </div>
 
-        {/* COLUMNA CENTRAL (50% - 5/10) */}
         <div className="col-span-5 flex flex-col gap-3 min-h-0">
           <TacticalPanel title="GLOBAL_NET_MAP" headerExtra="LIVE_TOPOLOGY" className="flex-[4]">
             <div className="w-full h-full relative bg-[#000d1a]/40 overflow-hidden">
@@ -181,27 +182,50 @@ export default function AegisUltimateDashboard() {
             </div>
           </TacticalPanel>
 
-          <TacticalPanel title="CORE_TERMINAL" className="flex-[2]">
-            <div className="p-2 bg-black/40 h-full overflow-y-auto terminal-scroll font-mono text-[8px] leading-tight">
-              <AnimatePresence mode="popLayout">
-                {terminalLines.map((line, i) => (
-                  <motion.div 
-                    key={`${i}-${line}`}
-                    initial={{ opacity: 0, x: -5 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    className={`mb-1 ${i === terminalLines.length - 1 ? 'text-[#00f2ff]' : 'text-[#00f2ff]/40'}`}
-                  >
-                    <span className="opacity-20 mr-1">[{i.toString().padStart(3, '0')}]</span>
-                    {line}
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-              <div className="w-1 h-3 bg-[#00f2ff] animate-pulse inline-block align-middle ml-1" />
-            </div>
-          </TacticalPanel>
+          <div className="flex-[2] grid grid-cols-2 gap-3 min-h-0">
+            <TacticalPanel title="CORE_TERMINAL" id="SYS_LOG">
+              <div className="p-2 bg-black/40 h-full overflow-y-auto terminal-scroll font-mono text-[7px] leading-tight">
+                <AnimatePresence mode="popLayout">
+                  {terminalLines.map((line, i) => (
+                    <motion.div 
+                      key={`${i}-${line}`}
+                      initial={{ opacity: 0, x: -5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className={`mb-1 ${i === terminalLines.length - 1 ? 'text-[#00f2ff]' : 'text-[#00f2ff]/40'}`}
+                    >
+                      <span className="opacity-20 mr-1">[{i.toString().padStart(3, '0')}]</span>
+                      {line}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                <div className="w-1 h-3 bg-[#00f2ff] animate-pulse inline-block align-middle ml-1" />
+              </div>
+            </TacticalPanel>
+
+            <TacticalPanel title="AI_INTEL_CORE" id="GEMINI_2.5">
+              <div className="p-2 bg-[#00f2ff]/2 h-full overflow-y-auto terminal-scroll font-mono text-[7px] leading-tight">
+                <div className="flex items-center gap-2 mb-2 p-1 border-b border-[#00f2ff]/10">
+                  <Brain className="w-3 h-3 text-[#00f2ff] animate-pulse" />
+                  <span className="text-[6px] uppercase tracking-widest text-[#00f2ff]">Reasoning_Engine_Active</span>
+                </div>
+                <AnimatePresence mode="popLayout">
+                  {aiAnalysis.map((line, i) => (
+                    <motion.div 
+                      key={`${i}-${line}`}
+                      initial={{ opacity: 0, x: 5 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className={`mb-1 ${i === aiAnalysis.length - 1 ? 'text-[#00f2ff]' : 'text-[#00f2ff]/50'}`}
+                    >
+                      <Sparkles className="inline-block w-2 h-2 mr-1 opacity-30" />
+                      {line}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </TacticalPanel>
+          </div>
         </div>
 
-        {/* COLUMNA DERECHA (30% - 3/10) */}
         <div className="col-span-3 flex flex-col gap-3 min-h-0">
           <TacticalPanel title="TRAFFIC_PPS" className="flex-[2]">
             <div className="p-2 h-full flex flex-col">
@@ -275,7 +299,6 @@ export default function AegisUltimateDashboard() {
         </div>
       </main>
 
-      {/* FOOTER TÉCNICO */}
       <footer className="mt-2 flex justify-between items-center px-1 text-[7px] border-t border-[#00f2ff]/10 pt-2 opacity-40 z-20 shrink-0">
         <div className="flex gap-6 font-bold uppercase tracking-widest">
           <span>Station: AEGIS_H1_SECURE_01</span>
