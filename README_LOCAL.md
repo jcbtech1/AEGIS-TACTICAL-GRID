@@ -1,54 +1,45 @@
-# Aegis Tactical Grid - Manual de Operación Local
+# Aegis Tactical Grid - Manual de Operación Frontend
 
-Este manual te guiará para limpiar tu repositorio de GitHub y organizar tus proyectos en carpetas.
+Este manual te guiará para gestionar tu repositorio de GitHub y desplegar la versión 100% Frontend en Replit.
 
-## 🧹 Cómo Limpiar tu GitHub (Borrón y Cuenta Nueva)
-Si tu repositorio de GitHub está desordenado y quieres que se vea **exactamente igual** a tu carpeta local actual, usa el comando de "Fuerza".
+## 🚀 Migración a Replit (Solo Frontend)
+El sistema ha sido optimizado para funcionar de forma autónoma. No necesitas configurar servidores externos.
 
-### Paso 1: Configurar el Repositorio Correcto
-Asegúrate de que tu carpeta local apunte al link que me diste:
+1. **Importar desde GitHub**: 
+   - En Replit, selecciona "Import from GitHub".
+   - Pega tu URL: `https://github.com/jcbtech1/AEGIS-TACTICAL-GRID.git`.
+2. **Configurar API Key**:
+   - Ve a **Tools > Secrets**.
+   - Añade `GOOGLE_GENAI_API_KEY` con tu llave de Google AI Studio.
+3. **Ejecutar**:
+   - Pulsa **Run**. Replit instalará las dependencias y lanzará el sistema en `http://localhost:9002`.
+
+---
+
+## 📂 Estructura del Sistema Unificado
+El proyecto ahora reside completamente en la arquitectura de Next.js:
+
+- **`/src/app`**: Rutas, acciones del servidor y estilos globales.
+- **`/src/components/cyber-grid`**: Todos los módulos visuales, dashboards y lógica de simulación.
+- **`/src/ai`**: Motores de Inteligencia Artificial (Genkit) integrados.
+
+---
+
+## 🧹 Cómo Limpiar tu GitHub (Sincronización Total)
+Si quieres que tu GitHub se vea exactamente igual a tu carpeta local actual (borrando cualquier rastro de los backends antiguos):
+
 ```bash
+# 1. Asegurar la ruta correcta
 git remote set-url origin https://github.com/jcbtech1/AEGIS-TACTICAL-GRID.git
-```
 
-### Paso 2: Sincronización Total
-Este comando le dice a Git: "Olvida lo que hay en la nube, lo que tengo aquí es la única verdad". Ejecuta esto en tu terminal:
-
-```bash
-# 1. Registra todos los archivos y detecta los que fueron movidos o borrados
+# 2. Registrar el estado actual (Detecta que borraste las carpetas de backend)
 git add -A
 
-# 2. Crea el commit de limpieza
-git commit -m "Build: Reinicio organizado del repositorio"
+# 3. Crear el commit de consolidación
+git commit -m "Build: Versión 100% Frontend autónoma"
 
-# 3. SOBRESCRIBE GitHub con tu versión actual
-# ¡ATENCIÓN! Esto borrará cualquier archivo en GitHub que no esté en tu PC.
+# 4. SOBRESCRIBIR GitHub con tu versión actual
 git push origin main --force
-```
-
----
-
-## 📂 Estructura del Sistema
-Para mantener el orden, el sistema Aegis utiliza esta jerarquía profesional:
-
-- **`/src/app`**: Lógica de navegación y páginas.
-- **`/src/components/cyber-grid`**: Módulos visuales y widgets.
-- **`/src/ai`**: Motores de Inteligencia Artificial (Genkit).
-- **`/src/backend`**: Motores de red (Go) y visión (Python).
-
----
-
-## 🛠 Ejecución del Sistema
-
-### Paso A: Backend de Red (Go)
-```bash
-cd src/backend/go
-go run main.go
-```
-
-### Paso B: Inteligencia Artificial (Next.js)
-```bash
-npm run dev
 ```
 
 **Desarrollado para Aegis Defense Systems**
