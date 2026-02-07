@@ -8,19 +8,22 @@
  * Optimizado para prevenir desbordamientos fuera de la pantalla.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, Crosshair, Zap, Trash2, Brain, 
   Terminal, Globe, Lock, Cpu, ArrowLeft,
   ChevronRight, Activity, AlertCircle, Database,
   Settings, Wifi, Radio, Server, MessageSquare, List,
-  Undo2, Syringe, Power, LayoutGrid, HardDrive, Eye
+  Undo2, Syringe, Power, LayoutGrid, HardDrive, Eye,
+  UserPlus, Users, Fingerprint, Camera, ShieldCheck,
+  FileSearch, History, Search
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import VisualScanModule from './visual-scan';
+import { useToast } from "@/hooks/use-toast";
 
-type ModuleType = 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS';
+type ModuleType = 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS' | 'SECURITY_MANAGEMENT';
 
 interface AdvancedOpsProps {
   onBack: () => void;
@@ -41,7 +44,7 @@ const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }
 );
 
 export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
-  const [activeModule, setActiveModule] = useState<ModuleType>('VISUAL_SCAN');
+  const [activeModule, setActiveModule] = useState<ModuleType>('SECURITY_MANAGEMENT');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -87,6 +90,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
         <DoubleBorderPanel className="flex-1 p-0 flex flex-col">
           <nav className="flex-1 py-2 overflow-y-auto terminal-scroll">
             <div className="px-4 py-2 text-[6px] text-[#00f2ff]/20 uppercase tracking-[0.3em]">Operational_Modules</div>
+            <NavButton type="SECURITY_MANAGEMENT" label="SECURITY_MGMT" icon={ShieldCheck} />
             <NavButton type="RECONNAISSANCE" label="RECON_GRID" icon={Globe} />
             <NavButton type="VISUAL_SCAN" label="VISUAL_SCAN" icon={Eye} />
             <NavButton type="COUNTERMEASURES" label="COUNTERMEASURES" icon={Shield} />
@@ -130,6 +134,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="w-full h-full flex flex-col min-h-0"
             >
+              {activeModule === 'SECURITY_MANAGEMENT' && <SecurityManagementModule />}
               {activeModule === 'RECONNAISSANCE' && <ReconModule />}
               {activeModule === 'VISUAL_SCAN' && <VisualScanModule />}
               {activeModule === 'COUNTERMEASURES' && <CountermeasuresModule />}
@@ -144,7 +149,188 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
   );
 }
 
-// --- MÓDULOS DE CONTENIDO ---
+// --- MÓDULO SECURITY MANAGEMENT ---
+
+function SecurityManagementModule() {
+  const [hasCameraPermission, setHasCameraPermission] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({video: true});
+        setHasCameraPermission(true);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+      }
+    };
+    getCameraPermission();
+    return () => {
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
+  const operators = [
+    { name: "ADMIN_PRIME", rank: "Level 5", lastConn: "02:14:55", token: "ACTIVE" },
+    { name: "SEC_OPERATOR_09", rank: "Level 4", lastConn: "05:22:10", token: "ACTIVE" },
+    { name: "VISION_CORE_X", rank: "Level 3", lastConn: "12:01:44", token: "EXPIRED" },
+  ];
+
+  const targets = [
+    { name: "SUBJECT_0x8F", job: "Network Intruder", risk: "CRITICAL", appearances: 12, img: "https://picsum.photos/seed/target1/200/200" },
+    { name: "ENT_GHOST_B", job: "Unknown Actor", risk: "HIGH", appearances: 3, img: "https://picsum.photos/seed/target2/200/200" },
+  ];
+
+  return (
+    <div className="flex flex-col h-full gap-4 min-h-0 overflow-hidden">
+      <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">
+        
+        {/* OPERATOR LIST TABLE */}
+        <DoubleBorderPanel title="[ OPERATOR_REGISTRY ]" className="col-span-8">
+          <div className="flex-1 overflow-y-auto terminal-scroll">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-[#00f2ff]/20">
+                  <th className="p-2 text-[7px] font-black uppercase opacity-40">Operator_ID</th>
+                  <th className="p-2 text-[7px] font-black uppercase opacity-40">Clearance</th>
+                  <th className="p-2 text-[7px] font-black uppercase opacity-40">Last_Access</th>
+                  <th className="p-2 text-[7px] font-black uppercase opacity-40">Encryption_Token</th>
+                </tr>
+              </thead>
+              <tbody>
+                {operators.map((op, i) => (
+                  <tr key={i} className="border-b border-[#00f2ff]/5 hover:bg-[#00f2ff]/5 transition-colors group">
+                    <td className="p-2 text-[9px] font-bold group-hover:text-[#00f2ff]">{op.name}</td>
+                    <td className="p-2 text-[9px] font-mono opacity-60">{op.rank}</td>
+                    <td className="p-2 text-[9px] font-mono opacity-60">{op.lastConn}</td>
+                    <td className="p-2">
+                      <span className={`text-[7px] px-2 py-0.5 border ${op.token === 'ACTIVE' ? 'border-green-500/40 text-green-500 bg-green-500/5' : 'border-red-500/40 text-red-500 bg-red-500/5'}`}>
+                        {op.token}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </DoubleBorderPanel>
+
+        {/* REGISTRATION FORM & BIO SCAN */}
+        <DoubleBorderPanel title="[ BIO_REGISTRATION ]" className="col-span-4 flex flex-col gap-4">
+          <div className="relative w-full aspect-video bg-black/60 border border-[#00f2ff]/30 overflow-hidden">
+            <video ref={videoRef} className="w-full h-full object-cover grayscale brightness-125" autoPlay muted />
+            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(#00f2ff_1px,transparent_1px)] bg-[size:10px_10px]" />
+            {!hasCameraPermission && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/80">
+                <span className="text-[7px] text-[#00f2ff] font-black uppercase animate-pulse">Waiting_For_Camera_Auth...</span>
+              </div>
+            )}
+            <div className="absolute top-2 left-2 flex gap-1">
+              <div className="w-1.5 h-1.5 bg-[#00f2ff] animate-ping" />
+              <span className="text-[5px] font-black uppercase text-[#00f2ff]">Live_Feed</span>
+            </div>
+          </div>
+          
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-[6px] opacity-40 uppercase tracking-[0.2em]">New_Subject_Name</label>
+              <input type="text" placeholder="ALPHA_X" className="w-full bg-black border border-[#00f2ff]/30 px-3 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff] transition-all" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[6px] opacity-40 uppercase tracking-[0.2em]">Clearance_Level</label>
+              <select className="w-full bg-black border border-[#00f2ff]/30 px-3 py-1.5 text-[9px] text-[#00f2ff] outline-none">
+                <option>Level 1</option>
+                <option>Level 2</option>
+                <option>Level 3</option>
+              </select>
+            </div>
+            <button className="w-full py-2 bg-[#00f2ff]/10 border border-[#00f2ff]/40 text-[#00f2ff] text-[8px] font-black uppercase tracking-[0.3em] tactic-clip hover:bg-[#00f2ff]/20 transition-all flex items-center justify-center gap-2">
+              <Fingerprint className="w-3 h-3" />
+              Capture_Bio_Scan
+            </button>
+          </div>
+        </DoubleBorderPanel>
+      </div>
+
+      <div className="grid grid-cols-12 gap-4 h-2/5 min-h-0">
+        {/* TARGET PROFILES (EXPEDIENTES) */}
+        <DoubleBorderPanel title="[ TARGET_PROFILES ]" className="col-span-8">
+          <div className="flex-1 overflow-x-auto terminal-scroll flex gap-4 p-1">
+            {targets.map((target, i) => (
+              <motion.div 
+                key={i}
+                whileHover={{ scale: 1.02 }}
+                className="w-64 h-full border border-[#00f2ff]/20 bg-[#00f2ff]/5 p-3 flex flex-col gap-3 shrink-0 group relative overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                <div className="flex gap-4 relative z-10">
+                  <div className="w-20 h-20 border border-[#00f2ff]/40 bg-black overflow-hidden relative">
+                    <img src={target.img} alt={target.name} className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity" />
+                    <div className="absolute top-0 right-0 p-0.5 bg-[#f43f5e] text-white text-[5px] font-black">RIP_01</div>
+                  </div>
+                  <div className="flex-1 flex flex-col justify-center">
+                    <span className="text-[10px] font-black text-[#00f2ff] tracking-tight">{target.name}</span>
+                    <span className="text-[6px] opacity-40 uppercase">{target.job}</span>
+                    <span className={`text-[7px] font-black mt-2 ${target.risk === 'CRITICAL' ? 'text-[#f43f5e]' : 'text-amber-400'}`}>
+                      [{target.risk}_RISK]
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-auto space-y-1 relative z-10">
+                  <div className="flex justify-between text-[6px] opacity-40 uppercase">
+                    <span>Appearances</span>
+                    <span>{target.appearances}</span>
+                  </div>
+                  <div className="h-0.5 bg-[#00f2ff]/10 w-full">
+                    <motion.div initial={{ width: 0 }} animate={{ width: `${(target.appearances / 15) * 100}%` }} className="h-full bg-[#00f2ff]" />
+                  </div>
+                  <button className="w-full mt-2 py-1 text-[6px] font-black uppercase tracking-widest border border-[#00f2ff]/20 hover:bg-[#00f2ff]/10 transition-all">
+                    View_Full_Expedient
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </DoubleBorderPanel>
+
+        {/* SECURITY AUDIT LOG */}
+        <DoubleBorderPanel title="[ SECURITY_AUDIT_LOG ]" className="col-span-4 bg-black/60" isAccent>
+          <div className="flex-1 overflow-y-auto terminal-scroll p-2 space-y-1">
+            <div className="text-[6px] font-bold text-[#f43f5e] flex gap-2">
+              <span className="opacity-40">[02:14:55]</span>
+              <span className="font-black uppercase">AUDIT:</span>
+              <span className="opacity-80">OPERATOR ADMIN_PRIME ACTIVATED PURGE_PROTOCOL</span>
+            </div>
+            <div className="text-[6px] font-bold text-amber-500 flex gap-2">
+              <span className="opacity-40">[05:22:10]</span>
+              <span className="font-black uppercase">AUTH_WARN:</span>
+              <span className="opacity-80">FAILED LOGIN ATTEMPT FROM IP 192.168.1.1</span>
+            </div>
+            <div className="text-[6px] font-bold text-[#00f2ff] flex gap-2">
+              <span className="opacity-40">[06:01:44]</span>
+              <span className="font-black uppercase">SEC:</span>
+              <span className="opacity-80">ROTATING ENCRYPTION KEYS ACROSS SECTOR 7</span>
+            </div>
+            {Array.from({ length: 15 }).map((_, i) => (
+              <div key={i} className="text-[6px] text-white/20 flex gap-2">
+                <span className="opacity-20">[{Math.floor(Math.random()*24)}:00:00]</span>
+                <span className="uppercase">INFO: System_Check_Pass // OK</span>
+              </div>
+            ))}
+          </div>
+        </DoubleBorderPanel>
+      </div>
+    </div>
+  );
+}
 
 function CountermeasuresModule() {
   const [impact, setImpact] = useState(42);
@@ -423,3 +609,4 @@ function SystemLogsModule() {
     </DoubleBorderPanel>
   );
 }
+
