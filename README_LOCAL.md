@@ -1,9 +1,10 @@
+
 # Aegis Tactical Grid - Manual de Operación Frontend
 
 Este manual te guiará para gestionar tu repositorio de GitHub y desplegar la versión 100% Frontend en Replit.
 
 ## 🚀 Migración a Replit (Solo Frontend)
-El sistema ha sido optimizado para funcionar de forma autónoma. No necesitas configurar servidores externos.
+El sistema ha sido optimizado para funcionar de forma autónoma. No necesitas configurar servidores de Go o Python.
 
 1. **Importar desde GitHub**: 
    - En Replit, selecciona "Import from GitHub".
@@ -12,15 +13,15 @@ El sistema ha sido optimizado para funcionar de forma autónoma. No necesitas co
    - Ve a **Tools > Secrets**.
    - Añade `GOOGLE_GENAI_API_KEY` con tu llave de Google AI Studio.
 3. **Ejecutar**:
-   - Pulsa **Run**. Replit instalará las dependencias y lanzará el sistema en `http://localhost:9002`.
+   - Pulsa **Run**. Replit instalará las dependencias y lanzará el sistema.
 
 ---
 
-## 📂 Estructura del Sistema Unificado
-El proyecto ahora reside completamente en la arquitectura de Next.js:
+## 📂 Estructura del Sistema Unificado (Frontend Only)
+El proyecto reside completamente en la arquitectura de Next.js:
 
 - **`/src/app`**: Rutas, acciones del servidor y estilos globales.
-- **`/src/components/cyber-grid`**: Todos los módulos visuales, dashboards y lógica de simulación.
+- **`/src/components/cyber-grid`**: Todos los módulos visuales y dashboards.
 - **`/src/ai`**: Motores de Inteligencia Artificial (Genkit) integrados.
 
 ---
