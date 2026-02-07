@@ -12,7 +12,8 @@ import {
   Shield, Crosshair, Zap, Trash2, Brain, 
   Terminal, Globe, Lock, Cpu, ArrowLeft,
   ChevronRight, Activity, AlertCircle, Database,
-  Settings, Wifi, Radio, Server, MessageSquare, List
+  Settings, Wifi, Radio, Server, MessageSquare, List,
+  Undo2
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
@@ -64,8 +65,8 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
   );
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#010409] text-[#00f2ff] p-4 flex gap-4 font-mono animate-interference relative">
-      <div className="scanline-effect opacity-20 pointer-events-none" />
+    <div className="w-screen h-screen overflow-hidden bg-[#010409] text-[#00f2ff] p-4 flex gap-4 font-mono relative">
+      <div className="scanline-effect opacity-10 pointer-events-none" />
       <div className="vignette" />
 
       {/* MENÚ LATERAL TÁCTICO (18%) */}
@@ -78,22 +79,25 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
           </div>
         </DoubleBorderPanel>
 
-        <DoubleBorderPanel className="flex-1 p-0 overflow-hidden">
-          <div className="flex flex-col h-full">
-            <div className="px-4 py-2 border-b border-[#00f2ff]/10 text-[7px] opacity-30 uppercase tracking-widest">Navigation_Interface</div>
-            <div className="flex-1 py-2">
-              <NavButton type="RECONNAISSANCE" icon={Globe} label="[ Reconnaissance ]" />
-              <NavButton type="COUNTERMEASURES" icon={Crosshair} label="[ Countermeasures ]" />
-              <NavButton type="DATA_PURGE" icon={Trash2} label="[ Data Purge ]" />
-              <NavButton type="AI_ADVISOR" icon={Brain} label="[ AI Advisor ]" />
-              <NavButton type="SYSTEM_LOGS" icon={List} label="[ System Logs ]" />
-            </div>
+        <DoubleBorderPanel className="flex-1 p-0 overflow-hidden flex flex-col">
+          <div className="px-4 py-2 border-b border-[#00f2ff]/10 text-[7px] opacity-30 uppercase tracking-widest">Navigation_Interface</div>
+          
+          <nav className="flex-1 py-1 overflow-y-auto terminal-scroll">
+            <NavButton type="RECONNAISSANCE" icon={Globe} label="[ Reconnaissance ]" />
+            <NavButton type="COUNTERMEASURES" icon={Crosshair} label="[ Countermeasures ]" />
+            <NavButton type="DATA_PURGE" icon={Trash2} label="[ Data Purge ]" />
+            <NavButton type="AI_ADVISOR" icon={Brain} label="[ AI Advisor ]" />
+            <NavButton type="SYSTEM_LOGS" icon={List} label="[ System Logs ]" />
+          </nav>
+
+          <div className="mt-auto border-t border-[#00f2ff]/10 p-2 bg-[#00f2ff]/5">
             <button 
               onClick={onBack}
-              className="mt-auto flex items-center gap-2 px-4 py-4 text-[9px] font-bold text-[#f43f5e] uppercase border-t border-[#f43f5e]/20 hover:bg-[#f43f5e]/10 transition-colors"
+              className="w-full flex items-center justify-center gap-3 py-3 text-[10px] font-bold text-[#00f2ff] uppercase border border-[#00f2ff]/30 hover:bg-[#00f2ff]/20 transition-all group overflow-hidden relative"
             >
-              <ArrowLeft className="w-3 h-3" />
-              <span>[ Return_to_HUD ]</span>
+              <Undo2 className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <span>[ Back_to_HUD ]</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </button>
           </div>
         </DoubleBorderPanel>
@@ -104,7 +108,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
         <header className="flex justify-between items-center px-2">
           <div className="flex items-center gap-4">
             <div className="h-4 w-1 bg-amber-500 animate-pulse" />
-            <h2 className="text-xl font-black tracking-tighter uppercase">{activeModule} // CORE_ACCESS</h2>
+            <h2 className="text-xl font-black tracking-tighter uppercase">{activeModule.replace('_', ' ')} // CORE_ACCESS</h2>
           </div>
           <div className="flex gap-4 text-[7px] uppercase tracking-widest opacity-40">
             <span>Uptime: 48:12:09</span>
@@ -117,10 +121,10 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeModule}
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
               className="w-full h-full flex flex-col gap-4"
             >
               {activeModule === 'RECONNAISSANCE' && <ReconModule />}
@@ -171,7 +175,7 @@ function ReconModule() {
       <div className="flex flex-col gap-4">
         <DoubleBorderPanel title="TRAFFIC_STREAM" className="flex-1">
           <div className="p-2 overflow-hidden flex flex-col gap-1">
-            {Array.from({ length: 15 }).map((_, i) => (
+            {Array.from({ length: 25 }).map((_, i) => (
               <div key={i} className="text-[6px] font-mono whitespace-nowrap opacity-50 overflow-hidden">
                 <span className="text-[#00f2ff] mr-2">{`>>`}</span>
                 {`PKT_DATA_0x${Math.random().toString(16).slice(2, 10).toUpperCase()} [INBOUND_VERIFIED]`}
@@ -181,7 +185,7 @@ function ReconModule() {
         </DoubleBorderPanel>
         <DoubleBorderPanel title="SIGNAL_STRENGTH" className="h-40">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={Array.from({ length: 10 }, (_, i) => ({ val: 20 + Math.random() * 80 }))}>
+            <AreaChart data={Array.from({ length: 15 }, (_, i) => ({ val: 20 + Math.random() * 80 }))}>
               <Area type="step" dataKey="val" stroke="#00f2ff" fill="#00f2ff" fillOpacity={0.1} />
             </AreaChart>
           </ResponsiveContainer>
@@ -287,7 +291,7 @@ function DataPurgeModule() {
         
         <DoubleBorderPanel title="FILES_BEING_SHREDDED" className="w-1/3">
           <div className="p-2 space-y-1 overflow-hidden h-full">
-            {purging && Array.from({ length: 20 }).map((_, i) => (
+            {purging && Array.from({ length: 30 }).map((_, i) => (
               <div key={i} className="text-[6px] font-mono text-[#f43f5e] opacity-60">
                 [DELETE] {Math.random().toString(36).substring(7)}.mil_spec
               </div>
@@ -367,7 +371,7 @@ function SystemLogsModule() {
         <button className="px-4 py-1 border border-white/10 text-[8px] font-bold uppercase opacity-40">Network</button>
       </div>
       <div className="flex-1 overflow-y-auto terminal-scroll p-4 font-mono text-[9px] leading-tight space-y-1">
-        {Array.from({ length: 40 }).map((_, i) => (
+        {Array.from({ length: 60 }).map((_, i) => (
           <div key={i} className="flex gap-4 group hover:bg-[#00f2ff]/5 transition-colors">
             <span className="opacity-20">[{new Date().toISOString().slice(11, 19)}]</span>
             <span className="text-[#00f2ff] font-bold">AEGIS_SEC:</span>
