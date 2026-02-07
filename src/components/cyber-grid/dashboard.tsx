@@ -137,7 +137,6 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
 
       setChatHistory(prev => [...prev, aiMsg]);
       
-      // TTS
       if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance(aiMsg.text);
         utterance.rate = 1.1;
@@ -164,7 +163,7 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
             <h1 className="text-xs font-black tracking-[0.4em] text-[#00f2ff] glitch-text uppercase leading-none">Aegis Tactical Grid</h1>
             <span className="text-[6px] text-[#00f2ff]/40 tracking-[0.2em] font-bold mt-1 uppercase">OPERATIONAL_MODE: LOCAL_ENCRYPTED // {stats.encryption}</span>
           </div>
-          <div className="hidden lg:flex items-center gap-2 px-2 py-1 border border-[#00f2ff]/20 rounded bg-[#00f2ff]/5">
+          <div className="hidden lg:flex items-center gap-2 px-2 py-1 border border-[#00f2ff]/10 rounded bg-[#00f2ff]/5">
             <Shield className="w-2.5 h-2.5 text-[#00f2ff] animate-pulse" />
             <span className="text-[8px] font-bold tracking-widest uppercase opacity-70">Nodes: {vpns.length} Active</span>
           </div>
@@ -180,27 +179,27 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
-            <div className="flex flex-col items-end min-w-[100px]">
-              <span className="text-[6px] opacity-40 uppercase tracking-widest mb-0.5">System_Time_UTC</span>
-              <span className="text-[10px] font-bold tracking-[0.1em] font-mono whitespace-nowrap">{time || "--:--:--:---"}</span>
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col items-end">
+              <span className="text-[6px] opacity-40 uppercase tracking-widest mb-0.5">UTC_CLOCK</span>
+              <span className="text-[9px] font-bold tracking-[0.1em] font-mono whitespace-nowrap">{time.split(':').slice(0, 3).join(':') || "--:--:--"}</span>
             </div>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center justify-center w-8 h-8 rounded border border-[#00f2ff]/20 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/20 transition-all group">
-                  <User className="w-4 h-4 text-[#00f2ff] group-hover:scale-110 transition-transform" />
+                <button className="flex items-center justify-center w-7 h-7 rounded-sm border border-[#00f2ff]/10 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/20 hover:border-[#00f2ff]/30 transition-all group outline-none">
+                  <User className="w-3 h-3 text-[#00f2ff]/60 group-hover:text-[#00f2ff] transition-colors" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#050b1a]/95 border-[#00f2ff]/30 text-[#00f2ff] font-mono text-[8px] uppercase tracking-widest min-w-[160px] backdrop-blur-xl shadow-[0_0_30px_rgba(0,242,255,0.2)] rounded-none">
-                <DropdownMenuItem className="focus:bg-[#00f2ff]/10 focus:text-[#00f2ff] cursor-pointer py-2 group">
-                  <Settings className="w-3 h-3 mr-2 group-hover:rotate-90 transition-transform" /> 
-                  Configuración_Sistema
+              <DropdownMenuContent className="bg-[#050b1a]/98 border-[#00f2ff]/20 text-[#00f2ff] font-mono text-[7px] uppercase tracking-widest min-w-[130px] backdrop-blur-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)] rounded-none p-1">
+                <DropdownMenuItem className="focus:bg-[#00f2ff]/10 focus:text-[#00f2ff] cursor-pointer py-1.5 group outline-none">
+                  <Settings className="w-2.5 h-2.5 mr-2 group-hover:rotate-45 transition-transform opacity-60" /> 
+                  Config_Core
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-[#00f2ff]/20" />
-                <DropdownMenuItem onClick={onLogout} className="focus:bg-[#f43f5e]/20 focus:text-[#f43f5e] text-[#f43f5e]/80 cursor-pointer py-2">
-                  <LogOut className="w-3 h-3 mr-2" /> 
-                  Cerrar_Sesión_Táctica
+                <DropdownMenuSeparator className="bg-[#00f2ff]/10 my-1" />
+                <DropdownMenuItem onClick={onLogout} className="focus:bg-[#f43f5e]/10 focus:text-[#f43f5e] text-[#f43f5e]/60 cursor-pointer py-1.5 outline-none">
+                  <LogOut className="w-2.5 h-2.5 mr-2" /> 
+                  End_Session
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -309,7 +308,7 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
                 {isAILoading && (
                   <div className="flex items-center gap-2 text-[#00f2ff]/40">
                     <Loader2 className="w-3 h-3 animate-spin" />
-                    <span className="text-[6px] uppercase animate-pulse">Procesando_Respuesta...</span>
+                    <span className="text-[6px] uppercase animate-pulse">Procesando...</span>
                   </div>
                 )}
                 <div ref={chatEndRef} />
@@ -318,21 +317,17 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
               <form onSubmit={handleSendMessage} className="p-1 border-t border-[#00f2ff]/10 bg-black/60 flex items-center gap-1">
                 <div className="flex gap-1">
                   <button type="button" className="p-1 text-[#00f2ff]/40 hover:text-[#00f2ff] transition-colors">
-                    <Mic className="w-3 h-3" />
-                  </button>
-                  <button type="button" className="p-1 text-[#00f2ff]/40 hover:text-[#00f2ff] transition-colors">
-                    <Volume2 className="w-3 h-3" />
+                    <Mic className="w-2.5 h-2.5" />
                   </button>
                 </div>
                 <div className="flex-1 relative flex items-center">
-                  <Command className="absolute left-1 w-2.5 h-2.5 text-[#00f2ff]/20" />
                   <input 
                     type="text"
                     value={chatInput}
                     disabled={isAILoading}
                     onChange={(e) => setChatInput(e.target.value)}
-                    placeholder={isAILoading ? "SISTEMA_OCUPADO..." : "COMMAND_PROMPT..."}
-                    className="w-full bg-transparent border-none focus:ring-0 text-[7px] text-[#00f2ff] font-mono pl-4 placeholder:text-[#00f2ff]/10 disabled:opacity-50"
+                    placeholder={isAILoading ? "WAIT..." : "CMD..."}
+                    className="w-full bg-transparent border-none focus:ring-0 text-[7px] text-[#00f2ff] font-mono p-1 placeholder:text-[#00f2ff]/10 disabled:opacity-50"
                   />
                 </div>
                 <button 
@@ -340,7 +335,7 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
                   disabled={isAILoading || !chatInput.trim()} 
                   className="p-1 text-[#00f2ff] hover:scale-110 transition-transform disabled:opacity-30"
                 >
-                  <Send className="w-3 h-3" />
+                  <Send className="w-2.5 h-2.5" />
                 </button>
               </form>
             </TacticalPanel>
@@ -377,13 +372,13 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
           </TacticalPanel>
 
           <TacticalPanel title="ENCRYPTION_CONTROL" className="flex-[3]">
-            <div className="p-3 flex flex-col h-full bg-[#00f2ff]/2 gap-3">
-              <div className="space-y-1.5">
+            <div className="p-3 flex flex-col h-full bg-[#00f2ff]/2 gap-2">
+              <div className="space-y-1">
                 <div className="flex justify-between text-[7px] uppercase font-bold tracking-widest">
-                  <span className="opacity-40">Integrity_Link</span>
+                  <span className="opacity-40">Integrity</span>
                   <span className="text-[#00f2ff]">98.2%</span>
                 </div>
-                <div className="h-1 bg-white/5 w-full relative overflow-hidden rounded-full">
+                <div className="h-0.5 bg-white/5 w-full relative overflow-hidden rounded-full">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: '98.2%' }}
@@ -392,27 +387,23 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
                 </div>
               </div>
 
-              <div className="flex-1 space-y-1.5">
-                <div className="flex items-center justify-between p-1 border border-[#00f2ff]/10 bg-black/40 rounded">
-                  <span className="text-[8px] font-bold opacity-60">AES-256 Auth</span>
-                  <Lock className="w-2.5 h-2.5 text-[#00f2ff]/40" />
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center justify-between px-1.5 py-1 border border-[#00f2ff]/10 bg-black/40 rounded-sm">
+                  <span className="text-[7px] font-bold opacity-50 uppercase">AES-256</span>
+                  <Lock className="w-2 h-2 text-[#00f2ff]/30" />
                 </div>
-                <div className="flex items-center justify-between p-1 border border-[#00f2ff]/10 bg-black/40 rounded">
-                  <span className="text-[8px] font-bold opacity-60">Handshake</span>
-                  <span className="text-[8px] font-mono text-[#00f2ff]/80">0.8ms</span>
+                <div className="flex items-center justify-between px-1.5 py-1 border border-[#00f2ff]/10 bg-black/40 rounded-sm">
+                  <span className="text-[7px] font-bold opacity-50 uppercase">Handshake</span>
+                  <span className="text-[7px] font-mono text-[#00f2ff]/80">0.8ms</span>
                 </div>
               </div>
 
-              <div className="space-y-2 mt-auto">
-                <button className="w-full py-1.5 border border-[#00f2ff]/20 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/10 text-[7px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent via-[#00f2ff]/10 to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000" />
-                  <RefreshCw className="w-2.5 h-2.5 group-hover:rotate-180 transition-transform duration-500" />
-                  Reboot_Tunnel
+              <div className="grid grid-cols-2 gap-2 mt-auto">
+                <button className="py-1 border border-[#00f2ff]/20 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/10 text-[6px] font-bold uppercase tracking-widest transition-all">
+                  Reboot
                 </button>
-                <button className="w-full py-1.5 border border-[#f43f5e]/30 bg-[#f43f5e]/10 hover:bg-[#f43f5e]/20 text-[#f43f5e] text-[7px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-transparent via-[#f43f5e]/20 to-transparent -translate-y-full group-hover:translate-y-full transition-transform duration-1000" />
-                  <AlertTriangle className="w-2.5 h-2.5 animate-pulse" />
-                  Emergency_Purge
+                <button className="py-1 border border-[#f43f5e]/30 bg-[#f43f5e]/10 hover:bg-[#f43f5e]/20 text-[#f43f5e] text-[6px] font-bold uppercase tracking-widest transition-all">
+                  Purge
                 </button>
               </div>
             </div>
