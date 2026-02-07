@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -107,6 +106,8 @@ export default function AegisUltimateDashboard() {
     };
   }, []);
 
+  if (!mounted) return <div className="bg-[#020617] w-screen h-screen" />;
+
   return (
     <div className="relative w-screen h-screen flex flex-col p-4 dot-matrix overflow-hidden bg-[#020617] text-[#00f2ff]">
       <div className="scanline-effect opacity-30" />
@@ -136,7 +137,7 @@ export default function AegisUltimateDashboard() {
           <div className="flex flex-col items-end">
             <span className="text-[8px] opacity-40 uppercase tracking-widest mb-1">System_Time_UTC</span>
             <span className="text-sm font-bold tracking-[0.2em] font-mono">
-              {mounted && time ? time.toLocaleTimeString('en-GB', { hour12: false }) : "--:--:--"}
+              {time ? time.toLocaleTimeString('en-GB', { hour12: false }) : "--:--:--"}
             </span>
           </div>
         </div>
@@ -252,9 +253,9 @@ export default function AegisUltimateDashboard() {
           </TacticalPanel>
 
           <TacticalPanel title="ENCRYPTION_CONTROL" className="flex-[3]">
-            <div className="p-4 flex flex-col justify-between h-full bg-[#00f2ff]/2 overflow-y-auto terminal-scroll">
-              <div className="space-y-4">
-                <div className="space-y-1.5">
+            <div className="p-3 flex flex-col justify-between h-full bg-[#00f2ff]/2 overflow-y-auto terminal-scroll">
+              <div className="space-y-3">
+                <div className="space-y-1">
                   <div className="flex justify-between text-[7px] uppercase tracking-widest font-bold">
                     <span className="opacity-50">Ciphers_Integrity</span>
                     <span className="text-[#00f2ff]">VALIDATED 100%</span>
@@ -264,31 +265,31 @@ export default function AegisUltimateDashboard() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-1.5">
                   <div className="p-2 border border-[#00f2ff]/10 bg-black/40 rounded flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-[6px] opacity-40 uppercase">Latency_Handshake</span>
-                      <span className="text-[10px] font-bold tracking-tight">1.8 ms</span>
+                      <span className="text-[9px] font-bold tracking-tight">1.8 ms</span>
                     </div>
                     <Activity className="w-3 h-3 text-[#00f2ff]/40" />
                   </div>
                   <div className="p-2 border border-[#00f2ff]/10 bg-black/40 rounded flex items-center justify-between">
                     <div className="flex flex-col">
                       <span className="text-[6px] opacity-40 uppercase">Active_Tunnels</span>
-                      <span className="text-[10px] font-bold tracking-tight">{vpns.length} / 12</span>
+                      <span className="text-[9px] font-bold tracking-tight">{vpns.length} / 12</span>
                     </div>
                     <Radio className="w-3 h-3 text-[#00f2ff]/40" />
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-2 mt-4">
-                <button className="w-full py-2.5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/20 text-[9px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 group relative overflow-hidden rounded">
-                  <RefreshCw className="w-2.5 h-2.5 group-hover:rotate-180 transition-transform duration-500" />
+              <div className="space-y-1.5 mt-3">
+                <button className="w-full py-2 border border-[#00f2ff]/30 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/20 text-[8px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group relative overflow-hidden rounded">
+                  <RefreshCw className="w-2 h-2 group-hover:rotate-180 transition-transform duration-500" />
                   Rotate_Ciphers
                 </button>
-                <button className="w-full py-2.5 border border-[#f43f5e]/50 bg-[#f43f5e]/10 hover:bg-[#f43f5e]/30 text-[#f43f5e] text-[9px] font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 group overflow-hidden rounded">
-                  <AlertTriangle className="w-2.5 h-2.5 animate-pulse" />
+                <button className="w-full py-2 border border-[#f43f5e]/50 bg-[#f43f5e]/10 hover:bg-[#f43f5e]/30 text-[#f43f5e] text-[8px] font-bold uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group overflow-hidden rounded">
+                  <AlertTriangle className="w-2 h-2 animate-pulse" />
                   Purge_All_Tunnels
                 </button>
               </div>

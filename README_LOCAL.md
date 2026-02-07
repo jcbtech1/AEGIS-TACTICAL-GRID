@@ -1,24 +1,54 @@
+# Aegis Tactical Grid - Guía de Ejecución Local y GitHub
 
-# Aegis Tactical Grid - Guía de Ejecución Local
+Este proyecto es una consola de ciberseguridad avanzada distribuida.
 
-Este proyecto está diseñado para funcionar como un sistema distribuido:
+## 1. Requisitos Previos
+- Node.js v18+
+- Go 1.20+
+- Python 3.9+ con `pip`
 
-## 1. Frontend (React/Next.js)
-Ya está configurado para conectarse a `ws://localhost:8080/ws`.
-- Ejecuta: `npm install` y luego `npm run dev`.
+## 2. Preparación del Entorno Local
 
-## 2. Backend de Captura (Go)
+### Frontend (Next.js)
+```bash
+npm install
+npm run dev
+```
+La interfaz estará disponible en `http://localhost:3000`.
+
+### Backend de Red (Go)
 Ubicación: `src/backend/go/main.go`
-- Requiere Go instalado.
-- Instala dependencias: `go get github.com/gorilla/websocket`.
-- Ejecuta: `go run main.go`.
-- Este servidor enviará los datos de tráfico y logs a la UI.
+```bash
+go get github.com/gorilla/websocket
+go run src/backend/go/main.go
+```
 
-## 3. Backend de Inteligencia (Python)
+### Inteligencia Artificial (Python)
 Ubicación: `src/backend/python/intelligence.py`
-- Requiere Python 3.x y OpenCV.
-- Instala dependencias: `pip install opencv-python requests`.
-- Ejecuta: `python intelligence.py`.
+```bash
+pip install opencv-python requests
+python src/backend/python/intelligence.py
+```
 
-## 4. Comunicación (gRPC)
-Para producción, utiliza el archivo `aegis.proto` (que debes crear según tus necesidades) para generar los stubs de comunicación entre Go y Python.
+## 3. Subir a GitHub
+
+Para subir este proyecto a tu propio repositorio de GitHub, sigue estos pasos desde la terminal de tu proyecto local:
+
+1. **Crea un repositorio vacío** en GitHub.com.
+2. **Inicializa Git localmente**:
+   ```bash
+   git init
+   git add .
+   git commit -m "Initial commit: Aegis Tactical Grid Core"
+   ```
+3. **Vincula tu repositorio**:
+   ```bash
+   git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+## 4. Arquitectura
+- **Frontend**: React + Tailwind + Recharts + Framer Motion.
+- **Backend Core**: Go (WebSockets para streaming de datos de red).
+- **IA Core**: Python (Análisis de patrones y reconocimiento).

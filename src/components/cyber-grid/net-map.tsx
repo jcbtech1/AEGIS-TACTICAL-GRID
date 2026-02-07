@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -14,13 +13,13 @@ const nodes = [
 ];
 
 const connections = [
-  { from: 1, to: 6 },
-  { from: 2, to: 6 },
-  { from: 3, to: 6 },
-  { from: 4, to: 6 },
-  { from: 5, to: 6 },
-  { from: 1, to: 2 },
-  { from: 4, to: 3 },
+  { from: 1, to: 6, duration: 2.5 },
+  { from: 2, to: 6, duration: 3.1 },
+  { from: 3, to: 6, duration: 2.8 },
+  { from: 4, to: 6, duration: 3.5 },
+  { from: 5, to: 6, duration: 2.2 },
+  { from: 1, to: 2, duration: 4.0 },
+  { from: 4, to: 3, duration: 3.8 },
 ];
 
 export default function NetMap() {
@@ -49,13 +48,12 @@ export default function NetMap() {
               <motion.circle
                 r="1.5"
                 fill="#00f2ff"
-                initial={{ offsetDistance: "0%" }}
                 animate={{ 
                   cx: [from.x, to.x],
                   cy: [from.y, to.y]
                 }}
                 transition={{ 
-                  duration: 2 + (i % 3), // Usamos 'i' en lugar de random para evitar hidratación
+                  duration: conn.duration,
                   repeat: Infinity, 
                   ease: "linear" 
                 }}
@@ -74,7 +72,6 @@ export default function NetMap() {
               fill={node.type === 'core' ? '#00f2ff' : 'transparent'}
               stroke="#00f2ff"
               strokeWidth="1"
-              initial={{ opacity: 0.5 }}
               animate={{ opacity: [0.3, 1, 0.3], r: node.type === 'core' ? [6, 8, 6] : undefined }}
               transition={{ duration: 3, repeat: Infinity }}
             />
