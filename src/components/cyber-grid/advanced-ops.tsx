@@ -18,7 +18,7 @@ import {
   Undo2, Syringe, Power, LayoutGrid, HardDrive, Eye,
   UserPlus, Users, Fingerprint, Camera, ShieldCheck,
   FileSearch, History, Search, Radar, FolderLock, 
-  ZapOff, Ghost, Siren
+  ZapOff, Ghost, Siren, Key
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import VisualScanModule from './visual-scan';
