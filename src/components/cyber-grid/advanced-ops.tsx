@@ -17,13 +17,14 @@ import {
   Settings, Wifi, Radio, Server, MessageSquare, List,
   Undo2, Syringe, Power, LayoutGrid, HardDrive, Eye,
   UserPlus, Users, Fingerprint, Camera, ShieldCheck,
-  FileSearch, History, Search
+  FileSearch, History, Search, Radar, FolderLock, 
+  ZapOff, Ghost, Siren
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import VisualScanModule from './visual-scan';
 import { useToast } from "@/hooks/use-toast";
 
-type ModuleType = 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS' | 'SECURITY_MANAGEMENT';
+type ModuleType = 'STRATEGIC_INTELLIGENCE' | 'SECURITY_MANAGEMENT' | 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS';
 
 interface AdvancedOpsProps {
   onBack: () => void;
@@ -44,7 +45,7 @@ const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }
 );
 
 export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
-  const [activeModule, setActiveModule] = useState<ModuleType>('SECURITY_MANAGEMENT');
+  const [activeModule, setActiveModule] = useState<ModuleType>('STRATEGIC_INTELLIGENCE');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
   );
 
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#020814] text-[#00f2ff] p-4 flex gap-6 font-mono relative box-border">
+    <div className="w-screen h-screen overflow-hidden bg-[#000508] text-[#00f2ff] p-4 flex gap-6 font-mono relative box-border">
       <div className="scanline-effect opacity-5 pointer-events-none" />
       <div className="vignette" />
 
@@ -90,6 +91,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
         <DoubleBorderPanel className="flex-1 p-0 flex flex-col">
           <nav className="flex-1 py-2 overflow-y-auto terminal-scroll">
             <div className="px-4 py-2 text-[6px] text-[#00f2ff]/20 uppercase tracking-[0.3em]">Operational_Modules</div>
+            <NavButton type="STRATEGIC_INTELLIGENCE" label="STRATEGIC_INTEL" icon={Radar} />
             <NavButton type="SECURITY_MANAGEMENT" label="SECURITY_MGMT" icon={ShieldCheck} />
             <NavButton type="RECONNAISSANCE" label="RECON_GRID" icon={Globe} />
             <NavButton type="VISUAL_SCAN" label="VISUAL_SCAN" icon={Eye} />
@@ -134,6 +136,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
               transition={{ duration: 0.2, ease: "easeOut" }}
               className="w-full h-full flex flex-col min-h-0"
             >
+              {activeModule === 'STRATEGIC_INTELLIGENCE' && <StrategicIntelligenceModule />}
               {activeModule === 'SECURITY_MANAGEMENT' && <SecurityManagementModule />}
               {activeModule === 'RECONNAISSANCE' && <ReconModule />}
               {activeModule === 'VISUAL_SCAN' && <VisualScanModule />}
@@ -145,6 +148,181 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
           </AnimatePresence>
         </section>
       </main>
+    </div>
+  );
+}
+
+// --- MÓDULO STRATEGIC INTELLIGENCE ---
+
+function StrategicIntelligenceModule() {
+  const [kernelHealth, setKernelHealth] = useState(85);
+  const [attackSync, setAttackSync] = useState({ deauth: 0, enc: 0, jam: 0, ghost: 0 });
+  const [isGlitching, setIsGlitching] = useState(false);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setKernelHealth(prev => {
+        const next = prev + (Math.random() - 0.55) * 2;
+        const clamped = Math.max(0, Math.min(100, next));
+        setIsGlitching(clamped < 50);
+        return clamped;
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const startAttack = (key: keyof typeof attackSync) => {
+    setAttackSync(prev => ({ ...prev, [key]: 1 }));
+    const timer = setInterval(() => {
+      setAttackSync(prev => {
+        if (prev[key] >= 100) {
+          clearInterval(timer);
+          return { ...prev, [key]: 100 };
+        }
+        return { ...prev, [key]: prev[key] + 5 };
+      });
+    }, 100);
+  };
+
+  return (
+    <div className={`flex flex-col h-full gap-4 min-h-0 overflow-hidden relative ${isGlitching ? 'animate-interference' : ''}`}>
+      {isGlitching && (
+        <div className="absolute inset-0 bg-[#ff0055]/5 z-50 pointer-events-none animate-pulse" />
+      )}
+
+      <div className="grid grid-cols-12 gap-4 flex-[3] min-h-0">
+        {/* TACTICAL 3D MAP */}
+        <DoubleBorderPanel title="[ TACTICAL_GEO_INTEL ]" className="col-span-8 bg-[#000508]/60">
+          <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
+            <svg viewBox="0 0 800 400" className="w-full h-full opacity-40">
+              <path d="M 50 350 L 750 350" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="5 5" />
+              {/* Arcos de conexión */}
+              <motion.path 
+                d="M 100 350 Q 400 50 700 350" 
+                fill="none" 
+                stroke="#ff0055" 
+                strokeWidth="1"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 3, repeat: Infinity }}
+              />
+              <motion.path 
+                d="M 200 350 Q 400 150 600 350" 
+                fill="none" 
+                stroke="#00f2ff" 
+                strokeWidth="1"
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+              />
+              {/* Nodos */}
+              <circle cx="100" cy="350" r="4" fill="#00f2ff" />
+              <circle cx="700" cy="350" r="4" fill="#ff0055" className="animate-ping" />
+              <circle cx="200" cy="350" r="3" fill="#00f2ff" />
+              <circle cx="600" cy="350" r="3" fill="#00f2ff" />
+            </svg>
+            <div className="absolute top-4 right-4 bg-black/80 border border-[#ff0055]/40 p-3 flex flex-col gap-1 backdrop-blur-md">
+              <span className="text-[6px] text-[#ff0055] font-black uppercase tracking-[0.3em]">Attacker_Coord</span>
+              <span className="text-[10px] font-mono text-white tracking-tighter">LAT: 34.0522 N</span>
+              <span className="text-[10px] font-mono text-white tracking-tighter">LON: 118.2437 W</span>
+              <span className="text-[7px] text-[#00f2ff] font-bold mt-1">ISP: CLOUD_SHIELD_V4</span>
+            </div>
+            <div className="absolute bottom-4 left-4 flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-[#ff0055] animate-pulse" />
+                <span className="text-[8px] font-black uppercase text-[#ff0055]">Intrusion_Vector_Detected</span>
+              </div>
+            </div>
+          </div>
+        </DoubleBorderPanel>
+
+        {/* KERNEL HEALTH & CRISIS MONITOR */}
+        <div className="col-span-4 flex flex-col gap-4">
+          <DoubleBorderPanel title="[ KERNEL_INTEGRITY ]" className="flex-1 flex flex-col items-center justify-center gap-4">
+            <div className="relative w-32 h-32">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle cx="64" cy="64" r="50" stroke="currentColor" strokeWidth="4" fill="transparent" className="text-[#00f2ff]/10" />
+                <motion.circle 
+                  cx="64" cy="64" r="50" 
+                  stroke="currentColor" strokeWidth="4" 
+                  fill="transparent" 
+                  strokeDasharray="314.159"
+                  animate={{ strokeDashoffset: 314.159 - (314.159 * kernelHealth / 100) }}
+                  className={`${kernelHealth < 50 ? 'text-[#ff0055]' : 'text-[#00f2ff]'}`}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className={`text-2xl font-black ${kernelHealth < 50 ? 'text-[#ff0055] animate-pulse' : 'text-[#00f2ff]'}`}>
+                  {kernelHealth.toFixed(0)}%
+                </span>
+                <span className="text-[6px] opacity-40 uppercase tracking-[0.3em]">Stability</span>
+              </div>
+            </div>
+            <div className="text-center space-y-1">
+              <span className={`text-[8px] font-black uppercase tracking-widest ${kernelHealth < 50 ? 'text-[#ff0055]' : 'text-[#00f2ff]/60'}`}>
+                {kernelHealth < 50 ? '!! CRISIS_MODE_ACTIVE !!' : 'System_Normal'}
+              </span>
+              <p className="text-[6px] opacity-30 max-w-[150px] leading-tight mx-auto uppercase">
+                Monitoring core kernel frequencies and encryption stability layers.
+              </p>
+            </div>
+          </DoubleBorderPanel>
+
+          <DoubleBorderPanel title="[ OFFENSIVE_SYNC ]" className="flex-1">
+            <div className="space-y-4 p-2">
+              {[
+                { id: 'deauth', label: 'DEAUTH_ATTACK', icon: ZapOff },
+                { id: 'enc', label: 'ENC_OVERRIDE', icon: Key },
+                { id: 'jam', label: 'SIGNAL_JAMMER', icon: Radio },
+                { id: 'ghost', label: 'GHOST_PROTOCOL', icon: Ghost }
+              ].map((btn) => (
+                <div key={btn.id} className="space-y-1">
+                  <div className="flex justify-between items-end">
+                    <span className="text-[7px] font-black text-[#00f2ff]/60">{btn.label}</span>
+                    <span className="text-[7px] font-mono">{attackSync[btn.id as keyof typeof attackSync]}%</span>
+                  </div>
+                  <div className="h-1 bg-black border border-[#00f2ff]/20 overflow-hidden">
+                    <motion.div 
+                      animate={{ width: `${attackSync[btn.id as keyof typeof attackSync]}%` }}
+                      className="h-full bg-[#00f2ff]" 
+                    />
+                  </div>
+                  <button 
+                    onClick={() => startAttack(btn.id as keyof typeof attackSync)}
+                    disabled={attackSync[btn.id as keyof typeof attackSync] > 0}
+                    className="w-full py-1 text-[6px] font-bold uppercase tracking-[0.2em] border border-[#00f2ff]/30 hover:bg-[#00f2ff]/10 disabled:opacity-20 transition-all"
+                  >
+                    Initiate
+                  </button>
+                </div>
+              ))}
+            </div>
+          </DoubleBorderPanel>
+        </div>
+      </div>
+
+      {/* DEEP STORAGE / FILE SYSTEM */}
+      <DoubleBorderPanel title="[ DEEP_STORAGE_EXPLORER ]" className="flex-1 min-h-0 bg-black/60">
+        <div className="flex-1 overflow-x-auto terminal-scroll flex gap-4 p-2">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <motion.div 
+              key={i}
+              whileHover={{ scale: 1.05, borderColor: '#00f2ff' }}
+              className="w-40 h-full border border-[#00f2ff]/10 bg-[#00f2ff]/5 p-2 flex flex-col gap-2 shrink-0 group transition-all"
+            >
+              <div className="aspect-square bg-black border border-[#00f2ff]/20 relative overflow-hidden flex items-center justify-center">
+                <FolderLock className="w-8 h-8 opacity-20 group-hover:opacity-100 group-hover:text-[#00f2ff] transition-all" />
+                <div className="absolute top-1 right-1 px-1 bg-[#00f2ff] text-black text-[5px] font-black uppercase">Encrypted</div>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[8px] font-bold truncate">LOG_SESSION_0x{i}AF.MIL</span>
+                <span className="text-[6px] opacity-40">SIZE: 142.4 KB</span>
+                <span className="text-[5px] text-[#00f2ff]/60 font-mono mt-1">HASH: {Math.random().toString(16).slice(2, 8).toUpperCase()}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </DoubleBorderPanel>
     </div>
   );
 }
@@ -609,4 +787,3 @@ function SystemLogsModule() {
     </DoubleBorderPanel>
   );
 }
-
