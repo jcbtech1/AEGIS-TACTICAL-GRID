@@ -1,11 +1,12 @@
 # Aegis Tactical Grid - Manual de Operación Local
 
-Este proyecto es una consola de ciberseguridad avanzada. Sigue estos pasos para ejecutarlo en tu PC.
+Este proyecto es una consola de ciberseguridad avanzada. Sigue estos pasos para ejecutarlo y gestionarlo en tu PC.
 
-## 1. Requisitos
-- **Node.js v18+**
-- **Go 1.20+**
-- **Python 3.9+** con `pip`
+## 1. Requisitos del Sistema
+- **Node.js v18+**: Para el Frontend (Next.js).
+- **Go 1.20+**: Para el Backend de Red.
+- **Python 3.9+**: Para el Motor de Inteligencia Artificial.
+- **Git**: Para el control de versiones.
 
 ## 2. Ejecución del Sistema
 
@@ -33,19 +34,31 @@ npm run dev
 ```
 *Accede a `http://localhost:9002`*
 
-## 3. Subir a GitHub (Instrucciones para TI)
-Para subir este proyecto a tu propio repositorio de GitHub, ejecuta esto en la terminal de tu PC:
+## 3. Subir el Proyecto a GitHub (Guía Rápida)
 
-1. Crea un repositorio **vacio** en GitHub.
-2. En la carpeta de tu proyecto local:
-```bash
-git init
-git add .
-git commit -m "Build: Aegis Tactical Grid Core"
-git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
-git branch -M main
-git push -u origin main
-```
+Para subir tus archivos actualizados a un repositorio de GitHub, ejecuta estos comandos en la terminal desde la carpeta raíz:
+
+1. **Inicializar Git** (Solo la primera vez):
+   ```bash
+   git init
+   ```
+
+2. **Vincular con GitHub** (Reemplaza la URL con la tuya):
+   ```bash
+   git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+   ```
+
+3. **Subir Cambios**:
+   ```bash
+   git add .
+   git commit -m "Update: Aegis Tactical Grid Core"
+   git branch -M main
+   git push -u origin main
+   ```
+
+## 4. Notas de Seguridad
+- No compartas tu archivo `.env` si contiene claves reales de API.
+- La sesión del terminal se mantiene activa localmente mediante `localStorage`.
 
 ---
 **Desarrollado para Aegis Defense Systems**
