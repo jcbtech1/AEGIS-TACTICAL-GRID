@@ -18,13 +18,14 @@ import {
   Undo2, Syringe, Power, LayoutGrid, HardDrive, Eye,
   UserPlus, Users, Fingerprint, Camera, ShieldCheck,
   FileSearch, History, Search, Radar, FolderLock, 
-  ZapOff, Ghost, Siren, Key
+  ZapOff, Ghost, Siren, Key, Thermometer, FileText, FileArchive,
+  LockKeyhole
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import VisualScanModule from './visual-scan';
 import { useToast } from "@/hooks/use-toast";
 
-type ModuleType = 'STRATEGIC_INTELLIGENCE' | 'SECURITY_MANAGEMENT' | 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS';
+type ModuleType = 'STRATEGIC_INTELLIGENCE' | 'SECURITY_MANAGEMENT' | 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS' | 'INFRASTRUCTURE';
 
 interface AdvancedOpsProps {
   onBack: () => void;
@@ -98,6 +99,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
             <NavButton type="COUNTERMEASURES" label="COUNTERMEASURES" icon={Shield} />
             <NavButton type="DATA_PURGE" label="DATA_PURGE" icon={Trash2} />
             <NavButton type="AI_ADVISOR" label="AI_ADVISOR" icon={Brain} />
+            <NavButton type="INFRASTRUCTURE" label="INFRASTRUCTURE" icon={HardDrive} />
             <NavButton type="SYSTEM_LOGS" label="SYSTEM_LOGS" icon={List} />
           </nav>
 
@@ -144,15 +146,191 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
               {activeModule === 'DATA_PURGE' && <DataPurgeModule />}
               {activeModule === 'AI_ADVISOR' && <AIAdvisorModule />}
               {activeModule === 'SYSTEM_LOGS' && <SystemLogsModule />}
+              {activeModule === 'INFRASTRUCTURE' && <InfrastructureModule />}
             </motion.div>
           </AnimatePresence>
         </section>
+
+        {/* PRIORITY_ALPHA TICKER */}
+        <footer className="h-6 shrink-0 bg-black/80 border border-[#00f2ff]/20 overflow-hidden flex items-center">
+          <div className="bg-[#00f2ff]/10 px-4 h-full flex items-center border-r border-[#00f2ff]/20">
+            <span className="text-[7px] font-black text-[#00f2ff] tracking-[0.3em] uppercase">PRIORITY_ALPHA</span>
+          </div>
+          <div className="flex-1 overflow-hidden whitespace-nowrap flex items-center">
+            <motion.div 
+              animate={{ x: [0, -1000] }}
+              transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
+              className="flex gap-12 text-[7px] font-bold text-[#00f2ff]/60 uppercase tracking-[0.2em]"
+            >
+              <span>PROTOCOL_7B_ACTIVE... STATUS: SECURE</span>
+              <span>NO_INTRUSIONS_DETECTED... SCANNING_SECTOR_9</span>
+              <span>ALL_NODES_SYNCED... ENCRYPTION_LAYER_8_REINFORCED</span>
+              <span>HARDWARE_ENCRYPTION_ACTIVE... TEMP_NORMAL_0x3F</span>
+              <span>KERNEL_LOAD_OK... AUDIT_LOG_INITIALIZED</span>
+              <span>SIGNAL_STRENGTH_MAX... GLOBAL_RECON_GRID_ONLINE</span>
+            </motion.div>
+          </div>
+        </footer>
       </main>
     </div>
   );
 }
 
-// --- MÓDULO STRATEGIC INTELLIGENCE ---
+// --- MÓDULO INFRASTRUCTURE (CORE_TELEMETRY & EVIDENCE_VAULT) ---
+
+function InfrastructureModule() {
+  return (
+    <div className="flex flex-col h-full gap-4 min-h-0 overflow-hidden">
+      <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">
+        <div className="col-span-4 flex flex-col gap-4">
+           <CoreTelemetryWidget />
+           <DoubleBorderPanel title="[ SYSTEM_UPTIME ]" className="h-24 flex items-center justify-center">
+              <div className="text-center">
+                 <span className="text-xl font-black font-mono">142:55:12:09</span>
+                 <p className="text-[6px] opacity-40 uppercase tracking-widest mt-1">Days : Hours : Mins : Secs</p>
+              </div>
+           </DoubleBorderPanel>
+        </div>
+        <div className="col-span-8">
+           <EvidenceVaultWidget />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CoreTelemetryWidget() {
+  const [stats, setStats] = useState({ cpu: 45, thermal: 32, net: 12 });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStats({
+        cpu: Math.floor(20 + Math.random() * 70),
+        thermal: Math.floor(30 + Math.random() * 50),
+        net: Math.floor(5 + Math.random() * 90),
+      });
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const getGaugeColor = (val: number) => {
+    if (val >= 90) return '#f43f5e'; // Red
+    if (val >= 70) return '#fbbf24'; // Amber
+    return '#00f2ff'; // Cyan
+  };
+
+  const Gauge = ({ label, value, icon: Icon }: { label: string, value: number, icon: any }) => {
+    const color = getGaugeColor(value);
+    const radius = 30;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (value / 100) * circumference;
+
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <div className="relative w-20 h-20">
+          <svg className="w-full h-full transform -rotate-90">
+            <circle cx="40" cy="40" r={radius} stroke="currentColor" strokeWidth="2" fill="transparent" className="text-[#00f2ff]/5" />
+            <motion.circle 
+              cx="40" cy="40" r={radius} 
+              stroke={color} strokeWidth="2" 
+              fill="transparent" 
+              strokeDasharray={circumference}
+              animate={{ strokeDashoffset: offset }}
+              transition={{ duration: 1 }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <Icon className="w-3 h-3 opacity-20" style={{ color }} />
+            <span className="text-[10px] font-black" style={{ color }}>{value}%</span>
+          </div>
+        </div>
+        <span className="text-[6px] font-black uppercase tracking-[0.2em] opacity-40">{label}</span>
+      </div>
+    );
+  };
+
+  return (
+    <DoubleBorderPanel title="[ CORE_TELEMETRY ]" className="flex-1">
+      <div className="flex justify-around items-center h-full py-4">
+        <Gauge label="CPU_STRESS" value={stats.cpu} icon={Cpu} />
+        <Gauge label="THERMAL_LOAD" value={stats.thermal} icon={Thermometer} />
+        <Gauge label="NET_SATURATION" value={stats.net} icon={Wifi} />
+      </div>
+      <div className="mt-auto pt-2 border-t border-[#00f2ff]/10 text-center">
+        <span className="text-[6px] font-black uppercase text-[#00f2ff] tracking-[0.4em] animate-pulse">
+           HARDWARE_ENCRYPTION_ACTIVE
+        </span>
+      </div>
+    </DoubleBorderPanel>
+  );
+}
+
+function EvidenceVaultWidget() {
+  const files = [
+    { name: "IMG_TRG_882.bin", size: "1.4 MB", date: "2024.03.12", encrypted: true },
+    { name: "PKT_DUMP_01.log", size: "420 KB", date: "2024.03.11", encrypted: true },
+    { name: "GEO_LOC_X9.dat", size: "12 KB", date: "2024.03.11", encrypted: false },
+    { name: "VOICE_INT_04.wav", size: "8.2 MB", date: "2024.03.10", encrypted: true },
+    { name: "BIO_SCAN_ALFA.bin", size: "2.1 MB", date: "2024.03.10", encrypted: true },
+    { name: "SYS_DEBUG_09.txt", size: "45 KB", date: "2024.03.09", encrypted: false },
+    { name: "MAL_PAYLOAD_X.so", size: "1.1 MB", date: "2024.03.08", encrypted: true },
+    { name: "KEY_SPEC_ROT.bin", size: "4 KB", date: "2024.03.08", encrypted: true },
+  ];
+
+  return (
+    <DoubleBorderPanel title="[ EVIDENCE_VAULT ]" className="h-full">
+      <div className="flex-1 overflow-y-auto terminal-scroll p-2">
+         <div className="grid grid-cols-1 gap-2">
+            {files.map((file, i) => (
+              <motion.div 
+                key={i}
+                whileHover={{ scale: 1.01, backgroundColor: 'rgba(0, 242, 255, 0.05)' }}
+                className="group relative flex items-center gap-4 p-2 border border-[#00f2ff]/10 bg-black/40 transition-all cursor-pointer overflow-hidden"
+              >
+                <div className="flex-none w-10 h-10 bg-black border border-[#00f2ff]/20 flex items-center justify-center relative overflow-hidden">
+                   <FileText className="w-5 h-5 opacity-20 group-hover:opacity-100 transition-opacity" />
+                   {/* Pixelated Preview on Hover */}
+                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <img 
+                        src={`https://picsum.photos/seed/${file.name}/40/40?blur=10`} 
+                        alt="Preview" 
+                        className="w-full h-full object-cover grayscale brightness-150"
+                        style={{ imageRendering: 'pixelated' }}
+                      />
+                   </div>
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex justify-between items-start">
+                    <span className="text-[9px] font-bold text-[#00f2ff] truncate uppercase tracking-tighter">{file.name}</span>
+                    <span className="text-[6px] opacity-40 font-mono">{file.date}</span>
+                  </div>
+                  <div className="flex gap-3 text-[6px] opacity-40 uppercase tracking-widest mt-1">
+                    <span>Size: {file.size}</span>
+                    <span>Type: {file.name.split('.').pop()}_ENC</span>
+                  </div>
+                </div>
+
+                {file.encrypted && (
+                  <div className="flex-none">
+                     <LockKeyhole className="w-3 h-3 text-[#00f2ff] animate-pulse shadow-[0_0_10px_rgba(0,242,255,0.5)]" />
+                  </div>
+                )}
+
+                <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-[#00f2ff] opacity-0 group-hover:opacity-100 transition-opacity" />
+              </motion.div>
+            ))}
+         </div>
+      </div>
+      <div className="mt-2 p-2 bg-[#00f2ff]/5 border border-[#00f2ff]/20 flex justify-between items-center shrink-0">
+         <span className="text-[7px] font-black text-[#00f2ff]/60">VAULT_INTEGRITY: 100% // ALL_FILES_VERIFIED</span>
+         <button className="px-4 py-1 bg-[#00f2ff]/10 border border-[#00f2ff]/40 text-[7px] font-black uppercase hover:bg-[#00f2ff]/20 transition-all">Export_Report</button>
+      </div>
+    </DoubleBorderPanel>
+  );
+}
+
+// --- MÓDULOS EXISTENTES (PARA REFERENCIA) ---
 
 function StrategicIntelligenceModule() {
   const [kernelHealth, setKernelHealth] = useState(85);
@@ -191,12 +369,10 @@ function StrategicIntelligenceModule() {
       )}
 
       <div className="grid grid-cols-12 gap-4 flex-[3] min-h-0">
-        {/* TACTICAL 3D MAP */}
         <DoubleBorderPanel title="[ TACTICAL_GEO_INTEL ]" className="col-span-8 bg-[#000508]/60">
           <div className="relative w-full h-full overflow-hidden flex items-center justify-center">
             <svg viewBox="0 0 800 400" className="w-full h-full opacity-40">
               <path d="M 50 350 L 750 350" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="5 5" />
-              {/* Arcos de conexión */}
               <motion.path 
                 d="M 100 350 Q 400 50 700 350" 
                 fill="none" 
@@ -215,7 +391,6 @@ function StrategicIntelligenceModule() {
                 animate={{ pathLength: 1, opacity: 1 }}
                 transition={{ duration: 4, repeat: Infinity, delay: 1 }}
               />
-              {/* Nodos */}
               <circle cx="100" cy="350" r="4" fill="#00f2ff" />
               <circle cx="700" cy="350" r="4" fill="#ff0055" className="animate-ping" />
               <circle cx="200" cy="350" r="3" fill="#00f2ff" />
@@ -227,16 +402,9 @@ function StrategicIntelligenceModule() {
               <span className="text-[10px] font-mono text-white tracking-tighter">LON: 118.2437 W</span>
               <span className="text-[7px] text-[#00f2ff] font-bold mt-1">ISP: CLOUD_SHIELD_V4</span>
             </div>
-            <div className="absolute bottom-4 left-4 flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-[#ff0055] animate-pulse" />
-                <span className="text-[8px] font-black uppercase text-[#ff0055]">Intrusion_Vector_Detected</span>
-              </div>
-            </div>
           </div>
         </DoubleBorderPanel>
 
-        {/* KERNEL HEALTH & CRISIS MONITOR */}
         <div className="col-span-4 flex flex-col gap-4">
           <DoubleBorderPanel title="[ KERNEL_INTEGRITY ]" className="flex-1 flex flex-col items-center justify-center gap-4">
             <div className="relative w-32 h-32">
@@ -257,14 +425,6 @@ function StrategicIntelligenceModule() {
                 </span>
                 <span className="text-[6px] opacity-40 uppercase tracking-[0.3em]">Stability</span>
               </div>
-            </div>
-            <div className="text-center space-y-1">
-              <span className={`text-[8px] font-black uppercase tracking-widest ${kernelHealth < 50 ? 'text-[#ff0055]' : 'text-[#00f2ff]/60'}`}>
-                {kernelHealth < 50 ? '!! CRISIS_MODE_ACTIVE !!' : 'System_Normal'}
-              </span>
-              <p className="text-[6px] opacity-30 max-w-[150px] leading-tight mx-auto uppercase">
-                Monitoring core kernel frequencies and encryption stability layers.
-              </p>
             </div>
           </DoubleBorderPanel>
 
@@ -301,7 +461,6 @@ function StrategicIntelligenceModule() {
         </div>
       </div>
 
-      {/* DEEP STORAGE / FILE SYSTEM */}
       <DoubleBorderPanel title="[ DEEP_STORAGE_EXPLORER ]" className="flex-1 min-h-0 bg-black/60">
         <div className="flex-1 overflow-x-auto terminal-scroll flex gap-4 p-2">
           {Array.from({ length: 12 }).map((_, i) => (
@@ -312,12 +471,10 @@ function StrategicIntelligenceModule() {
             >
               <div className="aspect-square bg-black border border-[#00f2ff]/20 relative overflow-hidden flex items-center justify-center">
                 <FolderLock className="w-8 h-8 opacity-20 group-hover:opacity-100 group-hover:text-[#00f2ff] transition-all" />
-                <div className="absolute top-1 right-1 px-1 bg-[#00f2ff] text-black text-[5px] font-black uppercase">Encrypted</div>
               </div>
               <div className="flex flex-col gap-0.5">
                 <span className="text-[8px] font-bold truncate">LOG_SESSION_0x{i}AF.MIL</span>
                 <span className="text-[6px] opacity-40">SIZE: 142.4 KB</span>
-                <span className="text-[5px] text-[#00f2ff]/60 font-mono mt-1">HASH: {Math.random().toString(16).slice(2, 8).toUpperCase()}</span>
               </div>
             </motion.div>
           ))}
@@ -327,12 +484,9 @@ function StrategicIntelligenceModule() {
   );
 }
 
-// --- MÓDULO SECURITY MANAGEMENT ---
-
 function SecurityManagementModule() {
   const [hasCameraPermission, setHasCameraPermission] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     const getCameraPermission = async () => {
@@ -370,8 +524,6 @@ function SecurityManagementModule() {
   return (
     <div className="flex flex-col h-full gap-4 min-h-0 overflow-hidden">
       <div className="grid grid-cols-12 gap-4 flex-1 min-h-0">
-        
-        {/* OPERATOR LIST TABLE */}
         <DoubleBorderPanel title="[ OPERATOR_REGISTRY ]" className="col-span-8">
           <div className="flex-1 overflow-y-auto terminal-scroll">
             <table className="w-full text-left border-collapse">
@@ -401,45 +553,23 @@ function SecurityManagementModule() {
           </div>
         </DoubleBorderPanel>
 
-        {/* REGISTRATION FORM & BIO SCAN */}
         <DoubleBorderPanel title="[ BIO_REGISTRATION ]" className="col-span-4 flex flex-col gap-4">
           <div className="relative w-full aspect-video bg-black/60 border border-[#00f2ff]/30 overflow-hidden">
             <video ref={videoRef} className="w-full h-full object-cover grayscale brightness-125" autoPlay muted />
-            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(#00f2ff_1px,transparent_1px)] bg-[size:10px_10px]" />
             {!hasCameraPermission && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/80">
                 <span className="text-[7px] text-[#00f2ff] font-black uppercase animate-pulse">Waiting_For_Camera_Auth...</span>
               </div>
             )}
-            <div className="absolute top-2 left-2 flex gap-1">
-              <div className="w-1.5 h-1.5 bg-[#00f2ff] animate-ping" />
-              <span className="text-[5px] font-black uppercase text-[#00f2ff]">Live_Feed</span>
-            </div>
           </div>
-          
-          <div className="space-y-3">
-            <div className="space-y-1">
-              <label className="text-[6px] opacity-40 uppercase tracking-[0.2em]">New_Subject_Name</label>
-              <input type="text" placeholder="ALPHA_X" className="w-full bg-black border border-[#00f2ff]/30 px-3 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff] transition-all" />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[6px] opacity-40 uppercase tracking-[0.2em]">Clearance_Level</label>
-              <select className="w-full bg-black border border-[#00f2ff]/30 px-3 py-1.5 text-[9px] text-[#00f2ff] outline-none">
-                <option>Level 1</option>
-                <option>Level 2</option>
-                <option>Level 3</option>
-              </select>
-            </div>
-            <button className="w-full py-2 bg-[#00f2ff]/10 border border-[#00f2ff]/40 text-[#00f2ff] text-[8px] font-black uppercase tracking-[0.3em] tactic-clip hover:bg-[#00f2ff]/20 transition-all flex items-center justify-center gap-2">
-              <Fingerprint className="w-3 h-3" />
-              Capture_Bio_Scan
-            </button>
-          </div>
+          <button className="w-full py-2 bg-[#00f2ff]/10 border border-[#00f2ff]/40 text-[#00f2ff] text-[8px] font-black uppercase tracking-[0.3em] tactic-clip hover:bg-[#00f2ff]/20 transition-all flex items-center justify-center gap-2">
+            <Fingerprint className="w-3 h-3" />
+            Capture_Bio_Scan
+          </button>
         </DoubleBorderPanel>
       </div>
 
       <div className="grid grid-cols-12 gap-4 h-2/5 min-h-0">
-        {/* TARGET PROFILES (EXPEDIENTES) */}
         <DoubleBorderPanel title="[ TARGET_PROFILES ]" className="col-span-8">
           <div className="flex-1 overflow-x-auto terminal-scroll flex gap-4 p-1">
             {targets.map((target, i) => (
@@ -448,38 +578,20 @@ function SecurityManagementModule() {
                 whileHover={{ scale: 1.02 }}
                 className="w-64 h-full border border-[#00f2ff]/20 bg-[#00f2ff]/5 p-3 flex flex-col gap-3 shrink-0 group relative overflow-hidden"
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                 <div className="flex gap-4 relative z-10">
                   <div className="w-20 h-20 border border-[#00f2ff]/40 bg-black overflow-hidden relative">
                     <img src={target.img} alt={target.name} className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 transition-opacity" />
-                    <div className="absolute top-0 right-0 p-0.5 bg-[#f43f5e] text-white text-[5px] font-black">RIP_01</div>
                   </div>
                   <div className="flex-1 flex flex-col justify-center">
                     <span className="text-[10px] font-black text-[#00f2ff] tracking-tight">{target.name}</span>
                     <span className="text-[6px] opacity-40 uppercase">{target.job}</span>
-                    <span className={`text-[7px] font-black mt-2 ${target.risk === 'CRITICAL' ? 'text-[#f43f5e]' : 'text-amber-400'}`}>
-                      [{target.risk}_RISK]
-                    </span>
                   </div>
-                </div>
-                <div className="mt-auto space-y-1 relative z-10">
-                  <div className="flex justify-between text-[6px] opacity-40 uppercase">
-                    <span>Appearances</span>
-                    <span>{target.appearances}</span>
-                  </div>
-                  <div className="h-0.5 bg-[#00f2ff]/10 w-full">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${(target.appearances / 15) * 100}%` }} className="h-full bg-[#00f2ff]" />
-                  </div>
-                  <button className="w-full mt-2 py-1 text-[6px] font-black uppercase tracking-widest border border-[#00f2ff]/20 hover:bg-[#00f2ff]/10 transition-all">
-                    View_Full_Expedient
-                  </button>
                 </div>
               </motion.div>
             ))}
           </div>
         </DoubleBorderPanel>
 
-        {/* SECURITY AUDIT LOG */}
         <DoubleBorderPanel title="[ SECURITY_AUDIT_LOG ]" className="col-span-4 bg-black/60" isAccent>
           <div className="flex-1 overflow-y-auto terminal-scroll p-2 space-y-1">
             <div className="text-[6px] font-bold text-[#f43f5e] flex gap-2">
@@ -487,17 +599,7 @@ function SecurityManagementModule() {
               <span className="font-black uppercase">AUDIT:</span>
               <span className="opacity-80">OPERATOR ADMIN_PRIME ACTIVATED PURGE_PROTOCOL</span>
             </div>
-            <div className="text-[6px] font-bold text-amber-500 flex gap-2">
-              <span className="opacity-40">[05:22:10]</span>
-              <span className="font-black uppercase">AUTH_WARN:</span>
-              <span className="opacity-80">FAILED LOGIN ATTEMPT FROM IP 192.168.1.1</span>
-            </div>
-            <div className="text-[6px] font-bold text-[#00f2ff] flex gap-2">
-              <span className="opacity-40">[06:01:44]</span>
-              <span className="font-black uppercase">SEC:</span>
-              <span className="opacity-80">ROTATING ENCRYPTION KEYS ACROSS SECTOR 7</span>
-            </div>
-            {Array.from({ length: 15 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="text-[6px] text-white/20 flex gap-2">
                 <span className="opacity-20">[{Math.floor(Math.random()*24)}:00:00]</span>
                 <span className="uppercase">INFO: System_Check_Pass // OK</span>
@@ -511,122 +613,48 @@ function SecurityManagementModule() {
 }
 
 function CountermeasuresModule() {
-  const [impact, setImpact] = useState(42);
-
   return (
     <div className="flex flex-col h-full gap-4 min-h-0 overflow-hidden">
       <div className="grid grid-cols-2 grid-rows-2 gap-4 flex-1 min-h-0">
-        <DoubleBorderPanel title="[ MALWARE_INJECTION ]" className="group hover:bg-[#00f2ff]/5 transition-all">
+        <DoubleBorderPanel title="[ MALWARE_INJECTION ]">
           <div className="flex flex-col items-center justify-center gap-4 h-full">
-            <button className="relative w-4/5 py-4 border-2 border-[#00f2ff]/40 bg-[#00f2ff]/10 rounded-md flex items-center justify-center gap-4 group-hover:border-[#00f2ff] transition-all overflow-hidden">
-               <div className="absolute inset-0 bg-gradient-to-t from-transparent via-[#00f2ff]/5 to-transparent animate-scan" />
+            <button className="relative w-4/5 py-4 border-2 border-[#00f2ff]/40 bg-[#00f2ff]/10 rounded-md flex items-center justify-center gap-4 hover:border-[#00f2ff] transition-all">
               <Syringe className="w-5 h-5 text-[#00f2ff]" />
               <span className="text-[10px] font-black tracking-[0.2em] uppercase">Inject_Payload</span>
             </button>
-            
-            <div className="w-full px-8 flex justify-between items-center">
-              <div className="relative w-12 h-12 border-2 border-[#00f2ff]/20 rounded-full flex items-center justify-center">
-                <div className="absolute inset-0 border-2 border-t-[#00f2ff] rounded-full animate-spin" />
-                <Activity className="w-4 h-4 opacity-40" />
-              </div>
-              <div className="h-10 w-20 bg-[#00f2ff]/10 border border-[#00f2ff]/20 relative">
-                 <motion.div 
-                  initial={{ height: 0 }}
-                  animate={{ height: '75%' }}
-                  className="absolute bottom-0 w-full bg-[#00f2ff]/40 shadow-[0_0_15px_rgba(0,242,255,0.3)]" 
-                />
-              </div>
-              <div className="text-center">
-                <span className="text-lg font-black block leading-none">75%</span>
-                <span className="text-[6px] opacity-40 uppercase">Buffer_Ready</span>
-              </div>
-            </div>
           </div>
         </DoubleBorderPanel>
 
-        <DoubleBorderPanel title="[ ACCESS_DENIAL ]" className="group hover:bg-[#00f2ff]/5 transition-all">
+        <DoubleBorderPanel title="[ ACCESS_DENIAL ]">
           <div className="flex items-center gap-6 h-full p-4">
             <div className="w-20 h-20 border-2 border-[#00f2ff]/40 bg-[#00f2ff]/5 flex items-center justify-center relative shadow-[inset_0_0_20px_rgba(0,242,255,0.1)] shrink-0">
                <Lock className="w-8 h-8 text-[#00f2ff]" />
-               <div className="absolute -top-1 -left-1 w-2 h-2 bg-[#00f2ff]" />
-               <div className="absolute -bottom-1 -right-1 w-2 h-2 bg-[#00f2ff]" />
             </div>
             <div className="flex-1 flex flex-col gap-4">
-               <div className="text-left">
-                  <span className="text-[10px] font-black tracking-widest uppercase block mb-1">Gate_Lockdown</span>
-                  <span className="text-[7px] opacity-40 uppercase block">[ STATUS: ENCRYPTED_LOCK ]</span>
-               </div>
-               <div className="flex">
-                  <div className="w-24 h-8 border border-[#00f2ff]/40 bg-black flex items-center px-2 group-hover:border-[#00f2ff] transition-all">
-                     <div className="w-4 h-4 bg-[#00f2ff] flex items-center justify-center">
-                        <div className="w-1.5 h-1.5 bg-black" />
-                     </div>
-                     <div className="flex-1 flex flex-col gap-1 ml-3">
-                        <div className="h-1 w-full bg-[#00f2ff]/40" />
-                        <div className="h-1 w-1/2 bg-[#00f2ff]/20" />
-                     </div>
-                  </div>
-               </div>
+               <span className="text-[10px] font-black tracking-widest uppercase block mb-1">Gate_Lockdown</span>
             </div>
           </div>
         </DoubleBorderPanel>
 
-        <DoubleBorderPanel title="[ HONEYPOT_CLUSTER ]" className="group hover:bg-[#00f2ff]/5 transition-all">
+        <DoubleBorderPanel title="[ HONEYPOT_CLUSTER ]">
           <div className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 flex items-center justify-center relative overflow-hidden bg-black/30 rounded-lg border border-[#00f2ff]/10 min-h-0">
                <svg viewBox="0 0 200 100" className="w-full h-full opacity-60">
                   <circle cx="100" cy="50" r="15" fill="none" stroke="#00f2ff" strokeWidth="0.5" className="animate-pulse" />
-                  <path d="M50 20 L100 50 M150 20 L100 50 M50 80 L100 50 M150 80 L100 50" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="3 3" />
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <circle key={i} cx={50 + (i % 2 === 0 ? 0 : 100)} cy={20 + (i < 2 ? 0 : 60)} r="3" fill="#00f2ff" className="animate-flicker" />
-                  ))}
                </svg>
-            </div>
-            <div className="text-center py-2">
-               <span className="text-[7px] font-bold uppercase tracking-[0.3em] text-[#00f2ff]/60">[ INTRUDERS TRAPPED: 0 ]</span>
             </div>
           </div>
         </DoubleBorderPanel>
 
-        <DoubleBorderPanel title="SYSTEM_OVERRIDE" isAccent className="bg-[#f43f5e]/5 group hover:bg-[#f43f5e]/10 transition-all">
+        <DoubleBorderPanel title="SYSTEM_OVERRIDE" isAccent className="bg-[#f43f5e]/5">
            <div className="flex flex-col items-center justify-center gap-4 h-full">
-             <button className="relative w-full py-5 border-2 border-[#f43f5e] bg-[#f43f5e]/15 rounded-lg group-hover:scale-[1.01] transition-transform overflow-hidden shadow-[0_0_20px_rgba(244,63,94,0.1)]">
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-scan" />
+             <button className="relative w-full py-5 border-2 border-[#f43f5e] bg-[#f43f5e]/15 rounded-lg hover:scale-[1.01] transition-transform">
                 <span className="text-[10px] font-black tracking-[0.4em] text-[#f43f5e] uppercase">
                   !! EMERGENCY_TAKEOVER !!
                 </span>
              </button>
-             <div className="text-[6px] font-bold uppercase tracking-[0.2em] opacity-40 text-[#f43f5e]">
-                REQUIRES_HIGHER_CLEARANCE_AUTH
-             </div>
            </div>
         </DoubleBorderPanel>
-      </div>
-
-      <div className="flex flex-col gap-2 shrink-0">
-         <div className="flex justify-between items-center">
-            <span className="text-[8px] font-black uppercase tracking-[0.4em] text-[#00f2ff]">
-              [ TOTAL_IMPACT_METRIC: {impact}% ]
-            </span>
-            <span className="text-[6px] opacity-40 font-mono tracking-widest">Aegis_Tactical_v2.0</span>
-         </div>
-         <div className="h-4 w-full bg-black border border-[#00f2ff]/20 relative p-0.5 rounded-sm">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: `${impact}%` }}
-              className="h-full bg-gradient-to-r from-[#00f2ff]/40 to-[#00f2ff] shadow-[0_0_15px_rgba(0,242,255,0.4)] flex items-center justify-end px-3"
-            >
-               <span className="text-[6px] font-black text-black">{impact}%</span>
-            </motion.div>
-         </div>
-         <div className="flex justify-between items-end gap-10">
-            <p className="max-w-2xl text-[7px] opacity-40 uppercase tracking-[0.2em] leading-tight">
-              Proprietary military-grade algorithms ensure data integrity during offensive operations. All actions are logged and encrypted at source.
-            </p>
-            <button className="px-8 py-3 bg-[#00f2ff] text-black text-[9px] font-black uppercase tracking-[0.3em] tactic-clip hover:opacity-85 active:scale-95 transition-all shrink-0">
-              EXECUTE_COMMAND
-            </button>
-         </div>
       </div>
     </div>
   );
@@ -638,10 +666,6 @@ function ReconModule() {
       <DoubleBorderPanel title="GLOBAL_FOOTPRINT_SCAN" className="col-span-2 relative bg-black/20">
         <div className="w-full h-full flex items-center justify-center min-h-0 overflow-hidden">
           <svg viewBox="0 0 1000 600" className="w-full h-full opacity-60">
-            <path d="M100 300 Q250 100 400 300 T700 300 T900 100" fill="none" stroke="#00f2ff" strokeWidth="0.5" className="animate-pulse" />
-            <circle cx="200" cy="200" r="3" fill="#00f2ff" />
-            <circle cx="500" cy="350" r="4" fill="#f43f5e" className="animate-ping" />
-            <circle cx="750" cy="150" r="3" fill="#00f2ff" />
             <rect x="0" y="0" width="1000" height="600" fill="url(#grid)" />
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -661,13 +685,6 @@ function ReconModule() {
               </div>
             ))}
           </div>
-        </DoubleBorderPanel>
-        <DoubleBorderPanel title="SIGNAL_STRENGTH" className="h-32 shrink-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={Array.from({ length: 20 }, (_, i) => ({ val: 30 + Math.random() * 70 }))}>
-              <Area type="step" dataKey="val" stroke="#00f2ff" fill="#00f2ff" fillOpacity={0.15} isAnimationActive={false} />
-            </AreaChart>
-          </ResponsiveContainer>
         </DoubleBorderPanel>
       </div>
     </div>
@@ -694,80 +711,39 @@ function DataPurgeModule() {
         <DoubleBorderPanel title="SANITIZATION_CORE" className="flex-1 flex flex-col items-center justify-center gap-6 relative overflow-hidden bg-black/40">
           <motion.div 
             animate={{ rotate: purging ? 360 : 0 }} 
-            transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-            className={`w-32 h-32 border-4 border-dashed ${purging ? 'border-[#f43f5e] shadow-[0_0_30px_rgba(244,63,94,0.2)]' : 'border-[#00f2ff]/20'} rounded-full flex items-center justify-center transition-all`}
+            className={`w-32 h-32 border-4 border-dashed ${purging ? 'border-[#f43f5e]' : 'border-[#00f2ff]/20'} rounded-full flex items-center justify-center transition-all`}
           >
             <Database className={`w-10 h-10 ${purging ? 'text-[#f43f5e]' : 'text-[#00f2ff]/20'}`} />
           </motion.div>
           <div className="text-center">
             <h3 className="text-3xl font-black tracking-widest">{progress.toFixed(1)}%</h3>
-            <p className="text-[8px] opacity-40 uppercase mt-1 tracking-[0.5em]">Sanitizing_Sectors...</p>
-          </div>
-          {purging && <div className="absolute inset-0 bg-[#f43f5e]/5 animate-pulse pointer-events-none" />}
-        </DoubleBorderPanel>
-        
-        <DoubleBorderPanel title="SHREDDER_QUEUE" className="w-1/3 min-h-0">
-          <div className="flex-1 overflow-y-auto terminal-scroll p-2 space-y-1">
-            {purging && Array.from({ length: 30 }).map((_, i) => (
-              <div key={i} className="text-[6px] font-mono text-[#f43f5e] opacity-70 animate-flicker">
-                [PURGE] file_0x{Math.random().toString(36).substring(7)}.mil
-              </div>
-            ))}
           </div>
         </DoubleBorderPanel>
       </div>
-      
-      <DoubleBorderPanel title="PURGE_CONTROLS" className="h-24 shrink-0 flex items-center justify-between px-10">
-        <div className="flex flex-col gap-1">
-          <span className="text-[8px] opacity-30 uppercase tracking-widest">Time_To_Zero</span>
-          <span className="text-xl font-black font-mono">00:0{Math.floor((100 - progress)/25)}:{(100 - progress).toFixed(0)}</span>
-        </div>
-        <button 
+      <button 
           onClick={() => { setPurging(!purging); if(!purging) setProgress(0); }}
-          className={`px-12 py-3 border-2 font-black uppercase tracking-[0.4em] transition-all tactic-clip text-[9px] ${
-            purging ? 'border-[#f43f5e] text-[#f43f5e] bg-[#f43f5e]/10 animate-pulse' : 'border-[#00f2ff] text-[#00f2ff] hover:bg-[#00f2ff]/10'
-          }`}
+          className="w-full py-3 border-2 border-[#00f2ff] text-[#00f2ff] font-black uppercase tracking-[0.4em] tactic-clip text-[9px]"
         >
           {purging ? 'TERMINATE_PURGE' : 'START_GLOBAL_WIPE'}
-        </button>
-      </DoubleBorderPanel>
+      </button>
     </div>
   );
 }
 
 function AIAdvisorModule() {
   return (
-    <div className="grid grid-cols-4 gap-4 h-full min-h-0 overflow-hidden">
-      <DoubleBorderPanel title="STRATEGIC_AI_ADVISOR" className="col-span-3 flex flex-col bg-black/20">
+    <div className="flex flex-col h-full gap-4 min-h-0 overflow-hidden">
+      <DoubleBorderPanel title="STRATEGIC_AI_ADVISOR" className="flex-1 flex flex-col bg-black/20">
         <div className="flex-1 p-4 overflow-y-auto terminal-scroll space-y-4 min-h-0">
-          <div className="flex flex-col gap-2 max-w-[90%]">
-            <div className="flex items-center gap-2">
-               <Brain className="w-3 h-3 text-[#00f2ff]" />
-               <span className="text-[7px] text-[#00f2ff] font-bold uppercase tracking-widest">Gemini_Tactical_v2.5</span>
-            </div>
-            <div className="p-3 bg-[#00f2ff]/5 border border-[#00f2ff]/20 text-[10px] leading-tight rounded-r-lg border-l-4">
-              ANALYSIS COMPLETE. RECOMMEND IMMEDIATE REINFORCEMENT OF SECTOR 7. ANOMALIES DETECTED IN LATENCY PATTERNS SUGGEST AN IMPENDING BREACH ATTEMPT. PROTOCOL 9 STATUS: READY.
-            </div>
+          <div className="p-3 bg-[#00f2ff]/5 border border-[#00f2ff]/20 text-[10px] leading-tight rounded-r-lg border-l-4">
+            ANALYSIS COMPLETE. RECOMMEND IMMEDIATE REINFORCEMENT OF SECTOR 7.
           </div>
         </div>
         <div className="p-3 border-t border-[#00f2ff]/10 flex gap-2 bg-black/40 shrink-0">
-          <input type="text" placeholder="COMMAND_ADVISOR..." className="flex-1 bg-black/60 border border-[#00f2ff]/20 px-4 py-2 text-[9px] outline-none focus:border-[#00f2ff] transition-all" />
-          <button className="px-6 py-2 bg-[#00f2ff] text-[#010409] font-black text-[9px] uppercase tracking-widest hover:opacity-80 transition-all shrink-0">SEND_QUERY</button>
+          <input type="text" placeholder="COMMAND_ADVISOR..." className="flex-1 bg-black/60 border border-[#00f2ff]/20 px-4 py-2 text-[9px] outline-none" />
+          <button className="px-6 py-2 bg-[#00f2ff] text-[#010409] font-black text-[9px] uppercase tracking-widest shrink-0">SEND_QUERY</button>
         </div>
       </DoubleBorderPanel>
-      
-      <div className="flex flex-col gap-4 min-h-0">
-        <DoubleBorderPanel title="THREAT_LEVEL" className="flex-1 flex flex-col items-center justify-center gap-2">
-          <span className="text-2xl font-black text-[#f43f5e] animate-pulse">ELEVATED</span>
-          <div className="w-full h-1 bg-[#f43f5e]/20 overflow-hidden">
-             <motion.div animate={{ x: ['-100%', '100%'] }} transition={{ duration: 1.5, repeat: Infinity }} className="w-1/2 h-full bg-[#f43f5e]" />
-          </div>
-        </DoubleBorderPanel>
-        <DoubleBorderPanel title="COGNITIVE_LOAD" className="h-32 flex flex-col justify-center items-center gap-1 shrink-0">
-          <span className="text-2xl font-black text-[#00f2ff]">3.1%</span>
-          <span className="text-[8px] opacity-40 uppercase tracking-widest text-center">Neural_Core_Load</span>
-        </DoubleBorderPanel>
-      </div>
     </div>
   );
 }
@@ -777,10 +753,10 @@ function SystemLogsModule() {
     <DoubleBorderPanel title="TACTICAL_AUDIT_LOGS" className="h-full min-h-0">
       <div className="flex-1 overflow-y-auto terminal-scroll p-4 font-mono text-[8px] leading-relaxed space-y-1">
         {Array.from({ length: 60 }).map((_, i) => (
-          <div key={i} className="flex gap-4 group hover:bg-[#00f2ff]/5 transition-colors py-0.5 px-2 border-l border-transparent hover:border-[#00f2ff]/40">
+          <div key={i} className="flex gap-4 group hover:bg-[#00f2ff]/5 transition-colors py-0.5 px-2">
             <span className="opacity-25 font-bold shrink-0">[{new Date().toISOString().slice(11, 19)}]</span>
             <span className="text-[#00f2ff] font-bold tracking-widest shrink-0">AUDIT_SEC:</span>
-            <span className="opacity-70 truncate">{`Encryption layer ${Math.random().toString(36).slice(7).toUpperCase()} synchronized across all active nodes.`}</span>
+            <span className="opacity-70 truncate">{`Encryption layer ${Math.random().toString(36).slice(7).toUpperCase()} synchronized.`}</span>
           </div>
         ))}
       </div>
