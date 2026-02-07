@@ -1,48 +1,51 @@
-# Aegis Tactical Grid - Manual de Operación Local
+# Aegis Tactical Grid - Manual de Operación y Migración
 
-Este proyecto es una consola de ciberseguridad avanzada. Esta guía te ayudará a mantener tus archivos organizados y tu repositorio de GitHub actualizado.
+Este manual contiene las instrucciones para operar el sistema localmente, actualizar GitHub y migrar a plataformas como Replit.
 
-## 📂 Mapa del Proyecto (Estructura Organizada)
-Para que no sientas que los archivos están "desparramados", aquí tienes la guía de qué es cada carpeta:
+## 📂 Estructura de Archivos Necesarios
+Si vas a copiar el proyecto manualmente a Replit o a otra carpeta local, **DEBES** incluir estos archivos:
 
-- **`/src/app`**: El corazón del sistema (Páginas y estilos globales).
-- **`/src/components/cyber-grid`**: Todos los módulos visuales (Dashboard, Escaneo Visual, Operaciones).
-- **`/src/ai`**: El cerebro de Inteligencia Artificial (Genkit/Gemini).
-- **`/src/backend`**: Motores externos (Go para redes, Python para IA de visión).
-- **`/public`**: Imágenes y recursos estáticos.
+- **Configuración Core:** `package.json`, `tsconfig.json`, `tailwind.config.ts`, `components.json`.
+- **Variables de Entorno:** `.env` (Asegúrate de configurar tu `GOOGLE_GENAI_API_KEY`).
+- **Código Fuente:** Toda la carpeta `/src` (contiene el Frontend, los componentes visuales y la IA).
+- **Backends:** `/src/backend/go` y `/src/backend/python`.
 
 ---
 
-## 🚀 Cómo Limpiar y Actualizar GitHub
-Si GitHub tiene archivos viejos que quieres borrar para que se vea como tu carpeta local:
+## 🚀 Migración a Replit
+1. Entra a [Replit](https://replit.com).
+2. Haz clic en **"Create Repl"** y selecciona **"Import from GitHub"**.
+3. Pega el enlace: `https://github.com/jcbtech1/AEGIS-TACTICAL-GRID.git`.
+4. En la sección de **Secrets (Herramientas > Secrets)** de Replit, añade tu llave:
+   - Key: `GOOGLE_GENAI_API_KEY`
+   - Value: `tu_llave_aqui`
+5. Haz clic en **Run**. Replit instalará las dependencias automáticamente.
 
-1. **Abrir Terminal** en la carpeta raíz del proyecto.
-2. **Ejecutar estos comandos en orden**:
+---
+
+## 🛠 Ejecución Local (PC)
+Si ya tienes los archivos en tu PC:
+1. Instala las librerías: `npm install`.
+2. Inicia el sistema: `npm run dev`.
+3. El sistema estará disponible en `http://localhost:9002`.
+
+---
+
+## 🧹 Limpieza y Actualización de GitHub
+Si quieres que tu GitHub se vea exactamente como tu carpeta local (borrando cualquier desorden previo):
 
 ```bash
-# Sincroniza archivos borrados y movidos
+# 1. Asegurar la ruta correcta
+git remote set-url origin https://github.com/jcbtech1/AEGIS-TACTICAL-GRID.git
+
+# 2. Registrar el estado actual
 git add -A
 
-# Etiqueta el cambio
-git commit -m "Update: Limpieza y reorganización de carpetas"
+# 3. Crear el commit
+git commit -m "Build: Sincronización limpia y organizada"
 
-# Fuerza la actualización (Borra lo viejo en GitHub)
+# 4. SOBRESCRIBIR GitHub (Borra lo viejo y deja solo lo nuevo)
 git push origin main --force
-```
-
----
-
-## 🛠 Ejecución del Sistema
-
-### Paso A: El Backend de Red (Go)
-```bash
-cd src/backend/go
-go run main.go
-```
-
-### Paso B: La Interfaz de Usuario (Next.js)
-```bash
-npm run dev
 ```
 
 ---
