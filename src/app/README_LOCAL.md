@@ -13,21 +13,21 @@ Para que no sientas que los archivos están "desparramados", aquí tienes la gu�
 
 ---
 
-## 🚀 Cómo Actualizar tu GitHub
-Si ya subiste una versión y quieres actualizarla con los nuevos cambios de forma limpia:
+## 🚀 Cómo Limpiar y Actualizar GitHub
+Si GitHub tiene archivos viejos que quieres borrar para que se vea como tu carpeta local:
 
 1. **Abrir Terminal** en la carpeta raíz del proyecto.
 2. **Ejecutar estos comandos en orden**:
 
 ```bash
-# 1. Preparar todos los cambios nuevos
-git add .
+# Sincroniza archivos borrados y movidos
+git add -A
 
-# 2. Etiquetar la actualización (pon un nombre a tus cambios)
-git commit -m "Update: Implementación de Infraestructura y Bóveda de Evidencias"
+# Etiqueta el cambio
+git commit -m "Update: Limpieza y reorganización de carpetas"
 
-# 3. Subir los cambios a tu repositorio existente
-git push origin main
+# Fuerza la actualización (Borra lo viejo en GitHub)
+git push origin main --force
 ```
 
 ---
@@ -35,20 +35,12 @@ git push origin main
 ## 🛠 Ejecución del Sistema
 
 ### Paso A: El Backend de Red (Go)
-Gestiona WebSockets y tráfico cifrado.
 ```bash
 cd src/backend/go
 go run main.go
 ```
 
-### Paso B: La Inteligencia Artificial (Python)
-Análisis de intrusos y visión.
-```bash
-cd src/backend/python
-python intelligence.py
-```
-
-### Paso C: La Interfaz de Usuario (Next.js)
+### Paso B: La Interfaz de Usuario (Next.js)
 ```bash
 npm run dev
 ```

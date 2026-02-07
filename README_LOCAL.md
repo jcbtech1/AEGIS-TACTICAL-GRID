@@ -5,27 +5,26 @@ Este manual te guiará para limpiar tu repositorio de GitHub y organizar tus pro
 ## 🧹 Cómo Limpiar tu GitHub (Borrón y Cuenta Nueva)
 Si tu repositorio de GitHub está desordenado y quieres que se vea **exactamente igual** a tu carpeta local actual, usa el comando de "Fuerza".
 
-### Paso 1: Organiza tus archivos localmente
-Asegúrate de que en tu PC todo esté en su lugar (dentro de las carpetas que desees).
-
-### Paso 2: Ejecuta la Limpieza Profunda
-Abre la terminal en la raíz del proyecto y ejecuta:
+### Paso 1: Sincronización Total
+Este comando le dice a Git: "Olvida lo que hay en la nube, lo que tengo aquí es la única verdad". Ejecuta esto en tu terminal:
 
 ```bash
-# Sincroniza el estado local (detecta archivos borrados y movidos)
+# 1. Asegúrate de estar en la carpeta raíz
+# 2. Registra todos los archivos y detecta los que fueron movidos o borrados
 git add -A
 
-# Etiqueta la nueva estructura
+# 3. Crea el commit de limpieza
 git commit -m "Build: Reinicio organizado del repositorio"
 
-# SOBRESCRIBE GitHub con tu versión limpia
+# 4. SOBRESCRIBE GitHub con tu versión actual
+# ¡ATENCIÓN! Esto borrará cualquier archivo en GitHub que no esté en tu PC.
 git push origin main --force
 ```
 
 ---
 
-## 📂 Estructura Recomendada
-Para que no se vea "desparramado", el sistema Aegis utiliza esta jerarquía:
+## 📂 Estructura del Sistema
+Para mantener el orden, el sistema Aegis utiliza esta jerarquía profesional:
 
 - **`/src/app`**: Lógica de navegación y páginas.
 - **`/src/components/cyber-grid`**: Módulos visuales y widgets.
