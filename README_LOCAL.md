@@ -1,54 +1,51 @@
-# Aegis Tactical Grid - Guía de Ejecución Local y GitHub
+# Aegis Tactical Grid - Manual de Operación Local
 
-Este proyecto es una consola de ciberseguridad avanzada distribuida.
+Este proyecto es una consola de ciberseguridad avanzada. Sigue estos pasos para ejecutarlo en tu PC.
 
-## 1. Requisitos Previos
-- Node.js v18+
-- Go 1.20+
-- Python 3.9+ con `pip`
+## 1. Requisitos
+- **Node.js v18+**
+- **Go 1.20+**
+- **Python 3.9+** con `pip`
 
-## 2. Preparación del Entorno Local
+## 2. Ejecución del Sistema
 
-### Frontend (Next.js)
+### Paso A: El Backend de Red (Go)
+Este motor gestiona los WebSockets y simula el tráfico cifrado.
+```bash
+cd src/backend/go
+go get github.com/gorilla/websocket
+go run main.go
+```
+*El servidor correrá en `http://localhost:8080`*
+
+### Paso B: La Inteligencia Artificial (Python)
+Este motor analiza los datos en busca de intrusos.
+```bash
+cd src/backend/python
+pip install opencv-python
+python intelligence.py
+```
+
+### Paso C: La Interfaz de Usuario (Next.js)
 ```bash
 npm install
 npm run dev
 ```
-La interfaz estará disponible en `http://localhost:3000`.
+*Accede a `http://localhost:9002`*
 
-### Backend de Red (Go)
-Ubicación: `src/backend/go/main.go`
+## 3. Subir a GitHub (Instrucciones para TI)
+Para subir este proyecto a tu propio repositorio de GitHub, ejecuta esto en la terminal de tu PC:
+
+1. Crea un repositorio **vacio** en GitHub.
+2. En la carpeta de tu proyecto local:
 ```bash
-go get github.com/gorilla/websocket
-go run src/backend/go/main.go
+git init
+git add .
+git commit -m "Build: Aegis Tactical Grid Core"
+git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
+git branch -M main
+git push -u origin main
 ```
 
-### Inteligencia Artificial (Python)
-Ubicación: `src/backend/python/intelligence.py`
-```bash
-pip install opencv-python requests
-python src/backend/python/intelligence.py
-```
-
-## 3. Subir a GitHub
-
-Para subir este proyecto a tu propio repositorio de GitHub, sigue estos pasos desde la terminal de tu proyecto local:
-
-1. **Crea un repositorio vacío** en GitHub.com.
-2. **Inicializa Git localmente**:
-   ```bash
-   git init
-   git add .
-   git commit -m "Initial commit: Aegis Tactical Grid Core"
-   ```
-3. **Vincula tu repositorio**:
-   ```bash
-   git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
-   git branch -M main
-   git push -u origin main
-   ```
-
-## 4. Arquitectura
-- **Frontend**: React + Tailwind + Recharts + Framer Motion.
-- **Backend Core**: Go (WebSockets para streaming de datos de red).
-- **IA Core**: Python (Análisis de patrones y reconocimiento).
+---
+**Desarrollado para Aegis Defense Systems**
