@@ -17,7 +17,7 @@ import {
   Fingerprint, ShieldCheck,
   List, Radar, FolderLock, 
   ZapOff, Ghost, Radio, Key, Thermometer, FileText,
-  LockKeyhole, User, ArrowUpCircle, AlertTriangle
+  LockKeyhole, User, CircleArrowUp, AlertTriangle
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 
@@ -328,7 +328,7 @@ function ClearanceLevelManager({ level, onLevelChange }: { level: number, onLeve
           ))}
         </div>
         <div className="mt-2 p-2 bg-[#00f2ff]/5 border border-[#00f2ff]/20 flex items-center gap-3">
-           <ArrowUpCircle className="w-4 h-4 text-[#00f2ff] animate-bounce" />
+           <CircleArrowUp className="w-4 h-4 text-[#00f2ff] animate-bounce" />
            <span className="text-[7px] font-black uppercase text-[#00f2ff]/60 tracking-widest">
               Select_Operator_to_Modify_Access_Permissions
            </span>
@@ -416,8 +416,6 @@ function SecurityManagementModule({ currentClearance, onLevelChange }: { current
     </div>
   );
 }
-
-// --- OTROS MÓDULOS (PREVIAMENTE IMPLEMENTADOS) ---
 
 function StrategicIntelligenceModule() {
   const [kernelHealth, setKernelHealth] = useState(85);
