@@ -1,11 +1,11 @@
 
-"use client";
+'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, Activity, AlertTriangle, 
-  Lock, Zap, Radio, RefreshCw,
+  Lock, Zap, Radio, RefreshCw, Trash2,
   Terminal as TerminalIcon, Cpu, Smartphone,
   Database, Globe, Wifi, User, Brain, Sparkles,
   Mic, Send, Volume2, Command, Loader2, Settings, LogOut,
@@ -103,7 +103,6 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
         setTerminalLines(prev => [...prev.slice(-10), logs[Math.floor(Math.random() * logs.length)]]);
       }
 
-      // Simular fluctuación de integridad
       setIntegrity(prev => Math.min(100, Math.max(95, prev + (Math.random() - 0.5) * 0.1)));
     }, 100);
 
