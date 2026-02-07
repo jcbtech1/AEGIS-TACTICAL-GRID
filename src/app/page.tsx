@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -15,7 +14,7 @@ export default function Home() {
         {!isAuthenticated ? (
           <AegisLoginScreen key="login" onLogin={() => setIsAuthenticated(true)} />
         ) : (
-          <AegisUltimateDashboard key="dashboard" />
+          <AegisUltimateDashboard key="dashboard" onLogout={() => setIsAuthenticated(false)} />
         )}
       </AnimatePresence>
     </main>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -8,11 +7,18 @@ import {
   Lock, Zap, Radio, RefreshCw,
   Terminal as TerminalIcon, Cpu, Smartphone,
   Database, Globe, Wifi, User, Brain, Sparkles,
-  Mic, Send, Volume2, Command, Loader2
+  Mic, Send, Volume2, Command, Loader2, Settings, LogOut
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import NetMap from './net-map';
 import { sendTacticalCommand } from '@/app/actions';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface VPNStatus {
   id: string;
@@ -52,7 +58,7 @@ const TacticalPanel = ({ title, id, children, className = "", headerExtra = "" }
   </motion.div>
 );
 
-export default function AegisUltimateDashboard() {
+export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => void }) {
   const [time, setTime] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
   const [traffic, setTraffic] = useState<{time: number, pps: number}[]>([]);
@@ -179,9 +185,25 @@ export default function AegisUltimateDashboard() {
               <span className="text-[6px] opacity-40 uppercase tracking-widest mb-0.5">System_Time_UTC</span>
               <span className="text-[10px] font-bold tracking-[0.1em] font-mono whitespace-nowrap">{time || "--:--:--:---"}</span>
             </div>
-            <button className="flex items-center justify-center w-8 h-8 rounded border border-[#00f2ff]/20 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/20 transition-all group">
-              <User className="w-4 h-4 text-[#00f2ff] group-hover:scale-110 transition-transform" />
-            </button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center justify-center w-8 h-8 rounded border border-[#00f2ff]/20 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/20 transition-all group">
+                  <User className="w-4 h-4 text-[#00f2ff] group-hover:scale-110 transition-transform" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-[#050b1a]/95 border-[#00f2ff]/30 text-[#00f2ff] font-mono text-[8px] uppercase tracking-widest min-w-[160px] backdrop-blur-xl shadow-[0_0_30px_rgba(0,242,255,0.2)] rounded-none">
+                <DropdownMenuItem className="focus:bg-[#00f2ff]/10 focus:text-[#00f2ff] cursor-pointer py-2 group">
+                  <Settings className="w-3 h-3 mr-2 group-hover:rotate-90 transition-transform" /> 
+                  Configuración_Sistema
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-[#00f2ff]/20" />
+                <DropdownMenuItem onClick={onLogout} className="focus:bg-[#f43f5e]/20 focus:text-[#f43f5e] text-[#f43f5e]/80 cursor-pointer py-2">
+                  <LogOut className="w-3 h-3 mr-2" /> 
+                  Cerrar_Sesión_Táctica
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
