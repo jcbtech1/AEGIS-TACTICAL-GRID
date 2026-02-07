@@ -4,22 +4,22 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const nodes = [
-  { id: 1, x: 150, y: 120, type: 'hub' },
-  { id: 2, x: 450, y: 80, type: 'node' },
-  { id: 3, x: 600, y: 220, type: 'node' },
-  { id: 4, x: 300, y: 280, type: 'hub' },
-  { id: 5, x: 80, y: 220, type: 'node' },
-  { id: 6, x: 400, y: 180, type: 'core' },
+  { id: 1, x: 100, y: 100, label: "NY_HUB" },
+  { id: 2, x: 300, y: 50, label: "LDN_NODE" },
+  { id: 3, x: 450, y: 180, label: "TKY_CORE" },
+  { id: 4, x: 200, y: 250, label: "SYD_GATE" },
+  { id: 5, x: 50, y: 220, label: "SFP_BRCH" },
+  { id: 6, x: 280, y: 150, label: "CENTRAL_IX" },
 ];
 
 const connections = [
-  { from: 1, to: 6, duration: 2.5 },
-  { from: 2, to: 6, duration: 3.1 },
-  { from: 3, to: 6, duration: 2.8 },
-  { from: 4, to: 6, duration: 3.5 },
-  { from: 5, to: 6, duration: 2.2 },
-  { from: 1, to: 2, duration: 4.0 },
-  { from: 4, to: 3, duration: 3.8 },
+  { from: 1, to: 6 },
+  { from: 2, to: 6 },
+  { from: 3, to: 6 },
+  { from: 4, to: 6 },
+  { from: 5, to: 1 },
+  { from: 1, to: 2 },
+  { from: 3, to: 4 },
 ];
 
 export default function NetMap() {
@@ -32,81 +32,81 @@ export default function NetMap() {
   if (!mounted) return null;
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-black/10">
-      <svg viewBox="0 0 800 400" className="w-full h-full">
+    <div className="w-full h-full relative overflow-hidden bg-black/20">
+      <svg viewBox="0 0 500 300" className="w-full h-full preserve-3d">
         <defs>
-          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(0, 242, 255, 0.03)" strokeWidth="0.5"/>
+          <pattern id="mapGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0, 242, 255, 0.03)" strokeWidth="0.5"/>
           </pattern>
+          <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#00f2ff" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#00f2ff" stopOpacity="0" />
+          </radialGradient>
         </defs>
-        <rect width="100%" height="100%" fill="url(#grid)" />
+        
+        <rect width="100%" height="100%" fill="url(#mapGrid)" />
 
+        {/* LINEAS DE CONEXIÓN */}
         {connections.map((conn, i) => {
-          const from = nodes.find(n => n.id === conn.from)!;
-          const to = nodes.find(n => n.id === conn.to)!;
+          const fromNode = nodes.find(n => n.id === conn.from)!;
+          const toNode = nodes.find(n => n.id === conn.to)!;
           return (
             <g key={`conn-${i}`}>
               <line 
-                x1={from.x} y1={from.y} x2={to.x} y2={to.y} 
+                x1={fromNode.x} y1={fromNode.y} 
+                x2={toNode.x} y2={toNode.y} 
                 stroke="rgba(0, 242, 255, 0.1)" 
-                strokeWidth="1" 
+                strokeWidth="0.5" 
               />
               <motion.circle
-                r="1.2"
+                r="1"
                 fill="#00f2ff"
                 animate={{ 
-                  cx: [from.x, to.x],
-                  cy: [from.y, to.y]
+                  cx: [fromNode.x, toNode.x],
+                  cy: [fromNode.y, toNode.y],
+                  opacity: [0, 1, 0]
                 }}
                 transition={{ 
-                  duration: conn.duration,
+                  duration: 2 + Math.random() * 2, 
                   repeat: Infinity, 
-                  ease: "linear" 
+                  ease: "linear",
+                  delay: Math.random() * 2
                 }}
               />
             </g>
           );
         })}
 
+        {/* NODOS */}
         {nodes.map((node) => (
           <g key={`node-${node.id}`}>
+            <circle cx={node.x} cy={node.y} r="8" fill="url(#nodeGlow)" />
             <motion.circle
               cx={node.x}
               cy={node.y}
-              r={node.type === 'core' ? 5 : node.type === 'hub' ? 3.5 : 2}
-              fill={node.type === 'core' ? '#00f2ff' : 'transparent'}
-              stroke="#00f2ff"
-              strokeWidth="1"
-              strokeOpacity={0.6}
-              animate={{ 
-                opacity: [0.3, 0.8, 0.3],
-                r: node.type === 'core' ? [5, 6.5, 5] : undefined 
-              }}
-              transition={{ duration: 3, repeat: Infinity }}
+              r="2"
+              fill={node.id === 6 ? "#f43f5e" : "#00f2ff"}
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
             />
-            {node.type === 'hub' && (
-              <circle
-                cx={node.x}
-                cy={node.y}
-                r="7"
-                fill="none"
-                stroke="#00f2ff"
-                strokeWidth="0.4"
-                strokeDasharray="2,2"
-                className="animate-spin"
-                style={{ transformOrigin: `${node.x}px ${node.y}px`, animationDuration: '12s' }}
-              />
-            )}
             <text 
-              x={node.x + 8} 
-              y={node.y + 12} 
+              x={node.x + 6} 
+              y={node.y + 10} 
               fill="rgba(0, 242, 255, 0.3)" 
-              className="text-[6px] font-mono tracking-tighter pointer-events-none uppercase"
+              className="text-[5px] font-mono tracking-tighter uppercase pointer-events-none"
             >
-              {node.type.substring(0, 3)}_{node.id}
+              {node.label}
             </text>
           </g>
         ))}
+
+        {/* EFECTO DE ESCANEO DE MAPA */}
+        <motion.rect
+          x="0" y="0" width="500" height="2"
+          fill="rgba(0, 242, 255, 0.05)"
+          animate={{ y: [0, 300, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+        />
       </svg>
     </div>
   );
