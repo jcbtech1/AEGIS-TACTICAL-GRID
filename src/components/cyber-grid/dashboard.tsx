@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -8,7 +9,7 @@ import {
   Terminal as TerminalIcon, Cpu, Smartphone,
   Database, Globe, Wifi, User, Brain, Sparkles,
   Mic, Send, Volume2, Command, Loader2, Settings, LogOut,
-  Power, ShieldAlert, Sliders
+  Power, ShieldAlert, Sliders, Hash, Key
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import NetMap from './net-map';
@@ -67,6 +68,7 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
   const [terminalLines, setTerminalLines] = useState<string[]>(["[SYSTEM] INITIALIZING AEGIS_V2_CORE...", "[SEC] KERNEL_LOAD_OK", "[NET] SCANNING_TOPOLOGY..."]);
   const [threatLevel, setThreatLevel] = useState("LEVEL_1_SAFE");
   const [stats, setStats] = useState({ throughput: "442.1", peak: "892.4", avg: "512.1", encryption: "MIL-SPEC AES-256" });
+  const [integrity, setIntegrity] = useState(98.2);
   const [vpns, setVpns] = useState<VPNStatus[]>([
     {id: "TNL-A1", protocol: "WireGuard", status: "ENC", bandwidth: 450.2, latency: 1.2},
     {id: "TNL-B2", protocol: "OpenVPN", status: "ENC", bandwidth: 210.5, latency: 4.5},
@@ -79,7 +81,7 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
   const [chatInput, setChatInput] = useState("");
   const [isAILoading, setIsAILoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
-    { role: 'ai', text: 'SISTEMA AEGIS ACTIVO. NÚCLEO DE RAZONAMIENTO GEMINI 2.5 OPERACIONAL.', timestamp: '00:00:00' }
+    { role: 'ai', text: 'SISTEMA AEGIS ACTIVO. NÚCLEO DE RAZONAMIENTO GEMINI 2.5 FLASH OPERACIONAL.', timestamp: '00:00:00' }
   ]);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -100,6 +102,9 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
         const logs = ["[DPI] PKT_INSPECTED", "[AUTH] NODE_VERIFIED", "[NET] MESH_STABLE", "[SEC] ROTATING_KEYS"];
         setTerminalLines(prev => [...prev.slice(-10), logs[Math.floor(Math.random() * logs.length)]]);
       }
+
+      // Simular fluctuación de integridad
+      setIntegrity(prev => Math.min(100, Math.max(95, prev + (Math.random() - 0.5) * 0.1)));
     }, 100);
 
     return () => clearInterval(interval);
@@ -186,13 +191,13 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
           <div className="flex items-center gap-3">
             <div className="flex flex-col items-end">
               <span className="text-[6px] opacity-40 uppercase tracking-widest mb-0.5">UTC_CLOCK</span>
-              <span className="text-[9px] font-bold tracking-[0.1em] font-mono whitespace-nowrap">{time.split(':').slice(0, 3).join(':') || "--:--:--"}</span>
+              <span className="text-[10px] font-bold tracking-[0.1em] font-mono whitespace-nowrap">{time.split(':').slice(0, 3).join(':') || "--:--:--"}</span>
             </div>
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center justify-center w-7 h-7 rounded-none border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 hover:shadow-[0_0_10px_rgba(0,242,255,0.3)] transition-all group outline-none">
-                  <User className="w-3.5 h-3.5 text-[#00f2ff] group-hover:scale-110 transition-transform" />
+                <button className="flex items-center justify-center w-8 h-8 rounded-none border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 hover:shadow-[0_0_10px_rgba(0,242,255,0.3)] transition-all group outline-none">
+                  <User className="w-4 h-4 text-[#00f2ff] group-hover:scale-110 transition-transform" />
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent 
@@ -246,6 +251,11 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
               <div className="absolute top-2 right-2 bg-[#f43f5e] text-white text-[6px] px-1 py-0.5 font-bold border border-white/10 animate-pulse">
                 REC_ACTIVE
               </div>
+              <div className="absolute bottom-2 left-2 flex gap-1">
+                 <div className="w-1 h-1 bg-[#00f2ff] rounded-full" />
+                 <div className="w-1 h-1 bg-[#00f2ff] rounded-full opacity-30" />
+                 <div className="w-1 h-1 bg-[#00f2ff] rounded-full opacity-30" />
+              </div>
             </div>
           </TacticalPanel>
 
@@ -255,7 +265,7 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
                 <div key={i} className="p-1.5 border border-[#00f2ff]/10 bg-[#00f2ff]/5 rounded flex items-center justify-between group hover:border-[#00f2ff]/40 transition-colors">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-1 bg-[#00f2ff] rounded-full" />
-                    <span className="text-[8px] font-bold">{vpn.id}</span>
+                    <span className="text-[8px] font-bold uppercase">{vpn.id}</span>
                   </div>
                   <span className="text-[7px] font-mono text-[#00f2ff]/40">{vpn.bandwidth.toFixed(1)} Mb/s</span>
                 </div>
@@ -306,30 +316,37 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
                       animate={{ opacity: 1, y: 0 }}
                       className={`flex flex-col ${msg.role === 'operator' ? 'items-end' : 'items-start'}`}
                     >
-                      <div className={`max-w-[85%] p-1.5 border rounded-sm ${
+                      <div className={`max-w-[90%] p-1.5 border rounded-none ${
                         msg.role === 'ai' 
                         ? 'border-[#00f2ff]/20 bg-[#00f2ff]/5 text-[#00f2ff]' 
                         : 'border-[#f43f5e]/20 bg-[#f43f5e]/5 text-[#f43f5e]'
                       }`}>
+                        <span className="text-[5px] opacity-40 block mb-0.5">[{msg.timestamp}] {msg.role.toUpperCase()}</span>
                         {msg.text}
                       </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
-                {isAILoading && <Loader2 className="w-3 h-3 animate-spin text-[#00f2ff]/40" />}
+                {isAILoading && (
+                  <div className="flex items-center gap-2 text-[#00f2ff]/40">
+                    <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                    <span>RAZONANDO...</span>
+                  </div>
+                )}
                 <div ref={chatEndRef} />
               </div>
               
-              <form onSubmit={handleSendMessage} className="p-1 border-t border-[#00f2ff]/10 bg-black/60 flex items-center gap-1">
+              <form onSubmit={handleSendMessage} className="p-1.5 border-t border-[#00f2ff]/10 bg-black/60 flex items-center gap-2">
+                <Mic className="w-3 h-3 text-[#00f2ff]/30 hover:text-[#00f2ff] cursor-pointer transition-colors" />
                 <input 
                   type="text"
                   value={chatInput}
                   disabled={isAILoading}
                   onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="CMD..."
-                  className="w-full bg-transparent border-none focus:ring-0 text-[7px] text-[#00f2ff] font-mono p-1"
+                  placeholder="COMANDO_TÁCTICO..."
+                  className="w-full bg-transparent border-none focus:ring-0 text-[7px] text-[#00f2ff] font-mono p-1 uppercase placeholder:text-[#00f2ff]/10 outline-none"
                 />
-                <button type="submit" className="p-1 text-[#00f2ff]"><Send className="w-2.5 h-2.5" /></button>
+                <button type="submit" className="p-1 text-[#00f2ff] hover:scale-110 transition-transform"><Send className="w-3 h-3" /></button>
               </form>
             </TacticalPanel>
           </div>
@@ -338,10 +355,20 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
         <div className="col-span-3 flex flex-col gap-3 min-h-0">
           <TacticalPanel title="TRAFFIC_PPS" className="flex-[2]">
             <div className="p-2 h-full flex flex-col">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-[7px] opacity-40 uppercase">Load: {traffic[traffic.length-1]?.pps.toFixed(1)}%</span>
+                <span className="text-[7px] text-[#00f2ff] font-bold">STABLE</span>
+              </div>
               <div className="flex-1 min-h-0">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={traffic}>
-                    <Area type="monotone" dataKey="pps" stroke="#00f2ff" fill="#00f2ff" fillOpacity={0.1} strokeWidth={1} isAnimationActive={false}/>
+                    <defs>
+                      <linearGradient id="colorPps" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#00f2ff" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#00f2ff" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area type="monotone" dataKey="pps" stroke="#00f2ff" fill="url(#colorPps)" strokeWidth={1} isAnimationActive={false}/>
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -349,19 +376,47 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
           </TacticalPanel>
 
           <TacticalPanel title="ENCRYPTION_CONTROL" className="flex-[3]">
-            <div className="p-3 flex flex-col h-full bg-[#00f2ff]/2 gap-2">
-              <div className="space-y-1">
+            <div className="p-3 flex flex-col h-full bg-[#00f2ff]/2 gap-3">
+              <div className="space-y-2">
                 <div className="flex justify-between text-[7px] uppercase font-bold">
-                  <span className="opacity-40">Integrity</span>
-                  <span className="text-[#00f2ff]">98.2%</span>
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="w-2.5 h-2.5 text-[#00f2ff]" />
+                    <span className="opacity-40 tracking-widest">Integrity_Core</span>
+                  </div>
+                  <span className="text-[#00f2ff]">{integrity.toFixed(1)}%</span>
                 </div>
-                <div className="h-0.5 bg-white/5 w-full relative overflow-hidden rounded-full">
-                  <motion.div initial={{ width: 0 }} animate={{ width: '98.2%' }} className="h-full bg-[#00f2ff]" />
+                <div className="h-1 bg-white/5 w-full relative overflow-hidden">
+                  <motion.div 
+                    animate={{ width: `${integrity}%` }} 
+                    className={`h-full ${integrity < 96 ? 'bg-[#f43f5e]' : 'bg-[#00f2ff]'} shadow-[0_0_10px_rgba(0,242,255,0.5)]`} 
+                  />
                 </div>
               </div>
+
+              <div className="flex-1 space-y-2">
+                 <div className="flex items-center justify-between border-b border-[#00f2ff]/10 pb-1">
+                   <span className="text-[6px] opacity-40 uppercase tracking-widest">Key_Rotation</span>
+                   <span className="text-[7px] text-[#00f2ff] font-mono">0x{Math.random().toString(16).slice(2,8).toUpperCase()}</span>
+                 </div>
+                 <div className="flex items-center justify-between border-b border-[#00f2ff]/10 pb-1">
+                   <span className="text-[6px] opacity-40 uppercase tracking-widest">Algo_Spec</span>
+                   <span className="text-[7px] text-[#00f2ff] font-mono">AES_256_GCM</span>
+                 </div>
+                 <div className="flex items-center justify-between border-b border-[#00f2ff]/10 pb-1">
+                   <span className="text-[6px] opacity-40 uppercase tracking-widest">Quantum_Safe</span>
+                   <span className="text-[7px] text-[#00f2ff] font-mono">ACTIVE</span>
+                 </div>
+              </div>
+
               <div className="grid grid-cols-2 gap-2 mt-auto">
-                <button className="py-1 border border-[#00f2ff]/20 bg-[#00f2ff]/5 text-[6px] font-bold uppercase">Reboot</button>
-                <button className="py-1 border border-[#f43f5e]/30 bg-[#f43f5e]/10 text-[#f43f5e] text-[6px] font-bold uppercase">Purge</button>
+                <button className="py-2 border border-[#00f2ff]/20 bg-[#00f2ff]/5 text-[7px] font-black uppercase tracking-widest hover:bg-[#00f2ff]/10 transition-colors flex items-center justify-center gap-2">
+                  <RefreshCw className="w-2.5 h-2.5" />
+                  Reboot
+                </button>
+                <button className="py-2 border border-[#f43f5e]/30 bg-[#f43f5e]/10 text-[#f43f5e] text-[7px] font-black uppercase tracking-widest hover:bg-[#f43f5e]/20 transition-colors flex items-center justify-center gap-2">
+                  <Trash2 className="w-2.5 h-2.5" />
+                  Purge
+                </button>
               </div>
             </div>
           </TacticalPanel>
