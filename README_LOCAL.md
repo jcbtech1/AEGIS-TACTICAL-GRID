@@ -5,18 +5,23 @@ Este manual te guiará para limpiar tu repositorio de GitHub y organizar tus pro
 ## 🧹 Cómo Limpiar tu GitHub (Borrón y Cuenta Nueva)
 Si tu repositorio de GitHub está desordenado y quieres que se vea **exactamente igual** a tu carpeta local actual, usa el comando de "Fuerza".
 
-### Paso 1: Sincronización Total
+### Paso 1: Configurar el Repositorio Correcto
+Asegúrate de que tu carpeta local apunte al link que me diste:
+```bash
+git remote set-url origin https://github.com/jcbtech1/AEGIS-TACTICAL-GRID.git
+```
+
+### Paso 2: Sincronización Total
 Este comando le dice a Git: "Olvida lo que hay en la nube, lo que tengo aquí es la única verdad". Ejecuta esto en tu terminal:
 
 ```bash
-# 1. Asegúrate de estar en la carpeta raíz
-# 2. Registra todos los archivos y detecta los que fueron movidos o borrados
+# 1. Registra todos los archivos y detecta los que fueron movidos o borrados
 git add -A
 
-# 3. Crea el commit de limpieza
+# 2. Crea el commit de limpieza
 git commit -m "Build: Reinicio organizado del repositorio"
 
-# 4. SOBRESCRIBE GitHub con tu versión actual
+# 3. SOBRESCRIBE GitHub con tu versión actual
 # ¡ATENCIÓN! Esto borrará cualquier archivo en GitHub que no esté en tu PC.
 git push origin main --force
 ```
