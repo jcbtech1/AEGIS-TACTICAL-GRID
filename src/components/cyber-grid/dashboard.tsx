@@ -7,7 +7,8 @@ import {
   Lock, Zap, Radio, RefreshCw,
   Terminal as TerminalIcon, Cpu, Smartphone,
   Database, Globe, Wifi, User, Brain, Sparkles,
-  Mic, Send, Volume2, Command, Loader2, Settings, LogOut
+  Mic, Send, Volume2, Command, Loader2, Settings, LogOut,
+  Power, ShieldAlert, Sliders
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import NetMap from './net-map';
@@ -19,6 +20,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
 
 interface VPNStatus {
   id: string;
@@ -70,6 +72,8 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
     {id: "TNL-B2", protocol: "OpenVPN", status: "ENC", bandwidth: 210.5, latency: 4.5},
     {id: "TNL-G9", protocol: "Shadow", status: "STL", bandwidth: 125.1, latency: 0.8}
   ]);
+
+  const { toast } = useToast();
 
   // AI Chat State
   const [chatInput, setChatInput] = useState("");
@@ -150,6 +154,13 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
     }
   };
 
+  const handleAdvancedOps = () => {
+    toast({
+      title: "ADVANCED_OPERATIONS_INITIATED",
+      description: "CARGANDO PROTOCOLOS DE INTERVENCIÓN NIVEL 5...",
+    });
+  };
+
   if (!isMounted) return <div className="bg-[#020617] w-screen h-screen" />;
 
   return (
@@ -187,20 +198,48 @@ export default function AegisUltimateDashboard({ onLogout }: { onLogout: () => v
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center justify-center w-7 h-7 rounded-sm border border-[#00f2ff]/10 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/20 hover:border-[#00f2ff]/30 transition-all group outline-none">
-                  <User className="w-3 h-3 text-[#00f2ff]/60 group-hover:text-[#00f2ff] transition-colors" />
+                <button className="flex items-center justify-center w-7 h-7 rounded-none border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 hover:shadow-[0_0_10px_rgba(0,242,255,0.3)] transition-all group outline-none">
+                  <User className="w-3.5 h-3.5 text-[#00f2ff] group-hover:scale-110 transition-transform" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-[#050b1a]/98 border-[#00f2ff]/20 text-[#00f2ff] font-mono text-[7px] uppercase tracking-widest min-w-[130px] backdrop-blur-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)] rounded-none p-1">
-                <DropdownMenuItem className="focus:bg-[#00f2ff]/10 focus:text-[#00f2ff] cursor-pointer py-1.5 group outline-none">
-                  <Settings className="w-2.5 h-2.5 mr-2 group-hover:rotate-45 transition-transform opacity-60" /> 
-                  Config_Core
+              <DropdownMenuContent 
+                align="end"
+                className="bg-[rgba(0,20,30,0.85)] backdrop-blur-[16px] border border-[#00f2ff]/50 shadow-[0_0_20px_rgba(0,242,255,0.2)] rounded-none p-1 min-w-[180px] tactic-clip animate-flicker"
+              >
+                <div className="px-3 py-2 border-b border-[#00f2ff]/10 mb-1">
+                  <span className="text-[6px] text-[#00f2ff]/40 uppercase tracking-[0.2em] block">Security_Access_Panel</span>
+                  <span className="text-[8px] font-bold text-[#00f2ff] tracking-widest">OPERATOR_AUTHENTICATED</span>
+                </div>
+
+                <DropdownMenuItem 
+                  className="relative flex items-center gap-3 px-3 py-2 text-[8px] font-bold text-[#00f2ff] uppercase tracking-widest cursor-pointer focus:bg-[#00f2ff]/10 focus:text-white rounded-none outline-none scan-hover-item group transition-colors overflow-hidden"
+                >
+                  <Settings className="w-3 h-3 group-hover:rotate-90 transition-transform duration-500" />
+                  <span>[ SYSTEM_CONFIG ]</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-[#00f2ff]/10 my-1" />
-                <DropdownMenuItem onClick={onLogout} className="focus:bg-[#f43f5e]/10 focus:text-[#f43f5e] text-[#f43f5e]/60 cursor-pointer py-1.5 outline-none">
-                  <LogOut className="w-2.5 h-2.5 mr-2" /> 
-                  End_Session
+
+                <DropdownMenuItem 
+                  onClick={handleAdvancedOps}
+                  className="relative flex items-center gap-3 px-3 py-2 text-[8px] font-bold text-amber-400 uppercase tracking-widest cursor-pointer focus:bg-amber-400/10 focus:text-amber-300 rounded-none outline-none border border-amber-400/20 my-1 scan-hover-item group transition-colors overflow-hidden"
+                >
+                  <ShieldAlert className="w-3 h-3 animate-pulse" />
+                  <span>[ ADVANCED_OPERATIONS ]</span>
                 </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="bg-[#00f2ff]/10 mx-1" />
+
+                <DropdownMenuItem 
+                  onClick={onLogout}
+                  className="relative flex items-center gap-3 px-3 py-2 text-[8px] font-bold text-[#f43f5e] uppercase tracking-widest cursor-pointer focus:bg-[#f43f5e]/10 rounded-none outline-none scan-hover-item group transition-colors overflow-hidden mt-1"
+                >
+                  <Power className="w-3 h-3 group-hover:scale-110 transition-transform" />
+                  <span>[ TERMINATE_SESSION ]</span>
+                </DropdownMenuItem>
+                
+                <div className="mt-2 px-3 py-1 flex justify-between items-center opacity-20 border-t border-[#00f2ff]/5">
+                  <span className="text-[5px]">SIG: 0x89AF2</span>
+                  <span className="text-[5px]">VER: 2.0.4</span>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
