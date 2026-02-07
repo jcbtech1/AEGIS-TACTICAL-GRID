@@ -6,6 +6,7 @@
  * 
  * Implementa una interfaz de vigilancia con seguimiento de objetivos,
  * escaneo láser y telemetría de identidad.
+ * Optimizado para ajustarse al contenedor padre sin desbordar.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -56,10 +57,10 @@ export default function VisualScanModule() {
   const isCritical = identity.threat === "CRITICAL";
 
   return (
-    <div className={`flex gap-6 h-full p-2 border transition-colors duration-500 ${isCritical ? 'border-[#f43f5e] animate-pulse' : 'border-[#00f2ff]/20'}`}>
+    <div className={`flex gap-4 h-full p-2 border transition-colors duration-500 min-h-0 overflow-hidden ${isCritical ? 'border-[#f43f5e] animate-pulse' : 'border-[#00f2ff]/20'}`}>
       
       {/* INTERFAZ DE VIDEO CENTRAL */}
-      <div className="flex-[3] relative bg-black overflow-hidden border border-[#00f2ff]/30">
+      <div className="flex-[3] relative bg-black overflow-hidden border border-[#00f2ff]/30 min-h-0">
         {/* Feed de Video (Placeholder con filtros) */}
         <div 
           className="w-full h-full bg-cover bg-center opacity-40 grayscale"
@@ -93,52 +94,52 @@ export default function VisualScanModule() {
           className="absolute z-20"
         >
           {/* Esquinas en L */}
-          <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
-          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
-          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
-          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
+          <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
+          <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
+          <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
+          <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
 
           {/* Etiqueta flotante del objetivo */}
-          <div className="absolute -top-8 left-0 flex flex-col gap-0.5">
-             <span className="text-[6px] font-black bg-[#00f2ff] text-black px-1 uppercase tracking-tighter">FACE_LOCKED</span>
-             <span className="text-[8px] text-[#00f2ff] font-bold drop-shadow-md">OBJ_0x{targetPos.x.toFixed(0)}</span>
+          <div className="absolute -top-6 left-0 flex flex-col gap-0.5 whitespace-nowrap">
+             <span className="text-[5px] font-black bg-[#00f2ff] text-black px-1 uppercase tracking-tighter">FACE_LOCKED</span>
+             <span className="text-[7px] text-[#00f2ff] font-bold drop-shadow-md">OBJ_0x{targetPos.x.toFixed(0)}</span>
           </div>
         </motion.div>
 
         {/* Marcas de Agua HUD */}
-        <div className="absolute top-4 left-4 text-[7px] text-[#00f2ff]/60 uppercase tracking-[0.3em] font-bold">
+        <div className="absolute top-3 left-3 text-[6px] text-[#00f2ff]/60 uppercase tracking-[0.3em] font-bold">
           [ LIVE_FEED // SECURE_CHANNEL_01 ]
         </div>
-        <div className="absolute bottom-4 right-4 text-[7px] text-[#00f2ff]/60 uppercase font-mono">
+        <div className="absolute bottom-3 right-3 text-[6px] text-[#00f2ff]/60 uppercase font-mono">
           COORD: {targetPos.x.toFixed(2)}N / {targetPos.y.toFixed(2)}E
         </div>
       </div>
 
       {/* PANELES LATERALES DE DATOS */}
-      <div className="flex-1 flex flex-col gap-4">
+      <div className="flex-1 flex flex-col gap-3 min-w-0">
         
         {/* PANEL DE IDENTIDAD */}
-        <div className="border border-[#00f2ff]/30 bg-[#00f2ff]/5 p-3 flex flex-col gap-2">
+        <div className="border border-[#00f2ff]/30 bg-[#00f2ff]/5 p-2 flex flex-col gap-1 shrink-0">
            <div className="flex items-center gap-2 border-b border-[#00f2ff]/20 pb-1 mb-1">
-              <UserCheck className="w-3 h-3 text-[#00f2ff]" />
-              <span className="text-[8px] font-black uppercase tracking-widest text-[#00f2ff]">Ident_Panel</span>
+              <UserCheck className="w-2.5 h-2.5 text-[#00f2ff]" />
+              <span className="text-[7px] font-black uppercase tracking-widest text-[#00f2ff]">Ident_Panel</span>
            </div>
            
-           <div className="space-y-3">
+           <div className="space-y-2">
               <div className="flex flex-col">
-                <span className="text-[6px] opacity-40 uppercase">Subject_Identity</span>
-                <span className="text-[10px] font-bold text-[#00f2ff]">{identity.name}</span>
+                <span className="text-[5px] opacity-40 uppercase">Subject_Identity</span>
+                <span className="text-[9px] font-bold text-[#00f2ff] truncate">{identity.name}</span>
               </div>
               
               <div className="flex flex-col">
-                <span className="text-[6px] opacity-40 uppercase">Threat_Classification</span>
-                <span className={`text-[10px] font-black ${isCritical ? 'text-[#f43f5e]' : 'text-amber-400'}`}>
+                <span className="text-[5px] opacity-40 uppercase">Threat_Classification</span>
+                <span className={`text-[9px] font-black ${isCritical ? 'text-[#f43f5e]' : 'text-amber-400'}`}>
                   [{identity.threat}]
                 </span>
               </div>
 
               <div className="flex flex-col">
-                <span className="text-[6px] opacity-40 uppercase">Match_Confidence</span>
+                <span className="text-[5px] opacity-40 uppercase">Match_Confidence</span>
                 <div className="flex items-center gap-2">
                    <div className="flex-1 h-1 bg-black/40 relative">
                       <motion.div 
@@ -147,25 +148,25 @@ export default function VisualScanModule() {
                         className="h-full bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" 
                       />
                    </div>
-                   <span className="text-[8px] font-mono">{identity.confidence.toFixed(1)}%</span>
+                   <span className="text-[7px] font-mono">{identity.confidence.toFixed(1)}%</span>
                 </div>
               </div>
            </div>
         </div>
 
         {/* PANEL TÉCNICO DE TELEMETRÍA */}
-        <div className="border border-[#00f2ff]/30 bg-black/40 p-3 flex flex-col gap-4 flex-1">
-           <div className="flex items-center gap-2 border-b border-[#00f2ff]/20 pb-1">
-              <Activity className="w-3 h-3 text-[#00f2ff]" />
-              <span className="text-[8px] font-black uppercase tracking-widest opacity-60">Tech_Specs</span>
+        <div className="border border-[#00f2ff]/30 bg-black/40 p-2 flex flex-col gap-3 flex-1 min-h-0 overflow-hidden">
+           <div className="flex items-center gap-2 border-b border-[#00f2ff]/20 pb-1 shrink-0">
+              <Activity className="w-2.5 h-2.5 text-[#00f2ff]" />
+              <span className="text-[7px] font-black uppercase tracking-widest opacity-60">Tech_Specs</span>
            </div>
 
-           <div className="flex-1 flex flex-col gap-4 justify-center">
+           <div className="flex-1 flex flex-col gap-3 justify-center min-h-0">
               {/* Gráfico de Barras Signal */}
               <div className="space-y-1">
-                <span className="text-[6px] opacity-30 uppercase tracking-widest">Signal_Intensity</span>
-                <div className="flex gap-0.5 h-6 items-end">
-                   {Array.from({ length: 12 }).map((_, i) => (
+                <span className="text-[5px] opacity-30 uppercase tracking-widest">Signal_Intensity</span>
+                <div className="flex gap-0.5 h-4 items-end">
+                   {Array.from({ length: 10 }).map((_, i) => (
                       <motion.div 
                         key={i}
                         animate={{ height: `${20 + Math.random() * 80}%` }}
@@ -178,15 +179,15 @@ export default function VisualScanModule() {
 
               <div className="flex justify-between items-end">
                  <div className="flex flex-col">
-                    <span className="text-[6px] opacity-30 uppercase tracking-widest">Data_Ingestion</span>
-                    <span className="text-[12px] font-black font-mono">{(800 + Math.random() * 200).toFixed(1)} kB/s</span>
+                    <span className="text-[5px] opacity-30 uppercase tracking-widest">Data_Ingestion</span>
+                    <span className="text-[10px] font-black font-mono">{(800 + Math.random() * 200).toFixed(1)} kB/s</span>
                  </div>
-                 <Target className="w-5 h-5 text-[#00f2ff]/20 animate-pulse" />
+                 <Target className="w-4 h-4 text-[#00f2ff]/20 animate-pulse" />
               </div>
            </div>
 
-           <div className="mt-auto pt-2 border-t border-[#00f2ff]/10">
-              <div className="flex items-center justify-between text-[6px] opacity-40 uppercase">
+           <div className="mt-auto pt-1 border-t border-[#00f2ff]/10 shrink-0">
+              <div className="flex items-center justify-between text-[5px] opacity-40 uppercase">
                  <span>System_Load</span>
                  <span>4.2%</span>
               </div>
