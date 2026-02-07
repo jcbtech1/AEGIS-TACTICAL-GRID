@@ -14,11 +14,12 @@ import {
   Terminal, Globe, Lock, Cpu, ArrowLeft,
   ChevronRight, Activity, AlertCircle, Database,
   Settings, Wifi, Radio, Server, MessageSquare, List,
-  Undo2, Syringe, Power, LayoutGrid, HardDrive
+  Undo2, Syringe, Power, LayoutGrid, HardDrive, Eye
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+import VisualScanModule from './visual-scan';
 
-type ModuleType = 'RECONNAISSANCE' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS';
+type ModuleType = 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS';
 
 interface AdvancedOpsProps {
   onBack: () => void;
@@ -37,7 +38,7 @@ const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }
 );
 
 export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
-  const [activeModule, setActiveModule] = useState<ModuleType>('COUNTERMEASURES');
+  const [activeModule, setActiveModule] = useState<ModuleType>('VISUAL_SCAN');
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
           <nav className="flex-1 py-2 overflow-y-auto terminal-scroll">
             <div className="px-4 py-2 text-[6px] text-[#00f2ff]/20 uppercase tracking-[0.3em]">Operational_Modules</div>
             <NavButton type="RECONNAISSANCE" label="RECON_GRID" icon={Globe} />
+            <NavButton type="VISUAL_SCAN" label="VISUAL_SCAN" icon={Eye} />
             <NavButton type="COUNTERMEASURES" label="COUNTERMEASURES" icon={Shield} />
             <NavButton type="DATA_PURGE" label="DATA_PURGE" icon={Trash2} />
             <NavButton type="AI_ADVISOR" label="AI_ADVISOR" icon={Brain} />
@@ -126,6 +128,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
               className="w-full h-full"
             >
               {activeModule === 'RECONNAISSANCE' && <ReconModule />}
+              {activeModule === 'VISUAL_SCAN' && <VisualScanModule />}
               {activeModule === 'COUNTERMEASURES' && <CountermeasuresModule />}
               {activeModule === 'DATA_PURGE' && <DataPurgeModule />}
               {activeModule === 'AI_ADVISOR' && <AIAdvisorModule />}
