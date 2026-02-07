@@ -13,21 +13,22 @@ Para mantener el orden, el proyecto se divide en módulos lógicos:
 
 ---
 
-## 🚀 Cómo Actualizar tu GitHub (Paso a Paso)
+## 🚀 Cómo Limpiar y Actualizar tu GitHub (Paso a Paso)
 
-Si ya tienes el repositorio vinculado y solo quieres subir los nuevos cambios:
+Si sientes que tienes archivos "desparramados" o un desorden en tu repositorio, usa estos comandos para limpiar y subir todo como una versión única y organizada:
 
 1. **Abrir Terminal** en la carpeta raíz del proyecto.
 2. **Ejecutar estos comandos**:
 
 ```bash
-# Prepara todos los archivos actualizados
-git add .
+# 1. Limpiar el estado de Git (opcional, si hay archivos borrados que siguen apareciendo)
+git add -A
 
-# Crea la etiqueta de versión (cambia el mensaje según lo que hayas hecho)
-git commit -m "Update: Sincronización de módulos tácticos y seguridad"
+# 2. Guardar todos los cambios actuales en un solo paquete
+git commit -m "Build: Sincronización completa y limpia del sistema Aegis"
 
-# Envía los cambios a la nube
+# 3. Enviar a GitHub de forma forzada para sobrescribir el desorden anterior (USA CON CUIDADO)
+# Esto hará que tu GitHub se vea exactamente igual a tu carpeta local actual
 git push origin main
 ```
 

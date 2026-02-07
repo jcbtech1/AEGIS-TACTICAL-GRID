@@ -12,7 +12,6 @@ type ViewState = 'login' | 'dashboard' | 'advanced';
 export default function Home() {
   const [currentView, setCurrentView] = useState<ViewState | null>(null);
 
-  // Protocolo de Persistencia: Recuperar sesión al arrancar
   useEffect(() => {
     const savedSession = localStorage.getItem('aegis_session');
     if (savedSession === 'active') {
