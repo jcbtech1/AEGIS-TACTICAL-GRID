@@ -8,7 +8,7 @@ Si vas a copiar el proyecto manualmente a Replit o a otra carpeta local, **DEBES
 - **Configuración Core:** `package.json`, `tsconfig.json`, `tailwind.config.ts`, `components.json`.
 - **Variables de Entorno:** `.env` (Asegúrate de configurar tu `GOOGLE_GENAI_API_KEY`).
 - **Código Fuente:** Toda la carpeta `/src` (contiene el Frontend, los componentes visuales y la IA).
-- **Backends:** `/src/backend/go` y `/src/backend/python`.
+- **Backends:** `/src/backend/go` (ahora incluye `go.mod`) y `/src/backend/python`.
 
 ---
 
@@ -19,15 +19,23 @@ Si vas a copiar el proyecto manualmente a Replit o a otra carpeta local, **DEBES
 4. En la sección de **Secrets (Herramientas > Secrets)** de Replit, añade tu llave:
    - Key: `GOOGLE_GENAI_API_KEY`
    - Value: `tu_llave_aqui`
-5. Haz clic en **Run**. Replit instalará las dependencias automáticamente.
+5. **Para el Backend de Go:**
+   Si Replit te pide inicializar el módulo, abre la Shell y ejecuta:
+   ```bash
+   cd src/backend/go
+   go mod tidy
+   go run main.go
+   ```
+6. Haz clic en **Run**. Replit instalará las dependencias de Node.js automáticamente.
 
 ---
 
 ## 🛠 Ejecución Local (PC)
 Si ya tienes los archivos en tu PC:
-1. Instala las librerías: `npm install`.
-2. Inicia el sistema: `npm run dev`.
-3. El sistema estará disponible en `http://localhost:9002`.
+1. Instala las librerías de Node: `npm install`.
+2. Instala las librerías de Go: `cd src/backend/go && go mod tidy`.
+3. Inicia el sistema: `npm run dev` (desde la raíz).
+4. El sistema estará disponible en `http://localhost:9002`.
 
 ---
 
