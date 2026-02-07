@@ -1,12 +1,11 @@
 
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { 
   Shield, Activity, AlertTriangle, 
-  Cpu, Database, Globe, Radio, RefreshCw, 
-  Box, Lock, Zap
+  Lock, Zap, Radio, RefreshCw
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import NetMap from './net-map';
@@ -48,7 +47,8 @@ const TacticalPanel = ({ title, id, children, className = "", headerExtra = "" }
 );
 
 export default function AegisUltimateDashboard() {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState<Date | null>(null);
+  const [mounted, setMounted] = useState(false);
   const [traffic, setTraffic] = useState(Array.from({ length: 30 }, (_, i) => ({ time: i, pps: 0 })));
   const [terminalLines, setTerminalLines] = useState<string[]>(["[SYSTEM] INITIALIZING AEGIS_V2_CORE..."]);
   const [threatLevel, setThreatLevel] = useState("LEVEL_1_SAFE");
@@ -56,6 +56,9 @@ export default function AegisUltimateDashboard() {
   const [vpns, setVpns] = useState<VPNStatus[]>([]);
 
   useEffect(() => {
+    setMounted(true);
+    setTime(new Date());
+
     const connectWS = () => {
       const socket = new WebSocket('ws://localhost:8080/ws');
 
@@ -109,7 +112,6 @@ export default function AegisUltimateDashboard() {
       <div className="scanline-effect opacity-30" />
       <div className="vignette" />
 
-      {/* HEADER TÁCTICO */}
       <header className="flex justify-between items-end mb-6 px-2 z-20">
         <div className="flex items-center gap-12">
           <div className="flex flex-col">
@@ -133,14 +135,14 @@ export default function AegisUltimateDashboard() {
           </div>
           <div className="flex flex-col items-end">
             <span className="text-[8px] opacity-40 uppercase tracking-widest mb-1">System_Time_UTC</span>
-            <span className="text-sm font-bold tracking-[0.2em] font-mono">{time.toLocaleTimeString('en-GB', { hour12: false })}</span>
+            <span className="text-sm font-bold tracking-[0.2em] font-mono">
+              {mounted && time ? time.toLocaleTimeString('en-GB', { hour12: false }) : "--:--:--"}
+            </span>
           </div>
         </div>
       </header>
 
-      {/* GRID PRINCIPAL */}
       <main className="flex-1 grid grid-cols-12 gap-5 min-h-0 z-20">
-        {/* COLUMNA IZQUIERDA */}
         <div className="col-span-3 flex flex-col gap-5 min-h-0">
           <TacticalPanel title="AI_VISUAL_MONITOR" id="CAM_ALPHA_01" className="flex-[3]">
             <div className="w-full h-full relative bg-black overflow-hidden group">
@@ -194,7 +196,6 @@ export default function AegisUltimateDashboard() {
           </TacticalPanel>
         </div>
 
-        {/* COLUMNA CENTRAL */}
         <div className="col-span-6 flex flex-col gap-5 min-h-0">
           <TacticalPanel title="GLOBAL_DEFENSE_MAP" headerExtra="NETWORK_NODE_TRACKING" className="flex-[4]">
             <div className="w-full h-full relative bg-[#00f2ff]/5 rounded-lg overflow-hidden border border-[#00f2ff]/10">
@@ -221,7 +222,6 @@ export default function AegisUltimateDashboard() {
           </TacticalPanel>
         </div>
 
-        {/* COLUMNA DERECHA */}
         <div className="col-span-3 flex flex-col gap-5 min-h-0">
           <TacticalPanel title="TRAFFIC_TELEMETRY" className="flex-[2]">
             <div className="p-4 h-full flex flex-col">

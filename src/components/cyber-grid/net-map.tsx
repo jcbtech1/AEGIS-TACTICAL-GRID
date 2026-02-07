@@ -1,6 +1,7 @@
+
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
 const nodes = [
@@ -23,6 +24,14 @@ const connections = [
 ];
 
 export default function NetMap() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <div className="w-full h-full relative overflow-hidden bg-black/20">
       <svg viewBox="0 0 800 400" className="w-full h-full">
@@ -46,7 +55,7 @@ export default function NetMap() {
                   cy: [from.y, to.y]
                 }}
                 transition={{ 
-                  duration: 2 + Math.random() * 3, 
+                  duration: 2 + (i % 3), // Usamos 'i' en lugar de random para evitar hidratación
                   repeat: Infinity, 
                   ease: "linear" 
                 }}
