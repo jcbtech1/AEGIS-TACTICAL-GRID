@@ -1,13 +1,14 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, Activity, AlertTriangle, 
   Lock, Zap, Radio, RefreshCw,
   Terminal as TerminalIcon, Cpu, Smartphone,
-  Database, Globe, Wifi, User, Brain, Sparkles
+  Database, Globe, Wifi, User, Brain, Sparkles,
+  Mic, Send, Volume2, Command
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import NetMap from './net-map';
@@ -18,6 +19,12 @@ interface VPNStatus {
   status: string;
   bandwidth: number;
   latency: number;
+}
+
+interface ChatMessage {
+  role: 'system' | 'ai' | 'operator';
+  text: string;
+  timestamp: string;
 }
 
 const TacticalPanel = ({ title, id, children, className = "", headerExtra = "" }: { title: string, id?: string, children: React.ReactNode, className?: string, headerExtra?: string }) => (
@@ -49,7 +56,6 @@ export default function AegisUltimateDashboard() {
   const [isMounted, setIsMounted] = useState(false);
   const [traffic, setTraffic] = useState<{time: number, pps: number}[]>([]);
   const [terminalLines, setTerminalLines] = useState<string[]>(["[SYSTEM] INITIALIZING AEGIS_V2_CORE...", "[SEC] KERNEL_LOAD_OK", "[NET] SCANNING_TOPOLOGY..."]);
-  const [aiAnalysis, setAiAnalysis] = useState<string[]>(["[AI] MODEL_LOADED: GEMINI_TACTICAL", "[AI] MONITORING_ANOMALIES...", "[AI] NEURAL_MESH_ACTIVE"]);
   const [threatLevel, setThreatLevel] = useState("LEVEL_1_SAFE");
   const [stats, setStats] = useState({ throughput: "442.1", peak: "892.4", avg: "512.1", encryption: "MIL-SPEC AES-256" });
   const [vpns, setVpns] = useState<VPNStatus[]>([
@@ -57,6 +63,13 @@ export default function AegisUltimateDashboard() {
     {id: "TNL-B2", protocol: "OpenVPN", status: "ENC", bandwidth: 210.5, latency: 4.5},
     {id: "TNL-G9", protocol: "Shadow", status: "STL", bandwidth: 125.1, latency: 0.8}
   ]);
+
+  // AI Chat State
+  const [chatInput, setChatInput] = useState("");
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
+    { role: 'ai', text: 'SISTEMA AEGIS ACTIVO. ESPERANDO ÓRDENES DEL OPERADOR.', timestamp: '00:00:00' }
+  ]);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -75,20 +88,53 @@ export default function AegisUltimateDashboard() {
         const logs = ["[DPI] PKT_INSPECTED", "[AUTH] NODE_VERIFIED", "[NET] MESH_STABLE", "[SEC] ROTATING_KEYS"];
         setTerminalLines(prev => [...prev.slice(-10), logs[Math.floor(Math.random() * logs.length)]]);
       }
-
-      if (Math.random() > 0.95) {
-        const insights = [
-          "[AI] PATTERN_DETECTED: BEHAVIOR_ANOMALY",
-          "[AI] HEURISTIC_SCAN: 0% MALWARE",
-          "[AI] PREDICTIVE_ANALYSIS: LOAD_BALANCED",
-          "[AI] ENCRYPTION_HEALTH: OPTIMAL"
-        ];
-        setAiAnalysis(prev => [...prev.slice(-8), insights[Math.floor(Math.random() * insights.length)]]);
-      }
     }, 100);
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory]);
+
+  const handleSendMessage = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!chatInput.trim()) return;
+
+    const newMsg: ChatMessage = {
+      role: 'operator',
+      text: chatInput.toUpperCase(),
+      timestamp: time.split(':')[0] + ':' + time.split(':')[1] + ':' + time.split(':')[2]
+    };
+
+    setChatHistory(prev => [...prev, newMsg]);
+    setChatInput("");
+
+    // Simulate AI Response
+    setTimeout(() => {
+      const responses = [
+        "ANALIZANDO PATRONES DE RED... ESTADO ÓPTIMO.",
+        "ENCRIPTACIÓN REFORZADA. TÚNELES ESTABLES.",
+        "NO SE DETECTAN ANOMALÍAS EN LOS NODOS ACTIVOS.",
+        "ADVERTENCIA: TRÁFICO INUSUAL DETECTADO EN TNL-A1. MONITOREANDO.",
+        "COORDENADAS DE LOS NODOS VERIFICADAS."
+      ];
+      const aiMsg: ChatMessage = {
+        role: 'ai',
+        text: responses[Math.floor(Math.random() * responses.length)],
+        timestamp: time.split(':')[0] + ':' + time.split(':')[1] + ':' + time.split(':')[2]
+      };
+      setChatHistory(prev => [...prev, aiMsg]);
+      
+      // Simple TTS (Opcional)
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(aiMsg.text);
+        utterance.rate = 1.1;
+        utterance.pitch = 0.8;
+        window.speechSynthesis.speak(utterance);
+      }
+    }, 800);
+  };
 
   if (!isMounted) return <div className="bg-[#020617] w-screen h-screen" />;
 
@@ -202,26 +248,59 @@ export default function AegisUltimateDashboard() {
               </div>
             </TacticalPanel>
 
-            <TacticalPanel title="AI_INTEL_CORE" id="GEMINI_2.5">
-              <div className="p-2 bg-[#00f2ff]/2 h-full overflow-y-auto terminal-scroll font-mono text-[7px] leading-tight">
-                <div className="flex items-center gap-2 mb-2 p-1 border-b border-[#00f2ff]/10">
-                  <Brain className="w-3 h-3 text-[#00f2ff] animate-pulse" />
-                  <span className="text-[6px] uppercase tracking-widest text-[#00f2ff]">Reasoning_Engine_Active</span>
-                </div>
+            <TacticalPanel title="AI_INTEL_CORE" id="GEMINI_2.5" className="flex flex-col">
+              <div className="flex-1 min-h-0 p-2 bg-[#00f2ff]/2 overflow-y-auto terminal-scroll font-mono text-[7px] space-y-2">
                 <AnimatePresence mode="popLayout">
-                  {aiAnalysis.map((line, i) => (
+                  {chatHistory.map((msg, i) => (
                     <motion.div 
-                      key={`${i}-${line}`}
-                      initial={{ opacity: 0, x: 5 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className={`mb-1 ${i === aiAnalysis.length - 1 ? 'text-[#00f2ff]' : 'text-[#00f2ff]/50'}`}
+                      key={i}
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex flex-col ${msg.role === 'operator' ? 'items-end' : 'items-start'}`}
                     >
-                      <Sparkles className="inline-block w-2 h-2 mr-1 opacity-30" />
-                      {line}
+                      <div className="flex items-center gap-1 mb-0.5">
+                        <span className="text-[5px] opacity-30">{msg.timestamp}</span>
+                        <span className={`text-[6px] font-bold uppercase ${msg.role === 'ai' ? 'text-[#00f2ff]' : 'text-[#f43f5e]'}`}>
+                          {msg.role === 'ai' ? 'GEMINI_AI' : 'OPERATOR'}
+                        </span>
+                      </div>
+                      <div className={`max-w-[85%] p-1.5 border rounded-sm ${
+                        msg.role === 'ai' 
+                        ? 'border-[#00f2ff]/20 bg-[#00f2ff]/5 text-[#00f2ff]' 
+                        : 'border-[#f43f5e]/20 bg-[#f43f5e]/5 text-[#f43f5e]'
+                      }`}>
+                        {msg.role === 'ai' && <Sparkles className="inline-block w-2 h-2 mr-1 animate-pulse" />}
+                        {msg.text}
+                      </div>
                     </motion.div>
                   ))}
                 </AnimatePresence>
+                <div ref={chatEndRef} />
               </div>
+              
+              <form onSubmit={handleSendMessage} className="p-1 border-t border-[#00f2ff]/10 bg-black/60 flex items-center gap-1">
+                <div className="flex gap-1">
+                  <button type="button" className="p-1 text-[#00f2ff]/40 hover:text-[#00f2ff] transition-colors">
+                    <Mic className="w-3 h-3" />
+                  </button>
+                  <button type="button" className="p-1 text-[#00f2ff]/40 hover:text-[#00f2ff] transition-colors">
+                    <Volume2 className="w-3 h-3" />
+                  </button>
+                </div>
+                <div className="flex-1 relative flex items-center">
+                  <Command className="absolute left-1 w-2.5 h-2.5 text-[#00f2ff]/20" />
+                  <input 
+                    type="text"
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    placeholder="COMMAND_PROMPT..."
+                    className="w-full bg-transparent border-none focus:ring-0 text-[7px] text-[#00f2ff] font-mono pl-4 placeholder:text-[#00f2ff]/10"
+                  />
+                </div>
+                <button type="submit" className="p-1 text-[#00f2ff] hover:scale-110 transition-transform">
+                  <Send className="w-3 h-3" />
+                </button>
+              </form>
             </TacticalPanel>
           </div>
         </div>
@@ -315,3 +394,4 @@ export default function AegisUltimateDashboard() {
     </div>
   );
 }
+
