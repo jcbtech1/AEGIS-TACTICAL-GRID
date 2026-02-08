@@ -6,6 +6,7 @@
  * 
  * Implementa una interfaz de "Comandancia Militar" con gestión de niveles de acceso (Clearance),
  * bloqueos de seguridad y efectos de elevación de privilegios.
+ * Incluye integración con Gemini AI en el módulo AI_ADVISOR.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -17,17 +18,16 @@ import {
   Fingerprint, ShieldCheck,
   List, Radar, FolderLock, 
   ZapOff, Ghost, Radio, Key, Thermometer, FileText,
-  LockKeyhole, User, CircleArrowUp, AlertTriangle
+  LockKeyhole, User, CircleArrowUp, AlertTriangle, Send, Loader2
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
+import { sendTacticalCommand } from '@/app/actions';
 
 type ModuleType = 'STRATEGIC_INTELLIGENCE' | 'SECURITY_MANAGEMENT' | 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS' | 'INFRASTRUCTURE';
 
 interface AdvancedOpsProps {
   onBack: () => void;
 }
-
-// --- COMPONENTES DE UTILIDAD TÁCTICA ---
 
 const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }: { children: React.ReactNode, title?: string, className?: string, isAccent?: boolean }) => (
   <div className={`relative ${isAccent ? 'border-[#f43f5e]' : 'border-[#00f2ff]/40'} border bg-black/40 backdrop-blur-md p-3 flex flex-col ${className} fui-corner-brackets overflow-hidden`}>
@@ -42,8 +42,6 @@ const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }
     </div>
   </div>
 );
-
-// --- SISTEMA DE BLOQUEO POR NIVEL (CLEARANCE OVERLAY) ---
 
 const ClearanceOverlay = ({ requiredLevel, currentLevel, children }: { requiredLevel: number, currentLevel: number, children: React.ReactNode }) => {
   const isLocked = currentLevel < requiredLevel;
@@ -70,8 +68,6 @@ const ClearanceOverlay = ({ requiredLevel, currentLevel, children }: { requiredL
     </div>
   );
 };
-
-// --- COMPONENTE DE FLASH DE ELEVACIÓN ---
 
 const ElevationFlash = ({ active }: { active: boolean }) => (
   <AnimatePresence>
@@ -133,7 +129,6 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
       <div className="scanline-effect opacity-5 pointer-events-none" />
       <div className="vignette" />
 
-      {/* MENÚ LATERAL TÁCTICO */}
       <aside className="w-[18%] flex flex-col gap-4 z-20 h-full">
         <DoubleBorderPanel className="flex-none p-4">
           <div className="flex flex-col items-start gap-1">
@@ -169,7 +164,6 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
         </DoubleBorderPanel>
       </aside>
 
-      {/* ÁREA DE CONTENIDO PRINCIPAL */}
       <main className="flex-1 flex flex-col gap-4 z-20 overflow-hidden h-full">
         <header className="flex justify-between items-start shrink-0">
           <div>
@@ -216,7 +210,7 @@ export default function AdvancedOpsScreen({ onBack }: AdvancedOpsProps) {
                   <DataPurgeModule />
                 </ClearanceOverlay>
               )}
-              {activeModule === 'AI_ADVISOR' && <AIAdvisorModule />}
+              {activeModule === 'AI_ADVISOR' && <AIAdvisorModule currentLevel={currentClearance} />}
               {activeModule === 'SYSTEM_LOGS' && <SystemLogsModule />}
               {activeModule === 'INFRASTRUCTURE' && <InfrastructureModule />}
             </motion.div>
@@ -667,21 +661,90 @@ function DataPurgeModule() {
   );
 }
 
-function AIAdvisorModule() {
+interface ChatEntry {
+  role: 'ai' | 'operator';
+  text: string;
+}
+
+function AIAdvisorModule({ currentLevel }: { currentLevel: number }) {
+  const [input, setInput] = useState('');
+  const [history, setHistory] = useState<ChatEntry[]>([
+    { role: 'ai', text: 'SISTEMA AEGIS ACTIVO. ESPERANDO COMANDOS ESTRATÉGICOS.' }
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo(0, scrollRef.current.scrollHeight);
+  }, [history]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+    
+    const userMsg: ChatEntry = { role: 'operator', text: input.toUpperCase() };
+    setHistory(prev => [...prev, userMsg]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const result = await sendTacticalCommand({
+        message: userMsg.text,
+        systemStatus: {
+          threatLevel: "ADVANCED_OP_ZONE",
+          activeNodes: 12,
+          throughput: "2.4 Gb/s"
+        }
+      });
+      
+      setHistory(prev => [...prev, { role: 'ai', text: result.response }]);
+    } catch (error) {
+      setHistory(prev => [...prev, { role: 'ai', text: 'ERROR EN EL ENLACE NEURAL.' }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full gap-4 min-h-0 overflow-hidden">
       <DoubleBorderPanel title="STRATEGIC_AI_ADVISOR" className="flex-1 flex flex-col bg-black/20">
-        <div className="flex-1 p-4 overflow-y-auto terminal-scroll space-y-4 min-h-0">
-          <div className="p-3 bg-[#00f2ff]/5 border border-[#00f2ff]/20 text-[10px] leading-tight rounded-none border-l-4">
-            [ADVISOR]: ANALYSIS COMPLETE. RECOMMEND IMMEDIATE REINFORCEMENT OF SECTOR 7. ANOMALY DETECTED IN KERNEL SYNC.
-          </div>
-          <div className="p-3 bg-[#f43f5e]/5 border border-[#f43f5e]/20 text-[10px] leading-tight rounded-none border-l-4">
-            [ADVISOR]: DETECTED UNAUTHORIZED DATA EXFILTRATION ATTEMPT. INITIATING COUNTER-PROTOCOLS.
-          </div>
+        <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto terminal-scroll space-y-4 min-h-0">
+          {history.map((msg, i) => (
+            <div 
+              key={i} 
+              className={`p-3 border text-[10px] leading-tight rounded-none border-l-4 ${
+                msg.role === 'ai' 
+                ? 'bg-[#00f2ff]/5 border-[#00f2ff]/20' 
+                : 'bg-[#f43f5e]/5 border-[#f43f5e]/20 text-right'
+              }`}
+            >
+              <span className="text-[6px] opacity-40 uppercase block mb-1">[{msg.role}]</span>
+              {msg.text}
+            </div>
+          ))}
+          {isLoading && (
+            <div className="flex items-center gap-2 text-[#00f2ff]/40 px-3">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              <span className="text-[8px] animate-pulse">PROCESANDO_DATA...</span>
+            </div>
+          )}
         </div>
         <div className="p-3 border-t border-[#00f2ff]/10 flex gap-2 bg-black/40 shrink-0">
-          <input type="text" placeholder="COMMAND_ADVISOR..." className="flex-1 bg-black/60 border border-[#00f2ff]/20 px-4 py-2 text-[9px] outline-none text-[#00f2ff] font-mono" />
-          <button className="px-6 py-2 bg-[#00f2ff] text-[#010409] font-black text-[9px] uppercase tracking-widest shrink-0">SEND_QUERY</button>
+          <input 
+            type="text" 
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            placeholder="COMMAND_ADVISOR..." 
+            className="flex-1 bg-black/60 border border-[#00f2ff]/20 px-4 py-2 text-[9px] outline-none text-[#00f2ff] font-mono" 
+          />
+          <button 
+            onClick={handleSend}
+            disabled={isLoading}
+            className="px-6 py-2 bg-[#00f2ff] text-[#010409] font-black text-[9px] uppercase tracking-widest shrink-0 flex items-center gap-2 hover:bg-[#00f2ff]/80 transition-colors"
+          >
+            {isLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+            RUN
+          </button>
         </div>
       </DoubleBorderPanel>
     </div>
