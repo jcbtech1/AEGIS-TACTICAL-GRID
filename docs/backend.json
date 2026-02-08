@@ -1,0 +1,42 @@
+
+{
+  "entities": {
+    "Operator": {
+      "title": "Perfil de Operador",
+      "description": "Datos del operador táctico y sus privilegios.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "name": { "type": "string" },
+        "clearance": { "type": "number", "minimum": 1, "maximum": 5 },
+        "lastActive": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "clearance"]
+    },
+    "TacticalLog": {
+      "title": "Log Táctico",
+      "description": "Registro de eventos del sistema o mensajes de la IA.",
+      "type": "object",
+      "properties": {
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["INFO", "SEC", "NET", "AI", "CRITICAL"] },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "operatorId": { "type": "string" }
+      },
+      "required": ["message", "type", "timestamp"]
+    }
+  },
+  "auth": {
+    "providers": ["password"]
+  },
+  "firestore": {
+    "/operators/{operatorId}": {
+      "schema": "Operator",
+      "description": "Perfiles de acceso de los operadores."
+    },
+    "/logs/{logId}": {
+      "schema": "TacticalLog",
+      "description": "Registro histórico de operaciones."
+    }
+  }
+}

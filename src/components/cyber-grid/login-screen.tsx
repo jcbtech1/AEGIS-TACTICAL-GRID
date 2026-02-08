@@ -4,16 +4,19 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Lock, Cpu, Terminal, Fingerprint, AlertCircle } from 'lucide-react';
+import { initializeFirebase } from '@/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 interface AegisLoginScreenProps {
   onLogin: () => void;
 }
 
 export default function AegisLoginScreen({ onLogin }: AegisLoginScreenProps) {
-  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
   const [accessCode, setAccessCode] = useState("");
   const [status, setStatus] = useState<"idle" | "scanning" | "denied" | "granted">("idle");
   const [bootLogs, setBootLogs] = useState<string[]>([]);
+  const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
     const logs = [
@@ -34,22 +37,27 @@ export default function AegisLoginScreen({ onLogin }: AegisLoginScreenProps) {
     return () => clearInterval(interval);
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id || !accessCode) return;
+    if (!email || !accessCode) return;
 
     setStatus("scanning");
+    setErrorMsg("");
     
-    // Simulación de validación táctica
-    setTimeout(() => {
-      if (accessCode === "AEGIS-2024" || accessCode === "admin") {
-        setStatus("granted");
-        setTimeout(onLogin, 1200);
-      } else {
-        setStatus("denied");
-        setTimeout(() => setStatus("idle"), 2000);
-      }
-    }, 2000);
+    try {
+      const { auth } = initializeFirebase();
+      // En una app real usaríamos el email. Para la interfaz mantenemos la estética.
+      const userEmail = email.includes('@') ? email : `${email}@aegis.mil`;
+      await signInWithEmailAndPassword(auth, userEmail, accessCode);
+      
+      setStatus("granted");
+      setTimeout(onLogin, 1200);
+    } catch (error: any) {
+      console.error("Auth Error:", error);
+      setStatus("denied");
+      setErrorMsg("INVALID_SECURITY_TOKEN");
+      setTimeout(() => setStatus("idle"), 2000);
+    }
   };
 
   return (
@@ -57,7 +65,6 @@ export default function AegisLoginScreen({ onLogin }: AegisLoginScreenProps) {
       <div className="scanline-effect opacity-20" />
       <div className="vignette" />
 
-      {/* FONDO DECORATIVO */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
         <Shield className="w-[600px] h-[600px] text-[#00f2ff] animate-pulse" />
       </div>
@@ -79,13 +86,13 @@ export default function AegisLoginScreen({ onLogin }: AegisLoginScreenProps) {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-[7px] text-[#00f2ff]/60 uppercase tracking-widest ml-1">Operator_ID</label>
+            <label className="text-[7px] text-[#00f2ff]/60 uppercase tracking-widest ml-1">Operator_ID (Email)</label>
             <div className="relative">
               <Terminal className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
               <input 
                 type="text" 
-                value={id}
-                onChange={(e) => setId(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="USER_ALPHA_01"
                 className="w-full bg-black/40 border border-[#00f2ff]/20 rounded-none px-8 py-2 text-[10px] text-[#00f2ff] focus:outline-none focus:border-[#00f2ff]/60 transition-colors placeholder:text-[#00f2ff]/10"
               />
@@ -139,7 +146,7 @@ export default function AegisLoginScreen({ onLogin }: AegisLoginScreenProps) {
             {status === "denied" && (
               <div className="text-[7px] text-red-500 flex items-center gap-1 mt-1">
                 <AlertCircle className="w-2 h-2" />
-                ERROR_AUTH_FAIL: INVALID_SECURITY_TOKEN
+                ERROR_AUTH_FAIL: {errorMsg}
               </div>
             )}
             {status === "scanning" && (
@@ -154,12 +161,11 @@ export default function AegisLoginScreen({ onLogin }: AegisLoginScreenProps) {
         </footer>
       </motion.div>
 
-      {/* ELEMENTOS DECORATIVOS EXTREMOS */}
       <div className="absolute top-4 left-4 text-[6px] text-[#00f2ff]/20 uppercase tracking-[0.5em]">
         System_Guard_Active // No_Unauthorized_Access
       </div>
       <div className="absolute bottom-4 right-4 text-[6px] text-[#00f2ff]/20 uppercase tracking-[0.5em]">
-        Encryption: MIL_SPEC_AES_256
+        Backend_Infrastructure: FIREBASE_CLOUD
       </div>
     </div>
   );
