@@ -6,8 +6,9 @@ import { AnimatePresence } from 'framer-motion';
 import AegisUltimateDashboard from '@/components/cyber-grid/dashboard';
 import AegisLoginScreen from '@/components/cyber-grid/login-screen';
 import AdvancedOpsScreen from '@/components/cyber-grid/advanced-ops';
+import AegisHubScreen from '@/components/cyber-grid/hub-screen';
 
-type ViewState = 'login' | 'dashboard' | 'advanced';
+type ViewState = 'login' | 'hub' | 'dashboard' | 'advanced';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState<ViewState | null>(null);
@@ -15,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     const savedSession = localStorage.getItem('aegis_session');
     if (savedSession === 'active') {
-      setCurrentView('dashboard');
+      setCurrentView('hub');
     } else {
       setCurrentView('login');
     }
@@ -23,7 +24,7 @@ export default function Home() {
 
   const handleLogin = () => {
     localStorage.setItem('aegis_session', 'active');
-    setCurrentView('dashboard');
+    setCurrentView('hub');
   };
 
   const handleLogout = () => {
@@ -43,18 +44,27 @@ export default function Home() {
           />
         )}
         
+        {currentView === 'hub' && (
+          <AegisHubScreen
+            key="hub"
+            onSelectDashboard={() => setCurrentView('dashboard')}
+            onSelectAdvanced={() => setCurrentView('advanced')}
+            onLogout={handleLogout}
+          />
+        )}
+
         {currentView === 'dashboard' && (
           <AegisUltimateDashboard 
             key="dashboard" 
             onLogout={handleLogout} 
-            onAdvancedOps={() => setCurrentView('advanced')}
+            onBackToHub={() => setCurrentView('hub')}
           />
         )}
 
         {currentView === 'advanced' && (
           <AdvancedOpsScreen 
             key="advanced" 
-            onBack={() => setCurrentView('dashboard')}
+            onBack={() => setCurrentView('hub')}
           />
         )}
       </AnimatePresence>

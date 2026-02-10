@@ -9,7 +9,7 @@ import {
   Terminal as TerminalIcon, Cpu, Smartphone,
   Database, Globe, Wifi, User, Brain, Sparkles,
   Mic, Send, Volume2, Command, Loader2, Settings, LogOut,
-  Power, ShieldAlert, Sliders, Hash, Key
+  Power, ShieldAlert, Sliders, Hash, Key, Home
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import NetMap from './net-map';
@@ -61,7 +61,7 @@ const TacticalPanel = ({ title, id, children, className = "", headerExtra = "" }
   </motion.div>
 );
 
-export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { onLogout: () => void, onAdvancedOps: () => void }) {
+export default function AegisUltimateDashboard({ onLogout, onBackToHub }: { onLogout: () => void, onBackToHub: () => void }) {
   const [time, setTime] = useState<string>("");
   const [isMounted, setIsMounted] = useState(false);
   const [traffic, setTraffic] = useState<{time: number, pps: number}[]>([]);
@@ -167,13 +167,15 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
 
       <header className="flex justify-between items-end mb-3 px-1 z-20 shrink-0">
         <div className="flex items-center gap-4">
+          <button 
+            onClick={onBackToHub}
+            className="p-2 border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 transition-all text-[#00f2ff]"
+          >
+            <Home className="w-4 h-4" />
+          </button>
           <div className="flex flex-col">
-            <h1 className="text-xs font-black tracking-[0.4em] text-[#00f2ff] glitch-text uppercase leading-none">Aegis Tactical Grid</h1>
-            <span className="text-[6px] text-[#00f2ff]/40 tracking-[0.2em] font-bold mt-1 uppercase">OPERATIONAL_MODE: LOCAL_ENCRYPTED // {stats.encryption}</span>
-          </div>
-          <div className="hidden lg:flex items-center gap-2 px-2 py-1 border border-[#00f2ff]/10 rounded bg-[#00f2ff]/5">
-            <Shield className="w-2.5 h-2.5 text-[#00f2ff] animate-pulse" />
-            <span className="text-[8px] font-bold tracking-widest uppercase opacity-70">Nodes: {vpns.length} Active</span>
+            <h1 className="text-xs font-black tracking-[0.4em] text-[#00f2ff] glitch-text uppercase leading-none">Tactical Grid Console</h1>
+            <span className="text-[6px] text-[#00f2ff]/40 tracking-[0.2em] font-bold mt-1 uppercase">AEGIS_CORE_LINK // {stats.encryption}</span>
           </div>
         </div>
 
@@ -195,7 +197,7 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center justify-center w-8 h-8 rounded-none border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 hover:shadow-[0_0_10px_rgba(0,242,255,0.3)] transition-all group outline-none">
+                <button className="flex items-center justify-center w-8 h-8 rounded-none border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 transition-all group outline-none">
                   <User className="w-4 h-4 text-[#00f2ff] group-hover:scale-110 transition-transform" />
                 </button>
               </DropdownMenuTrigger>
@@ -209,18 +211,11 @@ export default function AegisUltimateDashboard({ onLogout, onAdvancedOps }: { on
                 </div>
 
                 <DropdownMenuItem 
+                  onClick={onBackToHub}
                   className="relative flex items-center gap-3 px-3 py-2 text-[8px] font-bold text-[#00f2ff] uppercase tracking-widest cursor-pointer focus:bg-[#00f2ff]/10 focus:text-white rounded-none outline-none scan-hover-item group transition-colors overflow-hidden"
                 >
-                  <Settings className="w-3 h-3 group-hover:rotate-90 transition-transform duration-500" />
-                  <span>[ SYSTEM_CONFIG ]</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem 
-                  onClick={onAdvancedOps}
-                  className="relative flex items-center gap-3 px-3 py-2 text-[8px] font-bold text-amber-400 uppercase tracking-widest cursor-pointer focus:bg-amber-400/10 focus:text-amber-300 rounded-none outline-none border border-amber-400/20 my-1 scan-hover-item group transition-colors overflow-hidden"
-                >
-                  <ShieldAlert className="w-3 h-3 animate-pulse" />
-                  <span>[ ADVANCED_OPERATIONS ]</span>
+                  <Home className="w-3 h-3" />
+                  <span>[ CENTRAL_HUB ]</span>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator className="bg-[#00f2ff]/10 mx-1" />
