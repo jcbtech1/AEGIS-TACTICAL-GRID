@@ -12,6 +12,7 @@ type ViewState = 'login' | 'hub' | 'dashboard' | 'advanced' | 'users';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState<ViewState | null>(null);
+  const [initialModule, setInitialModule] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     const savedSession = localStorage.getItem('aegis_session');
@@ -32,6 +33,11 @@ export default function Home() {
     setCurrentView('login');
   };
 
+  const handleSelectAdvanced = (module: string) => {
+    setInitialModule(module);
+    setCurrentView('advanced');
+  };
+
   if (currentView === null) return <div className="bg-[#020617] w-screen h-screen" />;
 
   return (
@@ -48,7 +54,7 @@ export default function Home() {
           <AegisHubScreen
             key="hub"
             onSelectDashboard={() => setCurrentView('dashboard')}
-            onSelectAdvanced={() => setCurrentView('advanced')}
+            onSelectAdvanced={handleSelectAdvanced}
             onSelectUsers={() => setCurrentView('users')}
             onLogout={handleLogout}
           />
@@ -66,6 +72,7 @@ export default function Home() {
           <AdvancedOpsScreen 
             key="advanced" 
             onBack={() => setCurrentView('hub')}
+            initialModule={initialModule as any}
           />
         )}
 
