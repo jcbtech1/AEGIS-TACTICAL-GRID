@@ -1,4 +1,3 @@
-
 "use client";
 
 /**
@@ -59,7 +58,7 @@ const ClearanceOverlay = ({ requiredLevel, currentLevel, children }: { requiredL
         {children}
       </div>
       <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-md border border-[#f43f5e]/20">
-        <Lock className="w-8 h-8 text-[#f43f5e] mb-2 animate-pulse" />
+        <Lock className="w-8 h-8 text-[#f43f5e] mb-2" />
         <span className="text-[8px] font-black text-[#f43f5e] tracking-[0.3em] uppercase text-center px-6">
           LEVEL_{requiredLevel}_REQUIRED
         </span>
@@ -165,7 +164,7 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
           </div>
           <div className="flex items-center gap-2">
              <div className="w-5 h-5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 flex items-center justify-center">
-                <Shield className="w-3 h-3 animate-pulse" />
+                <Shield className="w-3 h-3" />
              </div>
           </div>
         </header>
@@ -291,11 +290,6 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
     setIsLoading(true);
 
     try {
-      /**
-       * --- CONEXIÓN A BACKEND ---
-       * Aquí es donde tu frontend se comunica con el servidor.
-       * Actualmente usa una Server Action de Next.js (sendTacticalCommand).
-       */
       const result = await sendTacticalCommand({
         message: userMsg.text,
         systemStatus: { 
@@ -385,16 +379,12 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
 
           {/* Círculo Central con Nombre AEGIS */}
           <div className="relative w-36 h-36 rounded-full border-2 border-[#00f2ff]/60 bg-[#00f2ff]/5 flex flex-col items-center justify-center backdrop-blur-md shadow-[0_0_30px_rgba(0,242,255,0.2)]">
-             <motion.div 
-               animate={{ opacity: [0.4, 1, 0.4] }}
-               transition={{ repeat: Infinity, duration: 3 }}
-               className="flex flex-col items-center"
-             >
+             <div className="flex flex-col items-center">
                 <h1 className="text-xl font-black tracking-[0.5em] text-[#00f2ff] ml-[0.5em] drop-shadow-[0_0_10px_#00f2ff]">AEGIS</h1>
                 <span className="text-[6px] font-bold text-[#00f2ff]/40 tracking-[0.3em] uppercase mt-1">
                    {isListening ? 'LISTENING...' : isLoading ? 'PROCESSING...' : 'CORE_ACTIVE'}
                 </span>
-             </motion.div>
+             </div>
 
              {/* Indicadores de rotación internos */}
              <div className="absolute inset-0 border-[3px] border-[#00f2ff]/10 rounded-full border-dashed animate-spin-slow" />
@@ -434,7 +424,7 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
              <Brain className="w-4 h-4 text-[#00f2ff]" />
              <span className="text-[8px] font-black tracking-widest uppercase">Aegis_Comm_Link</span>
            </div>
-           {isListening && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_red]" />}
+           {isListening && <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_10px_red]" />}
         </div>
 
         <div className="flex-1 overflow-y-auto terminal-scroll p-4 space-y-4">
@@ -469,7 +459,7 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
             {isLoading && (
               <div className="flex items-center gap-3 text-[#00f2ff]/40 p-2">
                 <Loader2 className="w-3 h-3 animate-spin" />
-                <span className="text-[7px] font-black tracking-[0.3em] animate-pulse">SYNCHRONIZING...</span>
+                <span className="text-[7px] font-black tracking-[0.3em]">SYNCHRONIZING...</span>
               </div>
             )}
             <div ref={chatEndRef} />
@@ -621,7 +611,7 @@ function CountermeasuresModule() {
 function DataPurgeModule() {
   return (
     <DoubleBorderPanel title="PURGE_SYSTEM" className="h-full flex flex-col items-center justify-center gap-4" isAccent>
-       <span className="text-lg font-black text-[#f43f5e] animate-pulse uppercase tracking-[0.2em]">!! STANDBY_PURGE !!</span>
+       <span className="text-lg font-black text-[#f43f5e] uppercase tracking-[0.2em]">!! STANDBY_PURGE !!</span>
        <button className="px-6 py-2 border border-[#f43f5e] bg-[#f43f5e]/10 text-[#f43f5e] text-[8px] font-black uppercase tracking-[0.3em] hover:bg-[#f43f5e]/20">Initialize</button>
     </DoubleBorderPanel>
   );

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -47,7 +46,7 @@ const TacticalPanel = ({ title, id, children, className = "", headerExtra = "" }
     <div className="fui-corner-brackets-inner" />
     <div className="flex justify-between items-center px-2 py-1 border-b border-[#00f2ff]/10 bg-[#00f2ff]/5">
       <div className="flex items-center gap-2">
-        <div className="w-1 h-1 bg-[#00f2ff] animate-ping rounded-full" />
+        <div className="w-1 h-1 bg-[#00f2ff] rounded-full" />
         <h3 className="text-[9px] font-bold tracking-[0.2em] uppercase text-[#00f2ff]/80">{title}</h3>
       </div>
       <div className="flex items-center gap-2">
@@ -183,7 +182,7 @@ export default function AegisUltimateDashboard({ onLogout, onBackToHub }: { onLo
           <div className="flex flex-col items-end">
             <span className="text-[6px] opacity-40 uppercase tracking-widest mb-0.5">Threat_Level</span>
             <div className={`px-2 py-0.5 border text-[8px] font-bold tracking-[0.1em] rounded transition-colors duration-500 ${
-              threatLevel.includes('LEVEL_4') ? 'border-[#f43f5e] bg-[#f43f5e]/20 text-[#f43f5e] animate-pulse' : 'border-[#00f2ff] bg-[#00f2ff]/10 text-[#00f2ff]'
+              threatLevel.includes('LEVEL_4') ? 'border-[#f43f5e] bg-[#f43f5e]/20 text-[#f43f5e]' : 'border-[#00f2ff] bg-[#00f2ff]/10 text-[#00f2ff]'
             }`}>
               {threatLevel}
             </div>
@@ -203,7 +202,7 @@ export default function AegisUltimateDashboard({ onLogout, onBackToHub }: { onLo
               </DropdownMenuTrigger>
               <DropdownMenuContent 
                 align="end"
-                className="bg-[rgba(0,20,30,0.85)] backdrop-blur-[16px] border border-[#00f2ff]/50 shadow-[0_0_20px_rgba(0,242,255,0.2)] rounded-none p-1 min-w-[180px] tactic-clip animate-flicker"
+                className="bg-[rgba(0,20,30,0.85)] backdrop-blur-[16px] border border-[#00f2ff]/50 shadow-[0_0_20px_rgba(0,242,255,0.2)] rounded-none p-1 min-w-[180px] tactic-clip"
               >
                 <div className="px-3 py-2 border-b border-[#00f2ff]/10 mb-1">
                   <span className="text-[6px] text-[#00f2ff]/40 uppercase tracking-[0.2em] block">Security_Access_Panel</span>
@@ -242,7 +241,7 @@ export default function AegisUltimateDashboard({ onLogout, onBackToHub }: { onLo
                 alt="Feed" 
                 className="w-full h-full object-cover grayscale opacity-20 contrast-150"
               />
-              <div className="absolute top-2 right-2 bg-[#f43f5e] text-white text-[6px] px-1 py-0.5 font-bold border border-white/10 animate-pulse">
+              <div className="absolute top-2 right-2 bg-[#f43f5e] text-white text-[6px] px-1 py-0.5 font-bold border border-white/10">
                 REC_ACTIVE
               </div>
               <div className="absolute bottom-2 left-2 flex gap-1">
