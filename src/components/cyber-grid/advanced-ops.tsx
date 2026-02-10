@@ -5,10 +5,10 @@
  * @fileOverview AdvancedOpsScreen - Rediseño de alta fidelidad basado en la estética Aegis Command.
  * 
  * Versión compactada para evitar desbordamientos en pantalla.
- * Actualizado: AEGIS_IA ahora es una vista dedicada con un núcleo circular inspirado en HUDs de Stark Industries.
+ * Actualizado: AEGIS_IA ahora con soporte de VOZ (Micrófono + Audio) e instrucciones de BACKEND.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Shield, Trash2, Brain, 
@@ -20,7 +20,7 @@ import {
   Database, Terminal as TerminalIcon,
   Mic, Send, Power, ShieldAlert,
   ArrowLeft, Cloud, Thermometer,
-  Wind, Gauge
+  Wind, Gauge, MicOff, Volume2
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
@@ -225,7 +225,50 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
     { role: 'ai', text: 'AEGIS_TACTICAL_AI_CONNECTED. STANDING BY FOR OPERATOR COMMANDS.', timestamp: '00:00:00' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const [metrics, setMetrics] = useState({ cpu: 12, ram: 45, load: 22, sync: 99.9 });
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // --- CONFIGURACIÓN DE VOZ (TTS) ---
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      // Detener cualquier audio previo
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES'; // Configura el idioma de la IA
+      utterance.rate = 1.1;     // Velocidad ligeramente más rápida para toque tech
+      utterance.pitch = 0.8;    // Tono más bajo para sonar más serio/militar
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  // --- RECONOCIMIENTO DE VOZ (STT) ---
+  const startListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'es-ES';
+      recognition.interimResults = false;
+      
+      recognition.onstart = () => setIsListening(true);
+      recognition.onend = () => setIsListening(false);
+      
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript.toUpperCase());
+        // Enviar automáticamente si se desea
+        // handleSend(transcript.toUpperCase()); 
+      };
+      
+      recognition.start();
+    } else {
+      alert("Tu navegador no soporta reconocimiento de voz.");
+    }
+  };
+
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [history]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -239,17 +282,31 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (forcedInput?: string) => {
+    const messageToSend = forcedInput || input;
+    if (!messageToSend.trim() || isLoading) return;
+
     const userMsg = { 
       role: 'operator', 
-      text: input.toUpperCase(),
+      text: messageToSend.toUpperCase(),
       timestamp: new Date().toLocaleTimeString().slice(0, 8)
     };
+    
     setHistory(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
+
     try {
+      /**
+       * --- CONEXIÓN A BACKEND ---
+       * Aquí es donde tu frontend se comunica con el servidor.
+       * Actualmente usa una Server Action de Next.js (sendTacticalCommand).
+       * 
+       * Puedes reemplazar 'sendTacticalCommand' por:
+       * 1. Una llamada fetch a tu API: fetch('/api/tactical', { method: 'POST', body: JSON.stringify(...) })
+       * 2. Un socket: socket.emit('command', userMsg)
+       * 3. Conexión directa a base de datos (si usas Firestore/Firebase SDK)
+       */
       const result = await sendTacticalCommand({
         message: userMsg.text,
         systemStatus: { 
@@ -258,11 +315,23 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
           throughput: `${metrics.load} Mb/s` 
         }
       });
-      setHistory(prev => [...prev, { 
+
+      const aiResponse = { 
         role: 'ai', 
         text: result.response,
         timestamp: new Date().toLocaleTimeString().slice(0, 8)
-      }]);
+      };
+
+      setHistory(prev => [...prev, aiResponse]);
+      
+      // La IA habla después de recibir la respuesta del backend
+      speak(aiResponse.text);
+
+    } catch (error) {
+      console.error("Critical System Failure:", error);
+      const errorMsg = "ERROR_CRÍTICO: FALLO EN EL NÚCLEO DE PROCESAMIENTO.";
+      setHistory(prev => [...prev, { role: 'ai', text: errorMsg, timestamp: 'ERROR' }]);
+      speak(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -320,8 +389,10 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
           
           {/* Centro del núcleo */}
           <div className="relative w-32 h-32 rounded-full border border-[#00f2ff]/40 bg-[#00f2ff]/5 flex flex-col items-center justify-center backdrop-blur-sm">
-             <Brain className="w-10 h-10 text-[#00f2ff] animate-pulse" />
-             <div className="mt-2 text-[7px] font-black text-[#00f2ff] tracking-[0.3em] uppercase">Core_Alpha</div>
+             <Brain className={`w-10 h-10 text-[#00f2ff] ${isLoading || isListening ? 'animate-pulse' : ''}`} />
+             <div className="mt-2 text-[7px] font-black text-[#00f2ff] tracking-[0.3em] uppercase">
+               {isListening ? 'LISTENING...' : isLoading ? 'THINKING...' : 'Core_Alpha'}
+             </div>
           </div>
 
           {/* Brackets flotantes */}
@@ -351,9 +422,13 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
 
       {/* CONSOLA DE COMANDOS (DERECHA - DENSITY) */}
       <div className="w-[300px] flex flex-col gap-3 h-full min-h-0 bg-black/40 border-l border-[#00f2ff]/10 z-10">
-        <div className="p-3 border-b border-[#00f2ff]/10 flex items-center gap-3">
-           <TerminalIcon className="w-4 h-4 text-[#00f2ff]" />
-           <span className="text-[8px] font-black tracking-widest uppercase">Comm_Interface</span>
+        <div className="p-3 border-b border-[#00f2ff]/10 flex justify-between items-center">
+           <div className="flex items-center gap-3">
+             <TerminalIcon className="w-4 h-4 text-[#00f2ff]" />
+             <span className="text-[8px] font-black tracking-widest uppercase">Comm_Interface</span>
+           </div>
+           {/* Indicador visual de voz activa */}
+           {isListening && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_red]" />}
         </div>
 
         <div className="flex-1 overflow-y-auto terminal-scroll p-4 space-y-4">
@@ -374,6 +449,9 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
                       <span className="text-[5px] font-black uppercase tracking-widest opacity-40">
                         {msg.role === 'ai' ? 'AEGIS_SYSTEM' : 'OPERATOR'}
                       </span>
+                      {msg.role === 'ai' && (
+                        <Volume2 className="w-2.5 h-2.5 opacity-40 cursor-pointer hover:opacity-100" onClick={() => speak(msg.text)} />
+                      )}
                     </div>
                     <p className="text-[8px] font-mono uppercase leading-tight tracking-tight">
                       {msg.text}
@@ -388,21 +466,37 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
                 <span className="text-[7px] font-black tracking-widest animate-pulse">PROCESSING...</span>
               </div>
             )}
+            <div ref={chatEndRef} />
         </div>
 
         <div className="p-3 bg-black/60 border-t border-[#00f2ff]/10">
            <div className="flex gap-2">
+              {/* Botón de Micrófono */}
+              <button 
+                onClick={startListening}
+                disabled={isLoading}
+                className={`w-8 h-8 flex items-center justify-center border ${
+                  isListening 
+                  ? 'border-red-500 bg-red-500/20 text-red-500 animate-pulse' 
+                  : 'border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff] hover:bg-[#00f2ff]/20'
+                } transition-all`}
+                title="Dictar Comando (VOZ)"
+              >
+                {isListening ? <Mic className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
+              </button>
+
               <input 
                 type="text" 
                 value={input} 
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder="INPUT_COMMAND..." 
+                placeholder={isListening ? "ESCUCHANDO..." : "INPUT_COMMAND..."} 
                 disabled={isLoading}
                 className="flex-1 bg-[#00f2ff]/5 border border-[#00f2ff]/20 px-3 py-1.5 text-[8px] outline-none text-[#00f2ff] placeholder:text-[#00f2ff]/10 uppercase" 
               />
               <button 
-                onClick={handleSend}
+                onClick={() => handleSend()}
+                disabled={isLoading}
                 className="w-8 h-8 flex items-center justify-center bg-[#00f2ff] text-black hover:bg-[#00f2ff]/80 transition-all"
               >
                 <Send className="w-3 h-3" />
