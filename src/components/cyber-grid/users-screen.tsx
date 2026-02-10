@@ -133,7 +133,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
             <motion.div 
               key="list"
               initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }}
-              className="h-full flex flex-col gap-4"
+              className="h-full flex flex-col gap-4 overflow-hidden"
             >
               <div className="flex gap-4 shrink-0">
                 <div className="flex-1 relative">
@@ -148,7 +148,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                 </div>
               </div>
 
-              <DoubleBorderPanel title="[ OPERATOR_DATA_STREAM ]" className="flex-1">
+              <DoubleBorderPanel title="[ OPERATOR_DATA_STREAM ]" className="flex-1 min-h-0">
                 <div className="flex-1 overflow-y-auto terminal-scroll pr-2">
                   <table className="w-full text-left border-collapse table-fixed">
                     <thead>
@@ -216,110 +216,110 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
               initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
               className="h-full grid grid-cols-12 gap-4 overflow-hidden"
             >
-              <div className="col-span-4 flex flex-col gap-4 overflow-hidden">
-                <DoubleBorderPanel title="[ BIOMETRIC_IDENT ]" className="flex-none items-center py-6">
-                  <div className="w-24 h-24 border border-[#00f2ff]/40 bg-[#00f2ff]/5 p-2 relative group overflow-hidden">
+              <div className="col-span-4 flex flex-col gap-4 overflow-hidden min-h-0">
+                <DoubleBorderPanel title="[ BIOMETRIC_IDENT ]" className="flex-none items-center py-4">
+                  <div className="w-20 h-20 border border-[#00f2ff]/40 bg-[#00f2ff]/5 p-2 relative group overflow-hidden shrink-0">
                     <User className="w-full h-full text-[#00f2ff]/20" />
                     <motion.div animate={{ top: ['0%', '100%', '0%'] }} transition={{ duration: 3, repeat: Infinity }} className="absolute left-0 right-0 h-0.5 bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
                   </div>
-                  <h2 className="mt-4 text-sm font-black text-white tracking-[0.2em] truncate max-w-full px-4">{selectedOp.name}</h2>
-                  <span className="text-[8px] opacity-40 font-mono truncate max-w-full px-2">UUID: {selectedOp.id}</span>
+                  <h2 className="mt-3 text-[12px] font-black text-white tracking-[0.2em] truncate w-full text-center px-4">{selectedOp.name}</h2>
+                  <span className="text-[7px] opacity-40 font-mono truncate w-full text-center px-2">UUID: {selectedOp.id}</span>
                 </DoubleBorderPanel>
 
-                <DoubleBorderPanel title="[ SECURITY_STATUS ]" className="flex-1">
-                  <div className="space-y-3 overflow-hidden">
+                <DoubleBorderPanel title="[ SECURITY_STATUS ]" className="flex-1 min-h-0">
+                  <div className="space-y-3 overflow-y-auto terminal-scroll pr-1">
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40 uppercase shrink-0">Clearance_Tier</span>
+                      <span className="text-[7px] opacity-40 uppercase shrink-0">Clearance</span>
                       <span className="text-[9px] font-black truncate ml-2">LEVEL_{selectedOp.clearance}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40 uppercase shrink-0">Operational_State</span>
+                      <span className="text-[7px] opacity-40 uppercase shrink-0">State</span>
                       <span className={`text-[9px] font-black truncate ml-2 ${selectedOp.status === 'ACTIVE' ? 'text-emerald-400' : 'text-red-500'}`}>{selectedOp.status}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40 uppercase shrink-0">Assigned_Sector</span>
+                      <span className="text-[7px] opacity-40 uppercase shrink-0">Sector</span>
                       <span className="text-[9px] font-black truncate ml-2">{selectedOp.sector}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40 uppercase shrink-0">Encryption_Key</span>
-                      <span className="text-[9px] font-black opacity-30 font-mono truncate ml-2">0x{Math.random().toString(16).slice(2,8).toUpperCase()}</span>
+                      <span className="text-[7px] opacity-40 uppercase shrink-0">Hash_Key</span>
+                      <span className="text-[8px] font-black opacity-30 font-mono truncate ml-2">0x{Math.random().toString(16).slice(2,8).toUpperCase()}</span>
                     </div>
                   </div>
                 </DoubleBorderPanel>
               </div>
 
-              <div className="col-span-8 flex flex-col gap-4 overflow-hidden">
-                <DoubleBorderPanel title="[ EXTENDED_DOSSIER ]" className="flex-1">
-                  <div className="grid grid-cols-2 gap-6 p-2 h-full overflow-hidden">
-                    <div className="space-y-4 overflow-hidden">
+              <div className="col-span-8 flex flex-col gap-4 overflow-hidden min-h-0">
+                <DoubleBorderPanel title="[ EXTENDED_DOSSIER ]" className="flex-1 min-h-0">
+                  <div className="grid grid-cols-2 gap-4 p-2 h-full overflow-hidden">
+                    <div className="space-y-4 overflow-y-auto terminal-scroll pr-2">
                       <div className="flex items-start gap-3 overflow-hidden">
-                        <Mail className="w-4 h-4 text-[#00f2ff]/40 shrink-0" />
+                        <Mail className="w-3.5 h-3.5 text-[#00f2ff]/40 shrink-0" />
                         <div className="flex flex-col overflow-hidden">
-                          <span className="text-[6px] opacity-30 uppercase truncate">Secure_Communication</span>
-                          <span className="text-[9px] font-bold truncate">{selectedOp.email}</span>
+                          <span className="text-[6px] opacity-30 uppercase truncate">Secure_Comm</span>
+                          <span className="text-[9px] font-bold truncate w-full">{selectedOp.email}</span>
                         </div>
                       </div>
                       <div className="flex items-start gap-3 overflow-hidden">
-                        <Calendar className="w-4 h-4 text-[#00f2ff]/40 shrink-0" />
+                        <Calendar className="w-3.5 h-3.5 text-[#00f2ff]/40 shrink-0" />
                         <div className="flex flex-col overflow-hidden">
-                          <span className="text-[6px] opacity-30 uppercase truncate">Induction_Date</span>
-                          <span className="text-[9px] font-bold truncate">{selectedOp.joinDate}</span>
+                          <span className="text-[6px] opacity-30 uppercase truncate">Induction</span>
+                          <span className="text-[9px] font-bold truncate w-full">{selectedOp.joinDate}</span>
                         </div>
                       </div>
                       <div className="flex items-start gap-3 overflow-hidden">
-                        <MapPin className="w-4 h-4 text-[#00f2ff]/40 shrink-0" />
+                        <MapPin className="w-3.5 h-3.5 text-[#00f2ff]/40 shrink-0" />
                         <div className="flex flex-col overflow-hidden">
-                          <span className="text-[6px] opacity-30 uppercase truncate">Main_Base_Access</span>
-                          <span className="text-[9px] font-bold truncate">{selectedOp.sector} GRID_NODE</span>
+                          <span className="text-[6px] opacity-30 uppercase truncate">Grid_Node</span>
+                          <span className="text-[9px] font-bold truncate w-full">{selectedOp.sector} NODE</span>
                         </div>
                       </div>
                       <div className="flex items-start gap-3 overflow-hidden">
-                        <HardDrive className="w-4 h-4 text-[#00f2ff]/40 shrink-0" />
+                        <HardDrive className="w-3.5 h-3.5 text-[#00f2ff]/40 shrink-0" />
                         <div className="flex flex-col overflow-hidden">
-                          <span className="text-[6px] opacity-30 uppercase truncate">Authorized_Device</span>
-                          <span className="text-[9px] font-bold truncate">{selectedOp.deviceId}</span>
+                          <span className="text-[6px] opacity-30 uppercase truncate">Authorized_Dev</span>
+                          <span className="text-[9px] font-bold truncate w-full">{selectedOp.deviceId}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-2 border-l border-[#00f2ff]/10 pl-6 overflow-hidden flex flex-col">
+                    <div className="space-y-2 border-l border-[#00f2ff]/10 pl-4 overflow-hidden flex flex-col min-h-0">
                       <span className="text-[6px] opacity-30 uppercase flex items-center gap-1 shrink-0">
-                        <Terminal className="w-2.5 h-2.5" /> Recent_System_Logs
+                        <Terminal className="w-2.5 h-2.5" /> Recent_Audit
                       </span>
-                      <div className="text-[7px] space-y-2 opacity-60 font-mono flex-1 overflow-y-auto terminal-scroll">
-                        <div className="truncate">[2h ago] SYSTEM_LOGIN_GRANTED_0x884</div>
-                        <div className="truncate">[5h ago] KERNEL_PARAMETER_ACCESS</div>
-                        <div className="truncate">[12h ago] ENCRYPTED_STREAM_STARTED</div>
-                        <div className="truncate">[1d ago] SECURITY_PROTOCOL_VERIFIED</div>
-                        <div className="truncate">[2d ago] NODE_SYNCHRONIZATION_OK</div>
-                        <div className="truncate">[3d ago] NEW_DEVICE_REGISTERED</div>
+                      <div className="text-[7px] space-y-1.5 opacity-60 font-mono flex-1 overflow-y-auto terminal-scroll">
+                        <div className="truncate">[2h ago] LOGIN_GRANTED_0x884</div>
+                        <div className="truncate">[5h ago] KERNEL_ACCESS_SEC_01</div>
+                        <div className="truncate">[12h ago] STREAM_ACTIVE_TLS_1.3</div>
+                        <div className="truncate">[1d ago] PROTOCOL_VERIFIED_7B</div>
+                        <div className="truncate">[2d ago] NODE_SYNC_OK_SFC</div>
+                        <div className="truncate">[3d ago] NEW_DEV_REG_99XX</div>
                       </div>
                     </div>
                   </div>
                 </DoubleBorderPanel>
 
-                <div className="grid grid-cols-3 gap-4 h-24 shrink-0">
-                   <DoubleBorderPanel title="ADMIN_TOOLS" className="flex items-center justify-center bg-[#00f2ff]/5">
-                      <button className="flex items-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 px-4 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group truncate max-w-full">
+                <div className="grid grid-cols-3 gap-3 h-20 shrink-0 min-h-0">
+                   <DoubleBorderPanel title="ADMIN" className="flex items-center justify-center bg-[#00f2ff]/5">
+                      <button className="w-full flex items-center justify-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group px-2">
                         <Edit3 className="w-3 h-3 group-hover:scale-110 shrink-0" />
-                        <span className="truncate">Edit_Profile</span>
+                        <span className="truncate">Edit</span>
                       </button>
                    </DoubleBorderPanel>
                    
-                   <DoubleBorderPanel title="SYSTEM_ACCESS" className="flex items-center justify-center">
-                      <button className="flex items-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 px-4 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group truncate max-w-full">
+                   <DoubleBorderPanel title="AUTH" className="flex items-center justify-center">
+                      <button className="w-full flex items-center justify-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group px-2">
                         <Lock className="w-3 h-3 group-hover:scale-110 shrink-0" />
-                        <span className="truncate">Revoke_Access</span>
+                        <span className="truncate">Revoke</span>
                       </button>
                    </DoubleBorderPanel>
 
-                   <DoubleBorderPanel title="PURGE_RECORD" className="flex items-center justify-center bg-red-500/5" isAccent>
+                   <DoubleBorderPanel title="DANGER" className="flex items-center justify-center bg-red-500/5" isAccent>
                       <button 
                         onClick={() => handleDelete(selectedOp.id)}
-                        className="flex items-center gap-2 text-[8px] font-black border border-red-500/30 text-red-500 px-4 py-2 hover:bg-red-500/20 transition-all uppercase tracking-widest group truncate max-w-full"
+                        className="w-full flex items-center justify-center gap-2 text-[8px] font-black border border-red-500/30 text-red-500 py-2 hover:bg-red-500/20 transition-all uppercase tracking-widest group px-2"
                       >
                         <Trash2 className="w-3 h-3 group-hover:scale-110 shrink-0" />
-                        <span className="truncate">Delete_Entry</span>
+                        <span className="truncate">Purge</span>
                       </button>
                    </DoubleBorderPanel>
                 </div>
@@ -331,30 +331,30 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
             <motion.div 
               key="create"
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-              className="h-full flex items-center justify-center"
+              className="h-full flex items-center justify-center overflow-hidden"
             >
-              <DoubleBorderPanel title="[ REGISTER_NEW_OPERATOR ]" className="w-[400px]">
-                <form onSubmit={handleCreate} className="space-y-4 py-2">
+              <DoubleBorderPanel title="[ REGISTER_NEW_OPERATOR ]" className="w-[360px] shrink-0">
+                <form onSubmit={handleCreate} className="space-y-3 py-1">
                   <div className="space-y-1">
                     <label className="text-[7px] opacity-40 uppercase">Full_Name_Designation</label>
                     <div className="relative">
                       <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                      <input name="name" required placeholder="OPERATOR_OMEGA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-2 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                      <input name="name" required placeholder="OPERATOR_OMEGA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <label className="text-[7px] opacity-40 uppercase">Role_Classification</label>
+                      <label className="text-[7px] opacity-40 uppercase">Role</label>
                       <div className="relative">
                         <Activity className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                        <input name="role" required placeholder="ANALYST" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-2 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                        <input name="role" required placeholder="ANALYST" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[7px] opacity-40 uppercase">Auth_Level</label>
+                      <label className="text-[7px] opacity-40 uppercase">Clearance</label>
                       <div className="relative">
                         <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                        <select name="clearance" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-2 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all">
+                        <select name="clearance" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all">
                           <option value="1">L-1 (BASIC)</option>
                           <option value="2">L-2 (AUDIT)</option>
                           <option value="3">L-3 (SECURITY)</option>
@@ -368,10 +368,10 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                     <label className="text-[7px] opacity-40 uppercase">Operation_Sector</label>
                     <div className="relative">
                       <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                      <input name="sector" required placeholder="SECTOR_ALPHA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-2 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                      <input name="sector" required placeholder="SECTOR_ALPHA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
                     </div>
                   </div>
-                  <button type="submit" className="w-full py-2 bg-[#00f2ff] text-black font-black text-[9px] uppercase tracking-widest hover:bg-[#00f2ff]/80 transition-all shadow-[0_0_15px_rgba(0,242,255,0.4)]">
+                  <button type="submit" className="w-full py-2 bg-[#00f2ff] text-black font-black text-[9px] uppercase tracking-widest hover:bg-[#00f2ff]/80 transition-all shadow-[0_0_15px_rgba(0,242,255,0.4)] mt-2">
                     Finalize_Registration
                   </button>
                 </form>
