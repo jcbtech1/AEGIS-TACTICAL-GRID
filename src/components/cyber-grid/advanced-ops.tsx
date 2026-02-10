@@ -5,6 +5,7 @@
  * @fileOverview AdvancedOpsScreen - Rediseño de alta fidelidad basado en la estética Aegis Command.
  * 
  * Versión compactada para evitar desbordamientos en pantalla.
+ * Actualizado: AEGIS_IA ahora es una vista dedicada sin barra lateral redundante.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -17,7 +18,8 @@ import {
   List, Radar, Radio, Loader2,
   Sparkles, Zap, Activity,
   Database, Terminal as TerminalIcon,
-  Mic, Send, Power, ShieldAlert
+  Mic, Send, Power, ShieldAlert,
+  ArrowLeft
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
@@ -77,6 +79,8 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
 
   if (!isMounted) return null;
 
+  const showSidebar = activeModule !== 'AEGIS_IA';
+
   const NavButton = ({ type, label, icon: Icon }: { type: ModuleType, label: string, icon: any }) => (
     <button
       onClick={() => setActiveModule(type)}
@@ -102,44 +106,58 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
       <div className="scanline-effect opacity-5 pointer-events-none" />
       <div className="vignette" />
 
-      <aside className="w-[160px] flex flex-col gap-3 z-20 h-full shrink-0">
-        <DoubleBorderPanel className="flex-none py-2 px-3">
-          <h1 className="text-[9px] font-black tracking-[0.3em] uppercase text-[#00f2ff] leading-none">AEGIS:MODULE</h1>
-        </DoubleBorderPanel>
+      {showSidebar && (
+        <aside className="w-[160px] flex flex-col gap-3 z-20 h-full shrink-0">
+          <DoubleBorderPanel className="flex-none py-2 px-3">
+            <h1 className="text-[9px] font-black tracking-[0.3em] uppercase text-[#00f2ff] leading-none">AEGIS:MODULE</h1>
+          </DoubleBorderPanel>
 
-        <DoubleBorderPanel className="flex-1 p-0 flex flex-col">
-          <nav className="flex-1 py-1 overflow-y-auto terminal-scroll">
-            <NavButton type="STRATEGIC_INTELLIGENCE" label="STRATEGIC_INTEL" icon={Radar} />
-            <NavButton type="SECURITY_MANAGEMENT" label="SECURITY_MGMT" icon={ShieldCheck} />
-            <NavButton type="RECONNAISSANCE" label="RECON_GRID" icon={Globe} />
-            <NavButton type="VISUAL_SCAN" label="VISUAL_SCAN" icon={Eye} />
-            <NavButton type="COUNTERMEASURES" label="COUNTERMEASURES" icon={Shield} />
-            <NavButton type="DATA_PURGE" label="DATA_PURGE" icon={Trash2} />
-            <NavButton type="AEGIS_IA" label="AEGIS_IA" icon={Brain} />
-            <NavButton type="INFRASTRUCTURE" label="INFRASTRUCTURE" icon={HardDrive} />
-            <NavButton type="SYSTEM_LOGS" label="SYSTEM_LOGS" icon={List} />
-          </nav>
+          <DoubleBorderPanel className="flex-1 p-0 flex flex-col">
+            <nav className="flex-1 py-1 overflow-y-auto terminal-scroll">
+              <NavButton type="STRATEGIC_INTELLIGENCE" label="STRATEGIC_INTEL" icon={Radar} />
+              <NavButton type="SECURITY_MANAGEMENT" label="SECURITY_MGMT" icon={ShieldCheck} />
+              <NavButton type="RECONNAISSANCE" label="RECON_GRID" icon={Globe} />
+              <NavButton type="VISUAL_SCAN" label="VISUAL_SCAN" icon={Eye} />
+              <NavButton type="COUNTERMEASURES" label="COUNTERMEASURES" icon={Shield} />
+              <NavButton type="DATA_PURGE" label="DATA_PURGE" icon={Trash2} />
+              <NavButton type="AEGIS_IA" label="AEGIS_IA" icon={Brain} />
+              <NavButton type="INFRASTRUCTURE" label="INFRASTRUCTURE" icon={HardDrive} />
+              <NavButton type="SYSTEM_LOGS" label="SYSTEM_LOGS" icon={List} />
+            </nav>
 
-          <div className="mt-auto border-t border-[#00f2ff]/10 p-2">
-            <button 
-              onClick={onBack}
-              className="w-full flex items-center justify-center gap-2 py-1.5 text-[7px] font-black text-[#00f2ff] uppercase border border-[#00f2ff]/30 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/10 transition-all tactic-clip"
-            >
-              <Undo2 className="w-3 h-3" />
-              <span>RETURN_HUB</span>
-            </button>
-          </div>
-        </DoubleBorderPanel>
-      </aside>
+            <div className="mt-auto border-t border-[#00f2ff]/10 p-2">
+              <button 
+                onClick={onBack}
+                className="w-full flex items-center justify-center gap-2 py-1.5 text-[7px] font-black text-[#00f2ff] uppercase border border-[#00f2ff]/30 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/10 transition-all tactic-clip"
+              >
+                <Undo2 className="w-3 h-3" />
+                <span>RETURN_HUB</span>
+              </button>
+            </div>
+          </DoubleBorderPanel>
+        </aside>
+      )}
 
       <main className="flex-1 flex flex-col gap-3 z-20 overflow-hidden h-full">
         <header className="flex justify-between items-center shrink-0">
-          <div>
-            <h2 className="text-[10px] font-black tracking-widest uppercase text-[#00f2ff]">
-              [{activeModule.replace('_', ' ')}]
-            </h2>
-            <div className="flex gap-3 text-[5px] uppercase tracking-widest opacity-40">
-              <span>Auth: OPERATOR_LEVEL_{currentClearance}</span>
+          <div className="flex items-center gap-4">
+            {!showSidebar && (
+              <button 
+                onClick={onBack}
+                className="p-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+            )}
+            <div>
+              <h2 className="text-[10px] font-black tracking-widest uppercase text-[#00f2ff]">
+                [{activeModule.replace('_', ' ')}]
+              </h2>
+              {showSidebar && (
+                <div className="flex gap-3 text-[5px] uppercase tracking-widest opacity-40">
+                  <span>Auth: OPERATOR_LEVEL_{currentClearance}</span>
+                </div>
+              )}
             </div>
           </div>
           <div className="flex items-center gap-2">
