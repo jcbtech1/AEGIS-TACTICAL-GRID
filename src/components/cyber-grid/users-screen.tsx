@@ -6,7 +6,7 @@ import {
   Users, User, Shield, Undo2, Search, 
   Circle, BadgeCheck, UserPlus, Trash2, 
   Edit3, Eye, ArrowLeft, Calendar, 
-  MapPin, HardDrive, Terminal, Settings2,
+  MapPin, HardDrive, Terminal,
   Lock, Activity, Mail
 } from 'lucide-react';
 
@@ -33,7 +33,7 @@ const mockOperators: Operator[] = [
 ];
 
 const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }: { children: React.ReactNode, title?: string, className?: string, isAccent?: boolean }) => (
-  <div className={`relative border ${isAccent ? 'border-[#f43f5e]/40' : 'border-[#00f2ff]/30'} bg-[#050b1a]/80 backdrop-blur-md p-4 flex flex-col fui-corner-brackets overflow-hidden ${className}`}>
+  <div className={`relative border ${isAccent ? 'border-[#f43f5e]/40' : 'border-[#00f2ff]/30'} bg-[#050b1a]/80 backdrop-blur-md p-3 flex flex-col fui-corner-brackets overflow-hidden ${className}`}>
     <div className="fui-corner-brackets-inner" />
     {title && (
       <div className={`absolute -top-2 left-4 px-2 bg-[#020814] text-[8px] font-bold tracking-[0.3em] uppercase z-10 ${isAccent ? 'text-[#f43f5e]' : 'text-[#00f2ff]'} border ${isAccent ? 'border-[#f43f5e]/30' : 'border-[#00f2ff]/30'}`}>
@@ -88,10 +88,10 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
       <div className="vignette" />
       <div className="dot-matrix absolute inset-0 opacity-10 pointer-events-none" />
 
-      <header className="flex justify-between items-center z-20 shrink-0">
+      <header className="flex justify-between items-center z-20 shrink-0 h-10">
         <div className="flex items-center gap-3">
-          <div className="p-2 border border-[#00f2ff]/40 bg-[#00f2ff]/10">
-            <Users className="w-6 h-6 text-[#00f2ff]" />
+          <div className="p-1.5 border border-[#00f2ff]/40 bg-[#00f2ff]/10">
+            <Users className="w-5 h-5 text-[#00f2ff]" />
           </div>
           <div>
             <h1 className="text-sm font-black tracking-[0.4em] uppercase text-[#00f2ff] glitch-text leading-none">Personnel_Directorate</h1>
@@ -103,7 +103,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
           {view === 'list' ? (
             <button 
               onClick={() => setView('create')}
-              className="flex items-center gap-2 px-4 py-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff] text-[8px] font-black uppercase tracking-[0.2em] hover:bg-[#00f2ff]/15 transition-all tactic-clip group"
+              className="flex items-center gap-2 px-3 py-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff] text-[7px] font-black uppercase tracking-[0.2em] hover:bg-[#00f2ff]/15 transition-all tactic-clip group"
             >
               <UserPlus className="w-3 h-3 group-hover:scale-110 transition-transform" />
               <span>Register_New</span>
@@ -111,7 +111,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
           ) : (
             <button 
               onClick={() => setView('list')}
-              className="flex items-center gap-2 px-4 py-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff] text-[8px] font-black uppercase tracking-[0.2em] hover:bg-[#00f2ff]/15 transition-all tactic-clip group"
+              className="flex items-center gap-2 px-3 py-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff] text-[7px] font-black uppercase tracking-[0.2em] hover:bg-[#00f2ff]/15 transition-all tactic-clip group"
             >
               <ArrowLeft className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
               <span>Back_to_List</span>
@@ -119,7 +119,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
           )}
           <button 
             onClick={onBack}
-            className="flex items-center gap-2 px-4 py-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff] text-[8px] font-black uppercase tracking-[0.2em] hover:bg-[#00f2ff]/15 transition-all tactic-clip group"
+            className="flex items-center gap-2 px-3 py-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff] text-[7px] font-black uppercase tracking-[0.2em] hover:bg-[#00f2ff]/15 transition-all tactic-clip group"
           >
             <Undo2 className="w-3 h-3 group-hover:-translate-x-1 transition-transform" />
             <span>Return_Hub</span>
@@ -152,7 +152,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                 <div className="flex-1 overflow-y-auto terminal-scroll pr-2">
                   <table className="w-full text-left border-collapse table-fixed">
                     <thead>
-                      <tr className="border-b border-[#00f2ff]/10 text-[6px] text-[#00f2ff]/40 uppercase tracking-[0.3em] font-bold">
+                      <tr className="border-b border-[#00f2ff]/10 text-[6px] text-[#00f2ff]/40 uppercase tracking-[0.3em] font-bold sticky top-0 bg-[#050b1a] z-10">
                         <th className="py-2 px-3 w-[40%]">Identity</th>
                         <th className="py-2 px-3 w-[20%]">Role</th>
                         <th className="py-2 px-3 w-[15%]">Clearance</th>
@@ -160,12 +160,12 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                         <th className="py-2 px-3 w-[10%] text-right">Access</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="divide-y divide-[#00f2ff]/5">
                       {filteredOperators.map((op, i) => (
                         <motion.tr 
                           key={op.id}
-                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
-                          className="group border-b border-[#00f2ff]/5 hover:bg-[#00f2ff]/5 transition-colors cursor-pointer"
+                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.01 }}
+                          className="group hover:bg-[#00f2ff]/5 transition-colors cursor-pointer"
                           onClick={() => { setSelectedOp(op); setView('details'); }}
                         >
                           <td className="py-2 px-3 overflow-hidden">
@@ -174,7 +174,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                                 <User className="w-4 h-4 text-[#00f2ff]/40 group-hover:text-[#00f2ff]" />
                                 {op.clearance === 5 && <BadgeCheck className="absolute -top-1 -right-1 w-3 h-3 text-[#00f2ff] fill-black" />}
                               </div>
-                              <div className="flex flex-col overflow-hidden">
+                              <div className="flex flex-col min-w-0">
                                 <span className="text-[10px] font-black text-white group-hover:text-[#00f2ff] transition-colors truncate">{op.name}</span>
                                 <span className="text-[6px] opacity-40 font-mono truncate">{op.id}</span>
                               </div>
@@ -186,7 +186,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                           <td className="py-2 px-3">
                             <div className="flex gap-0.5 items-center">
                               {Array.from({ length: 5 }).map((_, idx) => (
-                                <div key={idx} className={`w-2 h-1 ${idx < op.clearance ? 'bg-[#00f2ff] shadow-[0_0_5px_#00f2ff]' : 'bg-[#00f2ff]/10'}`} />
+                                <div key={idx} className={`w-1.5 h-1 ${idx < op.clearance ? 'bg-[#00f2ff] shadow-[0_0_5px_#00f2ff]' : 'bg-[#00f2ff]/10'}`} />
                               ))}
                             </div>
                           </td>
@@ -197,9 +197,9 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                             </div>
                           </td>
                           <td className="py-2 px-3 text-right">
-                             <button className="p-1.5 hover:bg-[#00f2ff]/20 transition-all rounded-none border border-transparent hover:border-[#00f2ff]/30">
+                             <div className="p-1 hover:bg-[#00f2ff]/20 transition-all rounded-none inline-block">
                                 <Eye className="w-3.5 h-3.5 text-[#00f2ff] opacity-60 group-hover:opacity-100" />
-                             </button>
+                             </div>
                           </td>
                         </motion.tr>
                       ))}
@@ -214,75 +214,75 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
             <motion.div 
               key="details"
               initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
-              className="h-full grid grid-cols-12 gap-4 overflow-hidden"
+              className="h-full grid grid-cols-12 gap-4 min-h-0 overflow-hidden"
             >
-              <div className="col-span-4 flex flex-col gap-4 overflow-hidden min-h-0">
-                <DoubleBorderPanel title="[ BIOMETRIC_IDENT ]" className="flex-none items-center py-4">
-                  <div className="w-20 h-20 border border-[#00f2ff]/40 bg-[#00f2ff]/5 p-2 relative group overflow-hidden shrink-0">
+              <div className="col-span-4 flex flex-col gap-4 h-full min-h-0 overflow-hidden">
+                <DoubleBorderPanel title="[ BIOMETRIC_IDENT ]" className="shrink-0 items-center py-4">
+                  <div className="w-16 h-16 border border-[#00f2ff]/40 bg-[#00f2ff]/5 p-2 relative group overflow-hidden shrink-0">
                     <User className="w-full h-full text-[#00f2ff]/20" />
                     <motion.div animate={{ top: ['0%', '100%', '0%'] }} transition={{ duration: 3, repeat: Infinity }} className="absolute left-0 right-0 h-0.5 bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
                   </div>
-                  <h2 className="mt-3 text-[12px] font-black text-white tracking-[0.2em] truncate w-full text-center px-4">{selectedOp.name}</h2>
-                  <span className="text-[7px] opacity-40 font-mono truncate w-full text-center px-2">UUID: {selectedOp.id}</span>
+                  <h2 className="mt-2 text-[11px] font-black text-white tracking-[0.2em] truncate w-full text-center px-4">{selectedOp.name}</h2>
+                  <span className="text-[6px] opacity-40 font-mono truncate w-full text-center px-2">UUID: {selectedOp.id}</span>
                 </DoubleBorderPanel>
 
                 <DoubleBorderPanel title="[ SECURITY_STATUS ]" className="flex-1 min-h-0">
-                  <div className="space-y-3 overflow-y-auto terminal-scroll pr-1">
+                  <div className="space-y-3 p-1">
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40 uppercase shrink-0">Clearance</span>
-                      <span className="text-[9px] font-black truncate ml-2">LEVEL_{selectedOp.clearance}</span>
+                      <span className="text-[6px] opacity-40 uppercase truncate">Clearance</span>
+                      <span className="text-[8px] font-black truncate text-white ml-2">LEVEL_{selectedOp.clearance}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40 uppercase shrink-0">State</span>
-                      <span className={`text-[9px] font-black truncate ml-2 ${selectedOp.status === 'ACTIVE' ? 'text-emerald-400' : 'text-red-500'}`}>{selectedOp.status}</span>
+                      <span className="text-[6px] opacity-40 uppercase truncate">State</span>
+                      <span className={`text-[8px] font-black truncate ml-2 ${selectedOp.status === 'ACTIVE' ? 'text-emerald-400' : 'text-red-500'}`}>{selectedOp.status}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40 uppercase shrink-0">Sector</span>
-                      <span className="text-[9px] font-black truncate ml-2">{selectedOp.sector}</span>
+                      <span className="text-[6px] opacity-40 uppercase truncate">Sector</span>
+                      <span className="text-[8px] font-black truncate text-white ml-2">{selectedOp.sector}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40 uppercase shrink-0">Hash_Key</span>
-                      <span className="text-[8px] font-black opacity-30 font-mono truncate ml-2">0x{Math.random().toString(16).slice(2,8).toUpperCase()}</span>
+                      <span className="text-[6px] opacity-40 uppercase truncate">Encryption</span>
+                      <span className="text-[7px] font-black opacity-30 font-mono truncate ml-2">RSA_4096_X</span>
                     </div>
                   </div>
                 </DoubleBorderPanel>
               </div>
 
-              <div className="col-span-8 flex flex-col gap-4 overflow-hidden min-h-0">
+              <div className="col-span-8 flex flex-col gap-4 h-full min-h-0 overflow-hidden">
                 <DoubleBorderPanel title="[ EXTENDED_DOSSIER ]" className="flex-1 min-h-0">
                   <div className="grid grid-cols-2 gap-4 p-2 h-full overflow-hidden">
-                    <div className="space-y-4 overflow-y-auto terminal-scroll pr-2">
-                      <div className="flex items-start gap-3 overflow-hidden">
-                        <Mail className="w-3.5 h-3.5 text-[#00f2ff]/40 shrink-0" />
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="text-[6px] opacity-30 uppercase truncate">Secure_Comm</span>
-                          <span className="text-[9px] font-bold truncate w-full">{selectedOp.email}</span>
+                    <div className="space-y-4 overflow-y-auto terminal-scroll pr-2 h-full">
+                      <div className="flex items-start gap-3 min-w-0">
+                        <Mail className="w-3 h-3 text-[#00f2ff]/40 shrink-0 mt-0.5" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[5px] opacity-30 uppercase">Secure_Comm</span>
+                          <span className="text-[8px] font-bold text-white truncate w-full">{selectedOp.email}</span>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3 overflow-hidden">
-                        <Calendar className="w-3.5 h-3.5 text-[#00f2ff]/40 shrink-0" />
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="text-[6px] opacity-30 uppercase truncate">Induction</span>
-                          <span className="text-[9px] font-bold truncate w-full">{selectedOp.joinDate}</span>
+                      <div className="flex items-start gap-3 min-w-0">
+                        <Calendar className="w-3 h-3 text-[#00f2ff]/40 shrink-0 mt-0.5" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[5px] opacity-30 uppercase">Induction</span>
+                          <span className="text-[8px] font-bold text-white truncate w-full">{selectedOp.joinDate}</span>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3 overflow-hidden">
-                        <MapPin className="w-3.5 h-3.5 text-[#00f2ff]/40 shrink-0" />
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="text-[6px] opacity-30 uppercase truncate">Grid_Node</span>
-                          <span className="text-[9px] font-bold truncate w-full">{selectedOp.sector} NODE</span>
+                      <div className="flex items-start gap-3 min-w-0">
+                        <MapPin className="w-3 h-3 text-[#00f2ff]/40 shrink-0 mt-0.5" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[5px] opacity-30 uppercase">Grid_Node</span>
+                          <span className="text-[8px] font-bold text-white truncate w-full">{selectedOp.sector} NODE</span>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3 overflow-hidden">
-                        <HardDrive className="w-3.5 h-3.5 text-[#00f2ff]/40 shrink-0" />
-                        <div className="flex flex-col overflow-hidden">
-                          <span className="text-[6px] opacity-30 uppercase truncate">Authorized_Dev</span>
-                          <span className="text-[9px] font-bold truncate w-full">{selectedOp.deviceId}</span>
+                      <div className="flex items-start gap-3 min-w-0">
+                        <HardDrive className="w-3 h-3 text-[#00f2ff]/40 shrink-0 mt-0.5" />
+                        <div className="flex flex-col min-w-0">
+                          <span className="text-[5px] opacity-30 uppercase">Authorized_Dev</span>
+                          <span className="text-[8px] font-bold text-white truncate w-full">{selectedOp.deviceId}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-2 border-l border-[#00f2ff]/10 pl-4 overflow-hidden flex flex-col min-h-0">
+                    <div className="space-y-2 border-l border-[#00f2ff]/10 pl-4 flex flex-col min-h-0 h-full">
                       <span className="text-[6px] opacity-30 uppercase flex items-center gap-1 shrink-0">
                         <Terminal className="w-2.5 h-2.5" /> Recent_Audit
                       </span>
@@ -298,27 +298,27 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                   </div>
                 </DoubleBorderPanel>
 
-                <div className="grid grid-cols-3 gap-3 h-20 shrink-0 min-h-0">
-                   <DoubleBorderPanel title="ADMIN" className="flex items-center justify-center bg-[#00f2ff]/5">
-                      <button className="w-full flex items-center justify-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group px-2">
-                        <Edit3 className="w-3 h-3 group-hover:scale-110 shrink-0" />
+                <div className="grid grid-cols-3 gap-3 shrink-0 h-14">
+                   <DoubleBorderPanel title="ADMIN" className="bg-[#00f2ff]/5">
+                      <button className="w-full h-full flex items-center justify-center gap-2 text-[7px] font-black border border-[#00f2ff]/30 py-1 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group">
+                        <Edit3 className="w-2.5 h-2.5 group-hover:scale-110" />
                         <span className="truncate">Edit</span>
                       </button>
                    </DoubleBorderPanel>
                    
-                   <DoubleBorderPanel title="AUTH" className="flex items-center justify-center">
-                      <button className="w-full flex items-center justify-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group px-2">
-                        <Lock className="w-3 h-3 group-hover:scale-110 shrink-0" />
+                   <DoubleBorderPanel title="AUTH">
+                      <button className="w-full h-full flex items-center justify-center gap-2 text-[7px] font-black border border-[#00f2ff]/30 py-1 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group">
+                        <Lock className="w-2.5 h-2.5 group-hover:scale-110" />
                         <span className="truncate">Revoke</span>
                       </button>
                    </DoubleBorderPanel>
 
-                   <DoubleBorderPanel title="DANGER" className="flex items-center justify-center bg-red-500/5" isAccent>
+                   <DoubleBorderPanel title="DANGER" className="bg-red-500/5" isAccent>
                       <button 
                         onClick={() => handleDelete(selectedOp.id)}
-                        className="w-full flex items-center justify-center gap-2 text-[8px] font-black border border-red-500/30 text-red-500 py-2 hover:bg-red-500/20 transition-all uppercase tracking-widest group px-2"
+                        className="w-full h-full flex items-center justify-center gap-2 text-[7px] font-black border border-red-500/30 text-red-500 py-1 hover:bg-red-500/20 transition-all uppercase tracking-widest group"
                       >
-                        <Trash2 className="w-3 h-3 group-hover:scale-110 shrink-0" />
+                        <Trash2 className="w-2.5 h-2.5 group-hover:scale-110" />
                         <span className="truncate">Purge</span>
                       </button>
                    </DoubleBorderPanel>
@@ -333,45 +333,45 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
               initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
               className="h-full flex items-center justify-center overflow-hidden"
             >
-              <DoubleBorderPanel title="[ REGISTER_NEW_OPERATOR ]" className="w-[360px] shrink-0">
+              <DoubleBorderPanel title="[ REGISTER_NEW_OPERATOR ]" className="w-[320px] shrink-0">
                 <form onSubmit={handleCreate} className="space-y-3 py-1">
                   <div className="space-y-1">
-                    <label className="text-[7px] opacity-40 uppercase">Full_Name_Designation</label>
+                    <label className="text-[6px] opacity-40 uppercase">Full_Name_Designation</label>
                     <div className="relative">
                       <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                      <input name="name" required placeholder="OPERATOR_OMEGA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                      <input name="name" required placeholder="OPERATOR_OMEGA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1">
-                      <label className="text-[7px] opacity-40 uppercase">Role</label>
+                      <label className="text-[6px] opacity-40 uppercase">Role</label>
                       <div className="relative">
                         <Activity className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                        <input name="role" required placeholder="ANALYST" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                        <input name="role" required placeholder="ANALYST" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[7px] opacity-40 uppercase">Clearance</label>
+                      <label className="text-[6px] opacity-40 uppercase">Clearance</label>
                       <div className="relative">
                         <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                        <select name="clearance" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all">
-                          <option value="1">L-1 (BASIC)</option>
-                          <option value="2">L-2 (AUDIT)</option>
-                          <option value="3">L-3 (SECURITY)</option>
-                          <option value="4">L-4 (OFFENSIVE)</option>
-                          <option value="5">L-5 (ADM_PRIME)</option>
+                        <select name="clearance" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all">
+                          <option value="1">L-1</option>
+                          <option value="2">L-2</option>
+                          <option value="3">L-3</option>
+                          <option value="4">L-4</option>
+                          <option value="5">L-5</option>
                         </select>
                       </div>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-[7px] opacity-40 uppercase">Operation_Sector</label>
+                    <label className="text-[6px] opacity-40 uppercase">Operation_Sector</label>
                     <div className="relative">
                       <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                      <input name="sector" required placeholder="SECTOR_ALPHA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                      <input name="sector" required placeholder="SECTOR_ALPHA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
                     </div>
                   </div>
-                  <button type="submit" className="w-full py-2 bg-[#00f2ff] text-black font-black text-[9px] uppercase tracking-widest hover:bg-[#00f2ff]/80 transition-all shadow-[0_0_15px_rgba(0,242,255,0.4)] mt-2">
+                  <button type="submit" className="w-full py-2 bg-[#00f2ff] text-black font-black text-[8px] uppercase tracking-widest hover:bg-[#00f2ff]/80 transition-all shadow-[0_0_10px_rgba(0,242,255,0.3)] mt-2">
                     Finalize_Registration
                   </button>
                 </form>
@@ -381,17 +381,17 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
         </AnimatePresence>
       </main>
 
-      <footer className="h-6 shrink-0 border border-[#00f2ff]/20 bg-black/40 flex items-center px-4 overflow-hidden">
+      <footer className="h-5 shrink-0 border border-[#00f2ff]/20 bg-black/40 flex items-center px-4 overflow-hidden">
         <div className="flex gap-12 whitespace-nowrap">
            <motion.span 
              animate={{ opacity: [0.4, 1, 0.4] }} 
              transition={{ duration: 2, repeat: Infinity }}
-             className="text-[6px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]"
+             className="text-[5px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]"
            >
              DIRECTORATE_LINK_STABLE...
            </motion.span>
-           <span className="text-[6px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">SYNCHRONIZING_PERSONNEL_INDEX...</span>
-           <span className="text-[6px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">PROTOCOL_7B_ENFORCED...</span>
+           <span className="text-[5px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">SYNCHRONIZING_PERSONNEL_INDEX...</span>
+           <span className="text-[5px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">PROTOCOL_7B_ENFORCED...</span>
         </div>
       </footer>
     </div>
