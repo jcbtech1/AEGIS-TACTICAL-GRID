@@ -4,16 +4,11 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, User, Shield, Undo2, Search, 
-  Filter, Circle, MoreVertical, BadgeCheck,
-  UserPlus, Trash2, Edit3, Eye, ArrowLeft,
-  Calendar, MapPin, HardDrive, Terminal
+  Circle, BadgeCheck, UserPlus, Trash2, 
+  Edit3, Eye, ArrowLeft, Calendar, 
+  MapPin, HardDrive, Terminal, Settings2,
+  Lock, Activity, Mail
 } from 'lucide-react';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
 interface Operator {
   id: string;
@@ -25,15 +20,16 @@ interface Operator {
   sector: string;
   joinDate: string;
   deviceId: string;
+  email: string;
 }
 
 const mockOperators: Operator[] = [
-  { id: 'OP-001', name: 'ADMIN_PRIME', role: 'System Architect', clearance: 5, status: 'ACTIVE', lastActive: 'NOW', sector: 'CENTRAL_COMMAND', joinDate: '2022-05-12', deviceId: 'AEGIS-V2-01' },
-  { id: 'OP-042', name: 'SEC_ALFA_09', role: 'Network Sentinel', clearance: 3, status: 'ACTIVE', lastActive: '12m ago', sector: 'NETWORK_PERIMETER', joinDate: '2023-01-20', deviceId: 'SENTINEL-X9' },
-  { id: 'OP-117', name: 'GHOST_RECON', role: 'Infiltration Specialist', clearance: 4, status: 'STANDBY', lastActive: '2h ago', sector: 'STEALTH_OPS', joinDate: '2021-11-05', deviceId: 'VOID-WALKER' },
-  { id: 'OP-088', name: 'CYBER_VANGUARD', role: 'Threat Analyst', clearance: 3, status: 'ACTIVE', lastActive: '5m ago', sector: 'THREAT_DETECTION', joinDate: '2023-08-14', deviceId: 'ANALYST-B4' },
-  { id: 'OP-203', name: 'NEURAL_LINK', role: 'AI Integration', clearance: 4, status: 'INACTIVE', lastActive: '1d ago', sector: 'AI_LABS', joinDate: '2024-02-10', deviceId: 'NEURAL-BRIDGE' },
-  { id: 'OP-512', name: 'LOG_MASTER', role: 'Data Auditor', clearance: 2, status: 'ACTIVE', lastActive: '1h ago', sector: 'ARCHIVE_VAULT', joinDate: '2022-12-01', deviceId: 'AUDIT-UNIT' },
+  { id: 'OP-001', name: 'ADMIN_PRIME', role: 'System Architect', clearance: 5, status: 'ACTIVE', lastActive: 'NOW', sector: 'CENTRAL_COMMAND', joinDate: '2022-05-12', deviceId: 'AEGIS-V2-01', email: 'admin@aegis.mil' },
+  { id: 'OP-042', name: 'SEC_ALFA_09', role: 'Network Sentinel', clearance: 3, status: 'ACTIVE', lastActive: '12m ago', sector: 'NETWORK_PERIMETER', joinDate: '2023-01-20', deviceId: 'SENTINEL-X9', email: 'alfa09@aegis.mil' },
+  { id: 'OP-117', name: 'GHOST_RECON', role: 'Infiltration Specialist', clearance: 4, status: 'STANDBY', lastActive: '2h ago', sector: 'STEALTH_OPS', joinDate: '2021-11-05', deviceId: 'VOID-WALKER', email: 'ghost@aegis.mil' },
+  { id: 'OP-088', name: 'CYBER_VANGUARD', role: 'Threat Analyst', clearance: 3, status: 'ACTIVE', lastActive: '5m ago', sector: 'THREAT_DETECTION', joinDate: '2023-08-14', deviceId: 'ANALYST-B4', email: 'vanguard@aegis.mil' },
+  { id: 'OP-203', name: 'NEURAL_LINK', role: 'AI Integration', clearance: 4, status: 'INACTIVE', lastActive: '1d ago', sector: 'AI_LABS', joinDate: '2024-02-10', deviceId: 'NEURAL-BRIDGE', email: 'neural@aegis.mil' },
+  { id: 'OP-512', name: 'LOG_MASTER', role: 'Data Auditor', clearance: 2, status: 'ACTIVE', lastActive: '1h ago', sector: 'ARCHIVE_VAULT', joinDate: '2022-12-01', deviceId: 'AUDIT-UNIT', email: 'logs@aegis.mil' },
 ];
 
 const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }: { children: React.ReactNode, title?: string, className?: string, isAccent?: boolean }) => (
@@ -63,6 +59,8 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
 
   const handleDelete = (id: string) => {
     setOperators(prev => prev.filter(op => op.id !== id));
+    setView('list');
+    setSelectedOp(null);
   };
 
   const handleCreate = (e: React.FormEvent) => {
@@ -70,14 +68,15 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
     const formData = new FormData(e.target as HTMLFormElement);
     const newOp: Operator = {
       id: `OP-${Math.floor(Math.random() * 999).toString().padStart(3, '0')}`,
-      name: formData.get('name') as string,
-      role: formData.get('role') as string,
+      name: (formData.get('name') as string).toUpperCase(),
+      role: (formData.get('role') as string).toUpperCase(),
       clearance: Number(formData.get('clearance')),
       status: 'ACTIVE',
       lastActive: 'JUST_NOW',
-      sector: formData.get('sector') as string,
+      sector: (formData.get('sector') as string).toUpperCase(),
       joinDate: new Date().toISOString().split('T')[0],
-      deviceId: `DEV-${Math.random().toString(36).substring(7).toUpperCase()}`
+      deviceId: `DEV-${Math.random().toString(36).substring(7).toUpperCase()}`,
+      email: `${formData.get('name')?.toString().toLowerCase().replace(/\s/g, '')}@aegis.mil`
     };
     setOperators(prev => [newOp, ...prev]);
     setView('list');
@@ -158,7 +157,7 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                         <th className="py-2 px-3">Role</th>
                         <th className="py-2 px-3">Clearance</th>
                         <th className="py-2 px-3">Status</th>
-                        <th className="py-2 px-3 text-right">Action</th>
+                        <th className="py-2 px-3 text-right">Access</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -166,7 +165,8 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                         <motion.tr 
                           key={op.id}
                           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
-                          className="group border-b border-[#00f2ff]/5 hover:bg-[#00f2ff]/5 transition-colors"
+                          className="group border-b border-[#00f2ff]/5 hover:bg-[#00f2ff]/5 transition-colors cursor-pointer"
+                          onClick={() => { setSelectedOp(op); setView('details'); }}
                         >
                           <td className="py-2 px-3">
                             <div className="flex items-center gap-3">
@@ -197,30 +197,9 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                             </div>
                           </td>
                           <td className="py-2 px-3 text-right">
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <button className="p-1 hover:bg-[#00f2ff]/20 transition-all rounded outline-none">
-                                  <MoreVertical className="w-3 h-3 opacity-40" />
-                                </button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="bg-[#050b1a] border-[#00f2ff]/50 rounded-none tactic-clip p-1 min-w-[120px]">
-                                <DropdownMenuItem 
-                                  onClick={() => { setSelectedOp(op); setView('details'); }}
-                                  className="text-[7px] font-bold uppercase tracking-widest text-[#00f2ff] focus:bg-[#00f2ff]/10 flex gap-2"
-                                >
-                                  <Eye className="w-3 h-3" /> Full_Record
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="text-[7px] font-bold uppercase tracking-widest text-[#00f2ff] focus:bg-[#00f2ff]/10 flex gap-2">
-                                  <Edit3 className="w-3 h-3" /> Edit_Profile
-                                </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => handleDelete(op.id)}
-                                  className="text-[7px] font-bold uppercase tracking-widest text-red-500 focus:bg-red-500/10 flex gap-2"
-                                >
-                                  <Trash2 className="w-3 h-3" /> Delete_Entry
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                             <button className="p-1.5 hover:bg-[#00f2ff]/20 transition-all rounded-none border border-transparent hover:border-[#00f2ff]/30">
+                                <Eye className="w-3.5 h-3.5 text-[#00f2ff] opacity-60 group-hover:opacity-100" />
+                             </button>
                           </td>
                         </motion.tr>
                       ))}
@@ -255,11 +234,15 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
                       <span className="text-[7px] opacity-40">OPERATIONAL_STATE</span>
-                      <span className="text-[9px] font-black text-emerald-400">{selectedOp.status}</span>
+                      <span className={`text-[9px] font-black ${selectedOp.status === 'ACTIVE' ? 'text-emerald-400' : 'text-red-500'}`}>{selectedOp.status}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
                       <span className="text-[7px] opacity-40">ASSIGNED_SECTOR</span>
                       <span className="text-[9px] font-black">{selectedOp.sector}</span>
+                    </div>
+                    <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
+                      <span className="text-[7px] opacity-40">ENCRYPTION_KEY</span>
+                      <span className="text-[9px] font-black opacity-30 font-mono">0x{Math.random().toString(16).slice(2,8).toUpperCase()}</span>
                     </div>
                   </div>
                 </DoubleBorderPanel>
@@ -269,6 +252,13 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                 <DoubleBorderPanel title="[ EXTENDED_DOSSIER ]" className="flex-1">
                   <div className="grid grid-cols-2 gap-6 p-2">
                     <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <Mail className="w-4 h-4 text-[#00f2ff]/40" />
+                        <div className="flex flex-col">
+                          <span className="text-[6px] opacity-30 uppercase">Secure_Communication</span>
+                          <span className="text-[9px] font-bold">{selectedOp.email}</span>
+                        </div>
+                      </div>
                       <div className="flex items-start gap-3">
                         <Calendar className="w-4 h-4 text-[#00f2ff]/40" />
                         <div className="flex flex-col">
@@ -296,22 +286,41 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                       <span className="text-[6px] opacity-30 uppercase flex items-center gap-1">
                         <Terminal className="w-2.5 h-2.5" /> Recent_System_Logs
                       </span>
-                      <div className="text-[7px] space-y-2 opacity-60 font-mono">
+                      <div className="text-[7px] space-y-2 opacity-60 font-mono h-32 overflow-y-auto terminal-scroll">
                         <div>[2h ago] SYSTEM_LOGIN_GRANTED_0x884</div>
                         <div>[5h ago] KERNEL_PARAMETER_ACCESS</div>
                         <div>[12h ago] ENCRYPTED_STREAM_STARTED</div>
                         <div>[1d ago] SECURITY_PROTOCOL_VERIFIED</div>
+                        <div>[2d ago] NODE_SYNCHRONIZATION_OK</div>
+                        <div>[3d ago] NEW_DEVICE_REGISTERED</div>
                       </div>
                     </div>
                   </div>
                 </DoubleBorderPanel>
 
-                <div className="grid grid-cols-2 gap-4 h-24">
-                   <DoubleBorderPanel title="VAULT_ACCESS" className="flex items-center justify-center">
-                      <button className="text-[8px] font-black border border-[#00f2ff]/30 px-4 py-1 hover:bg-[#00f2ff]/10">OPEN_ARCHIVE</button>
+                <div className="grid grid-cols-3 gap-4 h-24">
+                   <DoubleBorderPanel title="ADMIN_TOOLS" className="flex items-center justify-center bg-[#00f2ff]/5">
+                      <button className="flex items-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 px-4 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group">
+                        <Edit3 className="w-3 h-3 group-hover:scale-110" />
+                        Edit_Profile
+                      </button>
                    </DoubleBorderPanel>
-                   <DoubleBorderPanel title="COMM_LINK" className="flex items-center justify-center">
-                      <button className="text-[8px] font-black border border-[#00f2ff]/30 px-4 py-1 hover:bg-[#00f2ff]/10">ESTABLISH_PING</button>
+                   
+                   <DoubleBorderPanel title="SYSTEM_ACCESS" className="flex items-center justify-center">
+                      <button className="flex items-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 px-4 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group">
+                        <Lock className="w-3 h-3 group-hover:scale-110" />
+                        Revoke_Access
+                      </button>
+                   </DoubleBorderPanel>
+
+                   <DoubleBorderPanel title="PURGE_RECORD" className="flex items-center justify-center bg-red-500/5" isAccent>
+                      <button 
+                        onClick={() => handleDelete(selectedOp.id)}
+                        className="flex items-center gap-2 text-[8px] font-black border border-red-500/30 text-red-500 px-4 py-2 hover:bg-red-500/20 transition-all uppercase tracking-widest group"
+                      >
+                        <Trash2 className="w-3 h-3 group-hover:scale-110" />
+                        Delete_Entry
+                      </button>
                    </DoubleBorderPanel>
                 </div>
               </div>
@@ -328,29 +337,41 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                 <form onSubmit={handleCreate} className="space-y-4 py-2">
                   <div className="space-y-1">
                     <label className="text-[7px] opacity-40 uppercase">Full_Name_Designation</label>
-                    <input name="name" required placeholder="p. ej. OPERATOR_OMEGA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-3 py-2 text-[9px] text-[#00f2ff] outline-none" />
+                    <div className="relative">
+                      <User className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
+                      <input name="name" required placeholder="OPERATOR_OMEGA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-2 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                    </div>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1">
                       <label className="text-[7px] opacity-40 uppercase">Role_Classification</label>
-                      <input name="role" required placeholder="p. ej. ANALYST" className="w-full bg-black/40 border border-[#00f2ff]/20 px-3 py-2 text-[9px] text-[#00f2ff] outline-none" />
+                      <div className="relative">
+                        <Activity className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
+                        <input name="role" required placeholder="ANALYST" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-2 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                      </div>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-[7px] opacity-40 uppercase">Auth_Level (1-5)</label>
-                      <select name="clearance" className="w-full bg-black/40 border border-[#00f2ff]/20 px-3 py-2 text-[9px] text-[#00f2ff] outline-none">
-                        <option value="1">Level 1</option>
-                        <option value="2">Level 2</option>
-                        <option value="3">Level 3</option>
-                        <option value="4">Level 4</option>
-                        <option value="5">Level 5</option>
-                      </select>
+                      <label className="text-[7px] opacity-40 uppercase">Auth_Level</label>
+                      <div className="relative">
+                        <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
+                        <select name="clearance" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-2 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all">
+                          <option value="1">L-1 (BASIC)</option>
+                          <option value="2">L-2 (AUDIT)</option>
+                          <option value="3">L-3 (SECURITY)</option>
+                          <option value="4">L-4 (OFFENSIVE)</option>
+                          <option value="5">L-5 (ADM_PRIME)</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <label className="text-[7px] opacity-40 uppercase">Operation_Sector</label>
-                    <input name="sector" required placeholder="p. ej. SECTOR_ALPHA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-3 py-2 text-[9px] text-[#00f2ff] outline-none" />
+                    <div className="relative">
+                      <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
+                      <input name="sector" required placeholder="SECTOR_ALPHA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-2 text-[9px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
+                    </div>
                   </div>
-                  <button type="submit" className="w-full py-2 bg-[#00f2ff] text-black font-black text-[9px] uppercase tracking-widest hover:bg-[#00f2ff]/80 transition-all">
+                  <button type="submit" className="w-full py-2 bg-[#00f2ff] text-black font-black text-[9px] uppercase tracking-widest hover:bg-[#00f2ff]/80 transition-all shadow-[0_0_15px_rgba(0,242,255,0.4)]">
                     Finalize_Registration
                   </button>
                 </form>
@@ -362,7 +383,13 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
 
       <footer className="h-6 shrink-0 border border-[#00f2ff]/20 bg-black/40 flex items-center px-4 overflow-hidden">
         <div className="flex gap-12 whitespace-nowrap">
-           <span className="text-[6px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">DIRECTORATE_LINK_STABLE...</span>
+           <motion.span 
+             animate={{ opacity: [0.4, 1, 0.4] }} 
+             transition={{ duration: 2, repeat: Infinity }}
+             className="text-[6px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]"
+           >
+             DIRECTORATE_LINK_STABLE...
+           </motion.span>
            <span className="text-[6px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">SYNCHRONIZING_PERSONNEL_INDEX...</span>
            <span className="text-[6px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">PROTOCOL_7B_ENFORCED...</span>
         </div>
