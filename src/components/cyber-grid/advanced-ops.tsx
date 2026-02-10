@@ -5,7 +5,7 @@
  * @fileOverview AdvancedOpsScreen - Rediseño de alta fidelidad basado en la estética Aegis Command.
  * 
  * Versión compactada para evitar desbordamientos en pantalla.
- * Actualizado: AEGIS_IA ahora es una vista dedicada sin barra lateral redundante.
+ * Actualizado: AEGIS_IA ahora es una vista dedicada con un núcleo circular inspirado en HUDs de Stark Industries.
  */
 
 import React, { useState, useEffect } from 'react';
@@ -19,7 +19,8 @@ import {
   Sparkles, Zap, Activity,
   Database, Terminal as TerminalIcon,
   Mic, Send, Power, ShieldAlert,
-  ArrowLeft
+  ArrowLeft, Cloud, Thermometer,
+  Wind, Gauge
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
@@ -221,14 +222,19 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
 function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   const [input, setInput] = useState('');
   const [history, setHistory] = useState([
-    { role: 'ai', text: 'NÚCLEO AEGIS_IA EN LÍNEA. PROTOCOLOS DE RAZONAMIENTO AL 100%. ESPERANDO ÓRDENES DEL OPERADOR.', timestamp: '00:00:00' }
+    { role: 'ai', text: 'AEGIS_TACTICAL_AI_CONNECTED. STANDING BY FOR OPERATOR COMMANDS.', timestamp: '00:00:00' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [neuralStability, setNeuralStability] = useState(99.9);
+  const [metrics, setMetrics] = useState({ cpu: 12, ram: 45, load: 22, sync: 99.9 });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setNeuralStability(prev => Math.min(100, Math.max(98, prev + (Math.random() - 0.5) * 0.1)));
+      setMetrics({
+        cpu: Math.floor(10 + Math.random() * 20),
+        ram: Math.floor(40 + Math.random() * 10),
+        load: Math.floor(20 + Math.random() * 15),
+        sync: 99.8 + Math.random() * 0.2
+      });
     }, 2000);
     return () => clearInterval(interval);
   }, []);
@@ -247,9 +253,9 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
       const result = await sendTacticalCommand({
         message: userMsg.text,
         systemStatus: { 
-          threatLevel: "AEGIS_ZONE", 
+          threatLevel: "ALPHA_ZONE", 
           activeNodes: 14, 
-          throughput: "3.2 Gb/s" 
+          throughput: `${metrics.load} Mb/s` 
         }
       });
       setHistory(prev => [...prev, { 
@@ -263,97 +269,113 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   };
 
   return (
-    <div className="flex h-full gap-3 min-h-0 overflow-hidden">
-      {/* PANEL DE VISUALIZACIÓN NEURONAL */}
-      <div className="flex-[2] flex flex-col gap-3 min-h-0">
-        <DoubleBorderPanel title="NEURAL_CORE_VIZ" className="flex-[3] flex items-center justify-center bg-black/60 group">
-          <div className="relative w-24 h-24">
-            <motion.div 
-              animate={{ rotate: 360 }}
-              transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
-              className="absolute inset-0 border border-[#00f2ff]/20 rounded-full"
-            />
-            <motion.div 
-              animate={{ rotate: -360 }}
-              transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
-              className="absolute inset-2 border border-[#00f2ff]/40 rounded-full border-dashed"
-            />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Brain className="w-8 h-8 text-[#00f2ff] animate-pulse" />
-            </div>
-            {/* Partículas de "pensamiento" */}
-            {Array.from({ length: 4 }).map((_, i) => (
-              <motion.div
-                key={i}
-                animate={{ 
-                  scale: [1, 1.5, 1],
-                  opacity: [0.2, 0.5, 0.2],
-                  x: [0, (i % 2 === 0 ? 30 : -30)],
-                  y: [0, (i < 2 ? 30 : -30)]
-                }}
-                transition={{ repeat: Infinity, duration: 3, delay: i * 0.5 }}
-                className="absolute left-1/2 top-1/2 w-1 h-1 bg-[#00f2ff] rounded-full blur-[1px]"
-              />
-            ))}
+    <div className="flex h-full gap-4 min-h-0 overflow-hidden relative">
+      {/* HUD CIRCULAR CENTRAL (STARK STYLE) */}
+      <div className="flex-1 flex flex-col items-center justify-center relative p-8">
+        
+        {/* ELEMENTOS PERIFÉRICOS (TOP LEFT) */}
+        <div className="absolute top-4 left-4 flex flex-col gap-2">
+          <div className="flex items-center gap-2 text-[8px] font-black text-[#00f2ff]">
+            <Cpu className="w-3 h-3" />
+            <span>CPU: {metrics.cpu}%</span>
           </div>
-        </DoubleBorderPanel>
+          <div className="flex items-center gap-2 text-[8px] font-black text-[#00f2ff]">
+            <Database className="w-3 h-3" />
+            <span>RAM: {metrics.ram}%</span>
+          </div>
+          <div className="mt-4 flex flex-col gap-1">
+             <span className="text-[6px] opacity-40 uppercase tracking-widest">Neural_Sync</span>
+             <div className="w-24 h-1 bg-[#00f2ff]/10">
+                <motion.div animate={{ width: `${metrics.sync}%` }} className="h-full bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
+             </div>
+          </div>
+        </div>
 
-        <DoubleBorderPanel title="IA_METRICS" className="flex-[2] p-3 space-y-3">
-          <div className="space-y-1">
-            <div className="flex justify-between text-[6px] uppercase opacity-40">
-              <span>Neural_Stability</span>
-              <span>{neuralStability.toFixed(2)}%</span>
-            </div>
-            <div className="h-0.5 bg-[#00f2ff]/10 w-full">
-              <motion.div 
-                animate={{ width: `${neuralStability}%` }}
-                className="h-full bg-[#00f2ff] shadow-[0_0_5px_#00f2ff]"
-              />
-            </div>
+        {/* ELEMENTOS PERIFÉRICOS (TOP RIGHT - WEATHER/SECTOR) */}
+        <div className="absolute top-4 right-4 flex flex-col items-end gap-2 text-[#00f2ff]/80">
+          <div className="text-[12px] font-black tracking-tighter">13°C</div>
+          <div className="flex items-center gap-2 text-[6px] uppercase font-bold tracking-widest">
+            <Cloud className="w-3 h-3" />
+            <span>Clear_Sky</span>
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col">
-              <span className="text-[5px] opacity-40 uppercase">Reasoning_Path</span>
-              <span className="text-[7px] font-bold">GEMINI_FLASH_2.5</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-[5px] opacity-40 uppercase">Active_Directives</span>
-              <span className="text-[7px] font-bold">128_OPS/SEC</span>
-            </div>
+          <div className="text-[5px] opacity-40 uppercase tracking-widest mt-2">Sector_9_Russia</div>
+          <div className="flex flex-col gap-1 mt-4">
+            <div className="flex justify-between w-24 text-[5px] uppercase"><span>Humidity</span><span>77%</span></div>
+            <div className="flex justify-between w-24 text-[5px] uppercase"><span>Visibility</span><span>10km</span></div>
           </div>
-          <div className="pt-2 border-t border-[#00f2ff]/10">
-            <div className="flex items-center gap-2">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-              <span className="text-[6px] font-black uppercase">HEURISTIC_LINK_ACTIVE</span>
-            </div>
+        </div>
+
+        {/* NÚCLEO CENTRAL ANIMADO */}
+        <div className="relative w-[320px] h-[320px] flex items-center justify-center pointer-events-none">
+          {/* Anillos SVG */}
+          <svg className="absolute w-full h-full animate-spin-slow opacity-20" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="5,10" />
+          </svg>
+          <svg className="absolute w-[80%] h-[80%] animate-spin-reverse-slow opacity-40" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="#00f2ff" strokeWidth="1" strokeDasharray="30,150" />
+          </svg>
+          <svg className="absolute w-[60%] h-[60%] animate-spin-slow" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="1,2" />
+          </svg>
+          
+          {/* Centro del núcleo */}
+          <div className="relative w-32 h-32 rounded-full border border-[#00f2ff]/40 bg-[#00f2ff]/5 flex flex-col items-center justify-center backdrop-blur-sm">
+             <Brain className="w-10 h-10 text-[#00f2ff] animate-pulse" />
+             <div className="mt-2 text-[7px] font-black text-[#00f2ff] tracking-[0.3em] uppercase">Core_Alpha</div>
           </div>
-        </DoubleBorderPanel>
+
+          {/* Brackets flotantes */}
+          <motion.div 
+            animate={{ scale: [1, 1.05, 1], rotate: [0, 5, 0] }}
+            transition={{ repeat: Infinity, duration: 4 }}
+            className="absolute inset-0 border-[4px] border-[#00f2ff]/10 rounded-full border-dashed"
+          />
+        </div>
+
+        {/* MÉTRICAS DE CARGA (BOTTOM) */}
+        <div className="absolute bottom-12 w-full px-24 flex justify-between items-end">
+           <div className="flex flex-col gap-1">
+              <span className="text-[6px] opacity-40 uppercase tracking-widest">Active_Taskbar</span>
+              <div className="flex gap-2">
+                 <div className="w-2 h-2 border border-[#00f2ff] bg-[#00f2ff]/20" />
+                 <div className="w-2 h-2 border border-[#00f2ff] bg-[#00f2ff]/20" />
+                 <div className="w-2 h-2 border border-[#00f2ff] bg-transparent" />
+              </div>
+           </div>
+           <div className="text-right">
+              <span className="text-[12px] font-black tracking-tighter text-[#00f2ff]">{metrics.load} Gb/s</span>
+              <span className="text-[5px] opacity-40 uppercase block">Data_Throughput</span>
+           </div>
+        </div>
       </div>
 
-      {/* CONSOLA DE INTERACCIÓN */}
-      <div className="flex-[3] flex flex-col gap-3 min-h-0">
-        <DoubleBorderPanel title="COMM_LINK" className="flex-1 flex flex-col bg-black/60">
-          <div className="flex-1 p-2 overflow-y-auto terminal-scroll space-y-3">
-            <AnimatePresence mode="popLayout">
+      {/* CONSOLA DE COMANDOS (DERECHA - DENSITY) */}
+      <div className="w-[300px] flex flex-col gap-3 h-full min-h-0 bg-black/40 border-l border-[#00f2ff]/10 z-10">
+        <div className="p-3 border-b border-[#00f2ff]/10 flex items-center gap-3">
+           <TerminalIcon className="w-4 h-4 text-[#00f2ff]" />
+           <span className="text-[8px] font-black tracking-widest uppercase">Comm_Interface</span>
+        </div>
+
+        <div className="flex-1 overflow-y-auto terminal-scroll p-4 space-y-4">
+           <AnimatePresence mode="popLayout">
               {history.map((msg, i) => (
                 <motion.div 
                   key={i}
-                  initial={{ opacity: 0, x: msg.role === 'ai' ? -10 : 10 }}
+                  initial={{ opacity: 0, x: msg.role === 'ai' ? -5 : 5 }}
                   animate={{ opacity: 1, x: 0 }}
                   className={`flex flex-col ${msg.role === 'ai' ? 'items-start' : 'items-end'}`}
                 >
-                  <div className={`max-w-[85%] p-2 border ${
+                  <div className={`max-w-[90%] p-2 border ${
                     msg.role === 'ai' 
                     ? 'border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff]' 
                     : 'border-[#f43f5e]/30 bg-[#f43f5e]/5 text-[#f43f5e]'
                   } fui-corner-brackets relative`}>
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-[5px] font-black uppercase tracking-widest opacity-40">
-                        {msg.role === 'ai' ? 'AEGIS_INTELLIGENCE' : 'OPERATOR_SIGNAL'}
+                        {msg.role === 'ai' ? 'AEGIS_SYSTEM' : 'OPERATOR'}
                       </span>
-                      <span className="text-[4px] opacity-30 ml-4">[{msg.timestamp}]</span>
                     </div>
-                    <p className="text-[8px] leading-relaxed font-mono tracking-tight uppercase">
+                    <p className="text-[8px] font-mono uppercase leading-tight tracking-tight">
                       {msg.text}
                     </p>
                   </div>
@@ -361,36 +383,32 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
               ))}
             </AnimatePresence>
             {isLoading && (
-              <div className="flex items-center gap-2 text-[#00f2ff]/40 p-2 border border-[#00f2ff]/10 bg-[#00f2ff]/5">
+              <div className="flex items-center gap-2 text-[#00f2ff]/40 p-2">
                 <Loader2 className="w-3 h-3 animate-spin" />
-                <span className="text-[7px] font-black tracking-widest animate-pulse">RAZONANDO_RESPUESTA_TÁCTICA...</span>
+                <span className="text-[7px] font-black tracking-widest animate-pulse">PROCESSING...</span>
               </div>
             )}
-          </div>
+        </div>
 
-          <div className="p-2 border-t border-[#00f2ff]/10 bg-[#00f2ff]/2 flex gap-2 shrink-0 items-center">
-            <div className="w-6 h-6 border border-[#00f2ff]/20 bg-[#00f2ff]/5 flex items-center justify-center shrink-0">
-              <Mic className="w-3 h-3 opacity-30 hover:opacity-100 cursor-pointer transition-opacity" />
-            </div>
-            <input 
-              type="text" 
-              value={input} 
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-              placeholder="INTRODUCIR_COMANDO_O_CONSULTA..." 
-              disabled={isLoading}
-              className="flex-1 bg-black/40 border border-[#00f2ff]/20 px-3 py-1.5 text-[8px] outline-none text-[#00f2ff] placeholder:text-[#00f2ff]/10 uppercase font-mono tracking-widest" 
-            />
-            <button 
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              className="px-4 py-1.5 bg-[#00f2ff] text-black font-black text-[8px] uppercase tracking-[0.2em] hover:bg-[#00f2ff]/80 transition-all disabled:opacity-20 flex items-center gap-2"
-            >
-              <Send className="w-3 h-3" />
-              EJECUTAR
-            </button>
-          </div>
-        </DoubleBorderPanel>
+        <div className="p-3 bg-black/60 border-t border-[#00f2ff]/10">
+           <div className="flex gap-2">
+              <input 
+                type="text" 
+                value={input} 
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                placeholder="INPUT_COMMAND..." 
+                disabled={isLoading}
+                className="flex-1 bg-[#00f2ff]/5 border border-[#00f2ff]/20 px-3 py-1.5 text-[8px] outline-none text-[#00f2ff] placeholder:text-[#00f2ff]/10 uppercase" 
+              />
+              <button 
+                onClick={handleSend}
+                className="w-8 h-8 flex items-center justify-center bg-[#00f2ff] text-black hover:bg-[#00f2ff]/80 transition-all"
+              >
+                <Send className="w-3 h-3" />
+              </button>
+           </div>
+        </div>
       </div>
     </div>
   );
