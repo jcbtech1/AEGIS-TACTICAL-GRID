@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -7,8 +8,10 @@ import {
   Circle, BadgeCheck, UserPlus, Trash2, 
   Edit3, Eye, ArrowLeft, Calendar, 
   MapPin, HardDrive, Terminal,
-  Lock, Activity, Mail
+  Lock, Activity, Mail, Loader2
 } from 'lucide-react';
+import { useCollection, initializeFirebase } from '@/firebase';
+import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 interface Operator {
   id: string;
@@ -22,15 +25,6 @@ interface Operator {
   deviceId: string;
   email: string;
 }
-
-const mockOperators: Operator[] = [
-  { id: 'OP-001', name: 'ADMIN_PRIME', role: 'System Architect', clearance: 5, status: 'ACTIVE', lastActive: 'NOW', sector: 'CENTRAL_COMMAND', joinDate: '2022-05-12', deviceId: 'AEGIS-V2-01', email: 'admin@aegis.mil' },
-  { id: 'OP-042', name: 'SEC_ALFA_09', role: 'Network Sentinel', clearance: 3, status: 'ACTIVE', lastActive: '12m ago', sector: 'NETWORK_PERIMETER', joinDate: '2023-01-20', deviceId: 'SENTINEL-X9', email: 'alfa09@aegis.mil' },
-  { id: 'OP-117', name: 'GHOST_RECON', role: 'Infiltration Specialist', clearance: 4, status: 'STANDBY', lastActive: '2h ago', sector: 'STEALTH_OPS', joinDate: '2021-11-05', deviceId: 'VOID-WALKER', email: 'ghost@aegis.mil' },
-  { id: 'OP-088', name: 'CYBER_VANGUARD', role: 'Threat Analyst', clearance: 3, status: 'ACTIVE', lastActive: '5m ago', sector: 'THREAT_DETECTION', joinDate: '2023-08-14', deviceId: 'ANALYST-B4', email: 'vanguard@aegis.mil' },
-  { id: 'OP-203', name: 'NEURAL_LINK', role: 'AI Integration', clearance: 4, status: 'INACTIVE', lastActive: '1d ago', sector: 'AI_LABS', joinDate: '2024-02-10', deviceId: 'NEURAL-BRIDGE', email: 'neural@aegis.mil' },
-  { id: 'OP-512', name: 'LOG_MASTER', role: 'Data Auditor', clearance: 2, status: 'ACTIVE', lastActive: '1h ago', sector: 'ARCHIVE_VAULT', joinDate: '2022-12-01', deviceId: 'AUDIT-UNIT', email: 'logs@aegis.mil' },
-];
 
 const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }: { children: React.ReactNode, title?: string, className?: string, isAccent?: boolean }) => (
   <div className={`relative border ${isAccent ? 'border-[#f43f5e]/40' : 'border-[#00f2ff]/30'} bg-[#050b1a]/80 backdrop-blur-md p-3 flex flex-col fui-corner-brackets overflow-hidden ${className}`}>
@@ -49,25 +43,31 @@ const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }
 export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
   const [view, setView] = useState<'list' | 'details' | 'create'>('list');
   const [selectedOp, setSelectedOp] = useState<Operator | null>(null);
-  const [operators, setOperators] = useState<Operator[]>(mockOperators);
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // --- CONEXIÓN BACKEND (FIRESTORE) ---
+  const { data: operators, loading } = useCollection<Operator>('operators');
 
   const filteredOperators = operators.filter(op => 
     op.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     op.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = (id: string) => {
-    setOperators(prev => prev.filter(op => op.id !== id));
+  const handleDelete = async (id: string) => {
+    // --- MUTACIÓN BACKEND ---
+    const { db } = initializeFirebase();
+    await deleteDoc(doc(db, 'operators', id));
     setView('list');
     setSelectedOp(null);
   };
 
-  const handleCreate = (e: React.FormEvent) => {
+  const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
+    const opId = `OP-${Math.floor(Math.random() * 999).toString().padStart(3, '0')}`;
+    
     const newOp: Operator = {
-      id: `OP-${Math.floor(Math.random() * 999).toString().padStart(3, '0')}`,
+      id: opId,
       name: (formData.get('name') as string).toUpperCase(),
       role: (formData.get('role') as string).toUpperCase(),
       clearance: Number(formData.get('clearance')),
@@ -78,7 +78,10 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
       deviceId: `DEV-${Math.random().toString(36).substring(7).toUpperCase()}`,
       email: `${formData.get('name')?.toString().toLowerCase().replace(/\s/g, '')}@aegis.mil`
     };
-    setOperators(prev => [newOp, ...prev]);
+
+    // --- GUARDADO EN BACKEND ---
+    const { db } = initializeFirebase();
+    await setDoc(doc(db, 'operators', opId), newOp);
     setView('list');
   };
 
@@ -150,61 +153,67 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
 
               <DoubleBorderPanel title="[ OPERATOR_DATA_STREAM ]" className="flex-1 min-h-0">
                 <div className="flex-1 overflow-y-auto terminal-scroll pr-2">
-                  <table className="w-full text-left border-collapse table-fixed">
-                    <thead>
-                      <tr className="border-b border-[#00f2ff]/10 text-[6px] text-[#00f2ff]/40 uppercase tracking-[0.3em] font-bold sticky top-0 bg-[#050b1a] z-10">
-                        <th className="py-2 px-3 w-[40%]">Identity</th>
-                        <th className="py-2 px-3 w-[20%]">Role</th>
-                        <th className="py-2 px-3 w-[15%]">Clearance</th>
-                        <th className="py-2 px-3 w-[15%]">Status</th>
-                        <th className="py-2 px-3 w-[10%] text-right">Access</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[#00f2ff]/5">
-                      {filteredOperators.map((op, i) => (
-                        <motion.tr 
-                          key={op.id}
-                          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.01 }}
-                          className="group hover:bg-[#00f2ff]/5 transition-colors cursor-pointer"
-                          onClick={() => { setSelectedOp(op); setView('details'); }}
-                        >
-                          <td className="py-2 px-3 overflow-hidden">
-                            <div className="flex items-center gap-3 overflow-hidden">
-                              <div className="w-8 h-8 shrink-0 border border-[#00f2ff]/20 bg-[#00f2ff]/5 flex items-center justify-center relative">
-                                <User className="w-4 h-4 text-[#00f2ff]/40 group-hover:text-[#00f2ff]" />
-                                {op.clearance === 5 && <BadgeCheck className="absolute -top-1 -right-1 w-3 h-3 text-[#00f2ff] fill-black" />}
+                  {loading ? (
+                    <div className="flex items-center justify-center h-full gap-3 text-[#00f2ff]/40">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span className="text-[8px] tracking-[0.4em] uppercase">Fetching_Registry...</span>
+                    </div>
+                  ) : (
+                    <table className="w-full text-left border-collapse table-fixed">
+                      <thead>
+                        <tr className="border-b border-[#00f2ff]/10 text-[6px] text-[#00f2ff]/40 uppercase tracking-[0.3em] font-bold sticky top-0 bg-[#050b1a] z-10">
+                          <th className="py-2 px-3 w-[40%]">Identity</th>
+                          <th className="py-2 px-3 w-[20%]">Role</th>
+                          <th className="py-2 px-3 w-[15%]">Clearance</th>
+                          <th className="py-2 px-3 w-[15%]">Status</th>
+                          <th className="py-2 px-3 w-[10%] text-right">Access</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#00f2ff]/5">
+                        {filteredOperators.map((op, i) => (
+                          <motion.tr 
+                            key={op.id}
+                            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.01 }}
+                            className="group hover:bg-[#00f2ff]/5 transition-colors cursor-pointer"
+                            onClick={() => { setSelectedOp(op); setView('details'); }}
+                          >
+                            <td className="py-2 px-3 overflow-hidden">
+                              <div className="flex items-center gap-3 overflow-hidden">
+                                <div className="w-8 h-8 shrink-0 border border-[#00f2ff]/20 bg-[#00f2ff]/5 flex items-center justify-center relative">
+                                  <User className="w-4 h-4 text-[#00f2ff]/40 group-hover:text-[#00f2ff]" />
+                                  {op.clearance === 5 && <BadgeCheck className="absolute -top-1 -right-1 w-3 h-3 text-[#00f2ff] fill-black" />}
+                                </div>
+                                <div className="flex min-w-0">
+                                  <span className="text-[10px] font-black text-white group-hover:text-[#00f2ff] transition-colors truncate">{op.name}</span>
+                                </div>
                               </div>
-                              <div className="flex flex-col min-w-0">
-                                <span className="text-[10px] font-black text-white group-hover:text-[#00f2ff] transition-colors truncate">{op.name}</span>
-                                <span className="text-[6px] opacity-40 font-mono truncate">{op.id}</span>
+                            </td>
+                            <td className="py-2 px-3 overflow-hidden">
+                              <span className="text-[8px] font-bold uppercase opacity-70 truncate block">{op.role}</span>
+                            </td>
+                            <td className="py-2 px-3">
+                              <div className="flex gap-0.5 items-center">
+                                {Array.from({ length: 5 }).map((_, idx) => (
+                                  <div key={idx} className={`w-1.5 h-1 ${idx < op.clearance ? 'bg-[#00f2ff] shadow-[0_0_5px_#00f2ff]' : 'bg-[#00f2ff]/10'}`} />
+                                ))}
                               </div>
-                            </div>
-                          </td>
-                          <td className="py-2 px-3 overflow-hidden">
-                            <span className="text-[8px] font-bold uppercase opacity-70 truncate block">{op.role}</span>
-                          </td>
-                          <td className="py-2 px-3">
-                            <div className="flex gap-0.5 items-center">
-                              {Array.from({ length: 5 }).map((_, idx) => (
-                                <div key={idx} className={`w-1.5 h-1 ${idx < op.clearance ? 'bg-[#00f2ff] shadow-[0_0_5px_#00f2ff]' : 'bg-[#00f2ff]/10'}`} />
-                              ))}
-                            </div>
-                          </td>
-                          <td className="py-2 px-3">
-                            <div className="flex items-center gap-1.5">
-                              <Circle className={`w-1 h-1 fill-current ${op.status === 'ACTIVE' ? 'text-emerald-400 animate-pulse' : 'text-red-500'}`} />
-                              <span className={`text-[7px] font-black ${op.status === 'ACTIVE' ? 'text-emerald-400' : 'text-red-500'}`}>{op.status}</span>
-                            </div>
-                          </td>
-                          <td className="py-2 px-3 text-right">
-                             <div className="p-1 hover:bg-[#00f2ff]/20 transition-all rounded-none inline-block">
-                                <Eye className="w-3.5 h-3.5 text-[#00f2ff] opacity-60 group-hover:opacity-100" />
-                             </div>
-                          </td>
-                        </motion.tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            </td>
+                            <td className="py-2 px-3">
+                              <div className="flex items-center gap-1.5">
+                                <Circle className={`w-1 h-1 fill-current ${op.status === 'ACTIVE' ? 'text-emerald-400 animate-pulse' : 'text-red-500'}`} />
+                                <span className={`text-[7px] font-black ${op.status === 'ACTIVE' ? 'text-emerald-400' : 'text-red-500'}`}>{op.status}</span>
+                              </div>
+                            </td>
+                            <td className="py-2 px-3 text-right">
+                               <div className="p-1 hover:bg-[#00f2ff]/20 transition-all rounded-none inline-block">
+                                  <Eye className="w-3.5 h-3.5 text-[#00f2ff] opacity-60 group-hover:opacity-100" />
+                               </div>
+                            </td>
+                          </motion.tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
                 </div>
               </DoubleBorderPanel>
             </motion.div>
@@ -240,10 +249,6 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                       <span className="text-[6px] opacity-40 uppercase truncate">Sector</span>
                       <span className="text-[8px] font-black truncate text-white ml-2">{selectedOp.sector}</span>
                     </div>
-                    <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[6px] opacity-40 uppercase truncate">Encryption</span>
-                      <span className="text-[7px] font-black opacity-30 font-mono truncate ml-2">RSA_4096_X</span>
-                    </div>
                   </div>
                 </DoubleBorderPanel>
               </div>
@@ -267,32 +272,11 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                         </div>
                       </div>
                       <div className="flex items-start gap-3 min-w-0">
-                        <MapPin className="w-3 h-3 text-[#00f2ff]/40 shrink-0 mt-0.5" />
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-[5px] opacity-30 uppercase">Grid_Node</span>
-                          <span className="text-[8px] font-bold text-white truncate w-full">{selectedOp.sector} NODE</span>
-                        </div>
-                      </div>
-                      <div className="flex items-start gap-3 min-w-0">
                         <HardDrive className="w-3 h-3 text-[#00f2ff]/40 shrink-0 mt-0.5" />
                         <div className="flex flex-col min-w-0">
                           <span className="text-[5px] opacity-30 uppercase">Authorized_Dev</span>
                           <span className="text-[8px] font-bold text-white truncate w-full">{selectedOp.deviceId}</span>
                         </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2 border-l border-[#00f2ff]/10 pl-4 flex flex-col min-h-0 h-full">
-                      <span className="text-[6px] opacity-30 uppercase flex items-center gap-1 shrink-0">
-                        <Terminal className="w-2.5 h-2.5" /> Recent_Audit
-                      </span>
-                      <div className="text-[7px] space-y-1.5 opacity-60 font-mono flex-1 overflow-y-auto terminal-scroll">
-                        <div className="truncate">[2h ago] LOGIN_GRANTED_0x884</div>
-                        <div className="truncate">[5h ago] KERNEL_ACCESS_SEC_01</div>
-                        <div className="truncate">[12h ago] STREAM_ACTIVE_TLS_1.3</div>
-                        <div className="truncate">[1d ago] PROTOCOL_VERIFIED_7B</div>
-                        <div className="truncate">[2d ago] NODE_SYNC_OK_SFC</div>
-                        <div className="truncate">[3d ago] NEW_DEV_REG_99XX</div>
                       </div>
                     </div>
                   </div>
@@ -345,31 +329,22 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-1">
                       <label className="text-[6px] opacity-40 uppercase">Role</label>
-                      <div className="relative">
-                        <Activity className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                        <input name="role" required placeholder="ANALYST" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
-                      </div>
+                      <input name="role" required placeholder="ANALYST" className="w-full bg-black/40 border border-[#00f2ff]/20 px-2 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
                     </div>
                     <div className="space-y-1">
                       <label className="text-[6px] opacity-40 uppercase">Clearance</label>
-                      <div className="relative">
-                        <Shield className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                        <select name="clearance" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all">
-                          <option value="1">L-1</option>
-                          <option value="2">L-2</option>
-                          <option value="3">L-3</option>
-                          <option value="4">L-4</option>
-                          <option value="5">L-5</option>
-                        </select>
-                      </div>
+                      <select name="clearance" className="w-full bg-black/40 border border-[#00f2ff]/20 px-2 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all">
+                        <option value="1">L-1</option>
+                        <option value="2">L-2</option>
+                        <option value="3">L-3</option>
+                        <option value="4">L-4</option>
+                        <option value="5">L-5</option>
+                      </select>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <label className="text-[6px] opacity-40 uppercase">Operation_Sector</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-[#00f2ff]/30" />
-                      <input name="sector" required placeholder="SECTOR_ALPHA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-8 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
-                    </div>
+                    <input name="sector" required placeholder="SECTOR_ALPHA" className="w-full bg-black/40 border border-[#00f2ff]/20 px-2 py-1.5 text-[8px] text-[#00f2ff] outline-none focus:border-[#00f2ff]/60 transition-all uppercase" />
                   </div>
                   <button type="submit" className="w-full py-2 bg-[#00f2ff] text-black font-black text-[8px] uppercase tracking-widest hover:bg-[#00f2ff]/80 transition-all shadow-[0_0_10px_rgba(0,242,255,0.3)] mt-2">
                     Finalize_Registration
@@ -391,7 +366,6 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
              DIRECTORATE_LINK_STABLE...
            </motion.span>
            <span className="text-[5px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">SYNCHRONIZING_PERSONNEL_INDEX...</span>
-           <span className="text-[5px] font-bold text-[#00f2ff]/40 uppercase tracking-[0.2em]">PROTOCOL_7B_ENFORCED...</span>
         </div>
       </footer>
     </div>
