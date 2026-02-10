@@ -40,7 +40,7 @@ const DoubleBorderPanel = ({ children, title, className = "", isAccent = false }
         {title}
       </div>
     )}
-    <div className="flex-1 min-h-0 flex flex-col relative z-10">
+    <div className="flex-1 min-h-0 flex flex-col relative z-10 overflow-hidden">
       {children}
     </div>
   </div>
@@ -150,14 +150,14 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
 
               <DoubleBorderPanel title="[ OPERATOR_DATA_STREAM ]" className="flex-1">
                 <div className="flex-1 overflow-y-auto terminal-scroll pr-2">
-                  <table className="w-full text-left border-collapse">
+                  <table className="w-full text-left border-collapse table-fixed">
                     <thead>
                       <tr className="border-b border-[#00f2ff]/10 text-[6px] text-[#00f2ff]/40 uppercase tracking-[0.3em] font-bold">
-                        <th className="py-2 px-3">Identity</th>
-                        <th className="py-2 px-3">Role</th>
-                        <th className="py-2 px-3">Clearance</th>
-                        <th className="py-2 px-3">Status</th>
-                        <th className="py-2 px-3 text-right">Access</th>
+                        <th className="py-2 px-3 w-[40%]">Identity</th>
+                        <th className="py-2 px-3 w-[20%]">Role</th>
+                        <th className="py-2 px-3 w-[15%]">Clearance</th>
+                        <th className="py-2 px-3 w-[15%]">Status</th>
+                        <th className="py-2 px-3 w-[10%] text-right">Access</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -168,20 +168,20 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
                           className="group border-b border-[#00f2ff]/5 hover:bg-[#00f2ff]/5 transition-colors cursor-pointer"
                           onClick={() => { setSelectedOp(op); setView('details'); }}
                         >
-                          <td className="py-2 px-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 border border-[#00f2ff]/20 bg-[#00f2ff]/5 flex items-center justify-center relative">
+                          <td className="py-2 px-3 overflow-hidden">
+                            <div className="flex items-center gap-3 overflow-hidden">
+                              <div className="w-8 h-8 shrink-0 border border-[#00f2ff]/20 bg-[#00f2ff]/5 flex items-center justify-center relative">
                                 <User className="w-4 h-4 text-[#00f2ff]/40 group-hover:text-[#00f2ff]" />
                                 {op.clearance === 5 && <BadgeCheck className="absolute -top-1 -right-1 w-3 h-3 text-[#00f2ff] fill-black" />}
                               </div>
-                              <div className="flex flex-col">
-                                <span className="text-[10px] font-black text-white group-hover:text-[#00f2ff] transition-colors">{op.name}</span>
-                                <span className="text-[6px] opacity-40 font-mono">{op.id}</span>
+                              <div className="flex flex-col overflow-hidden">
+                                <span className="text-[10px] font-black text-white group-hover:text-[#00f2ff] transition-colors truncate">{op.name}</span>
+                                <span className="text-[6px] opacity-40 font-mono truncate">{op.id}</span>
                               </div>
                             </div>
                           </td>
-                          <td className="py-2 px-3">
-                            <span className="text-[8px] font-bold uppercase opacity-70">{op.role}</span>
+                          <td className="py-2 px-3 overflow-hidden">
+                            <span className="text-[8px] font-bold uppercase opacity-70 truncate block">{op.role}</span>
                           </td>
                           <td className="py-2 px-3">
                             <div className="flex gap-0.5 items-center">
@@ -216,110 +216,110 @@ export default function AegisUsersScreen({ onBack }: { onBack: () => void }) {
               initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.98 }}
               className="h-full grid grid-cols-12 gap-4 overflow-hidden"
             >
-              <div className="col-span-4 flex flex-col gap-4">
+              <div className="col-span-4 flex flex-col gap-4 overflow-hidden">
                 <DoubleBorderPanel title="[ BIOMETRIC_IDENT ]" className="flex-none items-center py-6">
                   <div className="w-24 h-24 border border-[#00f2ff]/40 bg-[#00f2ff]/5 p-2 relative group overflow-hidden">
                     <User className="w-full h-full text-[#00f2ff]/20" />
                     <motion.div animate={{ top: ['0%', '100%', '0%'] }} transition={{ duration: 3, repeat: Infinity }} className="absolute left-0 right-0 h-0.5 bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
                   </div>
-                  <h2 className="mt-4 text-sm font-black text-white tracking-[0.2em]">{selectedOp.name}</h2>
-                  <span className="text-[8px] opacity-40 font-mono">UUID: {selectedOp.id}</span>
+                  <h2 className="mt-4 text-sm font-black text-white tracking-[0.2em] truncate max-w-full px-4">{selectedOp.name}</h2>
+                  <span className="text-[8px] opacity-40 font-mono truncate max-w-full px-2">UUID: {selectedOp.id}</span>
                 </DoubleBorderPanel>
 
                 <DoubleBorderPanel title="[ SECURITY_STATUS ]" className="flex-1">
-                  <div className="space-y-3">
+                  <div className="space-y-3 overflow-hidden">
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40">CLEARANCE_TIER</span>
-                      <span className="text-[9px] font-black">LEVEL_{selectedOp.clearance}</span>
+                      <span className="text-[7px] opacity-40 uppercase shrink-0">Clearance_Tier</span>
+                      <span className="text-[9px] font-black truncate ml-2">LEVEL_{selectedOp.clearance}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40">OPERATIONAL_STATE</span>
-                      <span className={`text-[9px] font-black ${selectedOp.status === 'ACTIVE' ? 'text-emerald-400' : 'text-red-500'}`}>{selectedOp.status}</span>
+                      <span className="text-[7px] opacity-40 uppercase shrink-0">Operational_State</span>
+                      <span className={`text-[9px] font-black truncate ml-2 ${selectedOp.status === 'ACTIVE' ? 'text-emerald-400' : 'text-red-500'}`}>{selectedOp.status}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40">ASSIGNED_SECTOR</span>
-                      <span className="text-[9px] font-black">{selectedOp.sector}</span>
+                      <span className="text-[7px] opacity-40 uppercase shrink-0">Assigned_Sector</span>
+                      <span className="text-[9px] font-black truncate ml-2">{selectedOp.sector}</span>
                     </div>
                     <div className="flex justify-between items-center border-b border-[#00f2ff]/10 pb-1">
-                      <span className="text-[7px] opacity-40">ENCRYPTION_KEY</span>
-                      <span className="text-[9px] font-black opacity-30 font-mono">0x{Math.random().toString(16).slice(2,8).toUpperCase()}</span>
+                      <span className="text-[7px] opacity-40 uppercase shrink-0">Encryption_Key</span>
+                      <span className="text-[9px] font-black opacity-30 font-mono truncate ml-2">0x{Math.random().toString(16).slice(2,8).toUpperCase()}</span>
                     </div>
                   </div>
                 </DoubleBorderPanel>
               </div>
 
-              <div className="col-span-8 flex flex-col gap-4">
+              <div className="col-span-8 flex flex-col gap-4 overflow-hidden">
                 <DoubleBorderPanel title="[ EXTENDED_DOSSIER ]" className="flex-1">
-                  <div className="grid grid-cols-2 gap-6 p-2">
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <Mail className="w-4 h-4 text-[#00f2ff]/40" />
-                        <div className="flex flex-col">
-                          <span className="text-[6px] opacity-30 uppercase">Secure_Communication</span>
-                          <span className="text-[9px] font-bold">{selectedOp.email}</span>
+                  <div className="grid grid-cols-2 gap-6 p-2 h-full overflow-hidden">
+                    <div className="space-y-4 overflow-hidden">
+                      <div className="flex items-start gap-3 overflow-hidden">
+                        <Mail className="w-4 h-4 text-[#00f2ff]/40 shrink-0" />
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-[6px] opacity-30 uppercase truncate">Secure_Communication</span>
+                          <span className="text-[9px] font-bold truncate">{selectedOp.email}</span>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3">
-                        <Calendar className="w-4 h-4 text-[#00f2ff]/40" />
-                        <div className="flex flex-col">
-                          <span className="text-[6px] opacity-30 uppercase">Induction_Date</span>
-                          <span className="text-[9px] font-bold">{selectedOp.joinDate}</span>
+                      <div className="flex items-start gap-3 overflow-hidden">
+                        <Calendar className="w-4 h-4 text-[#00f2ff]/40 shrink-0" />
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-[6px] opacity-30 uppercase truncate">Induction_Date</span>
+                          <span className="text-[9px] font-bold truncate">{selectedOp.joinDate}</span>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3">
-                        <MapPin className="w-4 h-4 text-[#00f2ff]/40" />
-                        <div className="flex flex-col">
-                          <span className="text-[6px] opacity-30 uppercase">Main_Base_Access</span>
-                          <span className="text-[9px] font-bold">{selectedOp.sector} GRID_NODE</span>
+                      <div className="flex items-start gap-3 overflow-hidden">
+                        <MapPin className="w-4 h-4 text-[#00f2ff]/40 shrink-0" />
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-[6px] opacity-30 uppercase truncate">Main_Base_Access</span>
+                          <span className="text-[9px] font-bold truncate">{selectedOp.sector} GRID_NODE</span>
                         </div>
                       </div>
-                      <div className="flex items-start gap-3">
-                        <HardDrive className="w-4 h-4 text-[#00f2ff]/40" />
-                        <div className="flex flex-col">
-                          <span className="text-[6px] opacity-30 uppercase">Authorized_Device</span>
-                          <span className="text-[9px] font-bold">{selectedOp.deviceId}</span>
+                      <div className="flex items-start gap-3 overflow-hidden">
+                        <HardDrive className="w-4 h-4 text-[#00f2ff]/40 shrink-0" />
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="text-[6px] opacity-30 uppercase truncate">Authorized_Device</span>
+                          <span className="text-[9px] font-bold truncate">{selectedOp.deviceId}</span>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="space-y-2 border-l border-[#00f2ff]/10 pl-6">
-                      <span className="text-[6px] opacity-30 uppercase flex items-center gap-1">
+                    <div className="space-y-2 border-l border-[#00f2ff]/10 pl-6 overflow-hidden flex flex-col">
+                      <span className="text-[6px] opacity-30 uppercase flex items-center gap-1 shrink-0">
                         <Terminal className="w-2.5 h-2.5" /> Recent_System_Logs
                       </span>
-                      <div className="text-[7px] space-y-2 opacity-60 font-mono h-32 overflow-y-auto terminal-scroll">
-                        <div>[2h ago] SYSTEM_LOGIN_GRANTED_0x884</div>
-                        <div>[5h ago] KERNEL_PARAMETER_ACCESS</div>
-                        <div>[12h ago] ENCRYPTED_STREAM_STARTED</div>
-                        <div>[1d ago] SECURITY_PROTOCOL_VERIFIED</div>
-                        <div>[2d ago] NODE_SYNCHRONIZATION_OK</div>
-                        <div>[3d ago] NEW_DEVICE_REGISTERED</div>
+                      <div className="text-[7px] space-y-2 opacity-60 font-mono flex-1 overflow-y-auto terminal-scroll">
+                        <div className="truncate">[2h ago] SYSTEM_LOGIN_GRANTED_0x884</div>
+                        <div className="truncate">[5h ago] KERNEL_PARAMETER_ACCESS</div>
+                        <div className="truncate">[12h ago] ENCRYPTED_STREAM_STARTED</div>
+                        <div className="truncate">[1d ago] SECURITY_PROTOCOL_VERIFIED</div>
+                        <div className="truncate">[2d ago] NODE_SYNCHRONIZATION_OK</div>
+                        <div className="truncate">[3d ago] NEW_DEVICE_REGISTERED</div>
                       </div>
                     </div>
                   </div>
                 </DoubleBorderPanel>
 
-                <div className="grid grid-cols-3 gap-4 h-24">
+                <div className="grid grid-cols-3 gap-4 h-24 shrink-0">
                    <DoubleBorderPanel title="ADMIN_TOOLS" className="flex items-center justify-center bg-[#00f2ff]/5">
-                      <button className="flex items-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 px-4 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group">
-                        <Edit3 className="w-3 h-3 group-hover:scale-110" />
-                        Edit_Profile
+                      <button className="flex items-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 px-4 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group truncate max-w-full">
+                        <Edit3 className="w-3 h-3 group-hover:scale-110 shrink-0" />
+                        <span className="truncate">Edit_Profile</span>
                       </button>
                    </DoubleBorderPanel>
                    
                    <DoubleBorderPanel title="SYSTEM_ACCESS" className="flex items-center justify-center">
-                      <button className="flex items-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 px-4 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group">
-                        <Lock className="w-3 h-3 group-hover:scale-110" />
-                        Revoke_Access
+                      <button className="flex items-center gap-2 text-[8px] font-black border border-[#00f2ff]/30 px-4 py-2 hover:bg-[#00f2ff]/10 transition-all uppercase tracking-widest group truncate max-w-full">
+                        <Lock className="w-3 h-3 group-hover:scale-110 shrink-0" />
+                        <span className="truncate">Revoke_Access</span>
                       </button>
                    </DoubleBorderPanel>
 
                    <DoubleBorderPanel title="PURGE_RECORD" className="flex items-center justify-center bg-red-500/5" isAccent>
                       <button 
                         onClick={() => handleDelete(selectedOp.id)}
-                        className="flex items-center gap-2 text-[8px] font-black border border-red-500/30 text-red-500 px-4 py-2 hover:bg-red-500/20 transition-all uppercase tracking-widest group"
+                        className="flex items-center gap-2 text-[8px] font-black border border-red-500/30 text-red-500 px-4 py-2 hover:bg-red-500/20 transition-all uppercase tracking-widest group truncate max-w-full"
                       >
-                        <Trash2 className="w-3 h-3 group-hover:scale-110" />
-                        Delete_Entry
+                        <Trash2 className="w-3 h-3 group-hover:scale-110 shrink-0" />
+                        <span className="truncate">Delete_Entry</span>
                       </button>
                    </DoubleBorderPanel>
                 </div>
