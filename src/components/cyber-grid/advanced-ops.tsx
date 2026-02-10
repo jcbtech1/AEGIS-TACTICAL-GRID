@@ -1,3 +1,4 @@
+
 "use client";
 
 /**
@@ -13,12 +14,15 @@ import {
   Globe, Lock, Cpu, 
   Undo2, HardDrive, Eye,
   Fingerprint, ShieldCheck,
-  List, Radar, Radio, Loader2
+  List, Radar, Radio, Loader2,
+  Sparkles, Zap, Activity,
+  Database, Terminal as TerminalIcon,
+  Mic, Send, Power, ShieldAlert
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
 
-type ModuleType = 'STRATEGIC_INTELLIGENCE' | 'SECURITY_MANAGEMENT' | 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AI_ADVISOR' | 'SYSTEM_LOGS' | 'INFRASTRUCTURE';
+type ModuleType = 'STRATEGIC_INTELLIGENCE' | 'SECURITY_MANAGEMENT' | 'RECONNAISSANCE' | 'VISUAL_SCAN' | 'COUNTERMEASURES' | 'DATA_PURGE' | 'AEGIS_IA' | 'SYSTEM_LOGS' | 'INFRASTRUCTURE';
 
 interface AdvancedOpsProps {
   onBack: () => void;
@@ -111,7 +115,7 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
             <NavButton type="VISUAL_SCAN" label="VISUAL_SCAN" icon={Eye} />
             <NavButton type="COUNTERMEASURES" label="COUNTERMEASURES" icon={Shield} />
             <NavButton type="DATA_PURGE" label="DATA_PURGE" icon={Trash2} />
-            <NavButton type="AI_ADVISOR" label="AI_ADVISOR" icon={Brain} />
+            <NavButton type="AEGIS_IA" label="AEGIS_IA" icon={Brain} />
             <NavButton type="INFRASTRUCTURE" label="INFRASTRUCTURE" icon={HardDrive} />
             <NavButton type="SYSTEM_LOGS" label="SYSTEM_LOGS" icon={List} />
           </nav>
@@ -169,7 +173,7 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
                   <DataPurgeModule />
                 </ClearanceOverlay>
               )}
-              {activeModule === 'AI_ADVISOR' && <AIAdvisorModule currentLevel={currentClearance} />}
+              {activeModule === 'AEGIS_IA' && <AegisIAModule currentLevel={currentClearance} />}
               {activeModule === 'SYSTEM_LOGS' && <SystemLogsModule />}
               {activeModule === 'INFRASTRUCTURE' && <InfrastructureModule />}
             </motion.div>
@@ -184,7 +188,7 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
               className="flex gap-12 text-[5px] font-bold text-[#00f2ff]/60 uppercase tracking-[0.2em]"
             >
               <span>PROTOCOL_7B_ACTIVE... STATUS: SECURE</span>
-              <span>SCANNING_SECTOR_9... NO_INTRUSIONS_DETECTED</span>
+              <span>SCANNING_SECTOR_9... NO_INTRUSIONS_DETECTION</span>
               <span>ENCRYPTION_LAYER_8_REINFORCED</span>
             </motion.div>
           </div>
@@ -194,7 +198,185 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
   );
 }
 
-// --- MÓDULOS COMPACTADOS ---
+// --- MÓDULOS ---
+
+function AegisIAModule({ currentLevel }: { currentLevel: number }) {
+  const [input, setInput] = useState('');
+  const [history, setHistory] = useState([
+    { role: 'ai', text: 'NÚCLEO AEGIS_IA EN LÍNEA. PROTOCOLOS DE RAZONAMIENTO AL 100%. ESPERANDO ÓRDENES DEL OPERADOR.', timestamp: '00:00:00' }
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [neuralStability, setNeuralStability] = useState(99.9);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNeuralStability(prev => Math.min(100, Math.max(98, prev + (Math.random() - 0.5) * 0.1)));
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+    const userMsg = { 
+      role: 'operator', 
+      text: input.toUpperCase(),
+      timestamp: new Date().toLocaleTimeString().slice(0, 8)
+    };
+    setHistory(prev => [...prev, userMsg]);
+    setInput('');
+    setIsLoading(true);
+    try {
+      const result = await sendTacticalCommand({
+        message: userMsg.text,
+        systemStatus: { 
+          threatLevel: "AEGIS_ZONE", 
+          activeNodes: 14, 
+          throughput: "3.2 Gb/s" 
+        }
+      });
+      setHistory(prev => [...prev, { 
+        role: 'ai', 
+        text: result.response,
+        timestamp: new Date().toLocaleTimeString().slice(0, 8)
+      }]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex h-full gap-3 min-h-0 overflow-hidden">
+      {/* PANEL DE VISUALIZACIÓN NEURONAL */}
+      <div className="flex-[2] flex flex-col gap-3 min-h-0">
+        <DoubleBorderPanel title="NEURAL_CORE_VIZ" className="flex-[3] flex items-center justify-center bg-black/60 group">
+          <div className="relative w-24 h-24">
+            <motion.div 
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 20, ease: "linear" }}
+              className="absolute inset-0 border border-[#00f2ff]/20 rounded-full"
+            />
+            <motion.div 
+              animate={{ rotate: -360 }}
+              transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
+              className="absolute inset-2 border border-[#00f2ff]/40 rounded-full border-dashed"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Brain className="w-8 h-8 text-[#00f2ff] animate-pulse" />
+            </div>
+            {/* Partículas de "pensamiento" */}
+            {Array.from({ length: 4 }).map((_, i) => (
+              <motion.div
+                key={i}
+                animate={{ 
+                  scale: [1, 1.5, 1],
+                  opacity: [0.2, 0.5, 0.2],
+                  x: [0, (i % 2 === 0 ? 30 : -30)],
+                  y: [0, (i < 2 ? 30 : -30)]
+                }}
+                transition={{ repeat: Infinity, duration: 3, delay: i * 0.5 }}
+                className="absolute left-1/2 top-1/2 w-1 h-1 bg-[#00f2ff] rounded-full blur-[1px]"
+              />
+            ))}
+          </div>
+        </DoubleBorderPanel>
+
+        <DoubleBorderPanel title="IA_METRICS" className="flex-[2] p-3 space-y-3">
+          <div className="space-y-1">
+            <div className="flex justify-between text-[6px] uppercase opacity-40">
+              <span>Neural_Stability</span>
+              <span>{neuralStability.toFixed(2)}%</span>
+            </div>
+            <div className="h-0.5 bg-[#00f2ff]/10 w-full">
+              <motion.div 
+                animate={{ width: `${neuralStability}%` }}
+                className="h-full bg-[#00f2ff] shadow-[0_0_5px_#00f2ff]"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col">
+              <span className="text-[5px] opacity-40 uppercase">Reasoning_Path</span>
+              <span className="text-[7px] font-bold">GEMINI_FLASH_2.5</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-[5px] opacity-40 uppercase">Active_Directives</span>
+              <span className="text-[7px] font-bold">128_OPS/SEC</span>
+            </div>
+          </div>
+          <div className="pt-2 border-t border-[#00f2ff]/10">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+              <span className="text-[6px] font-black uppercase">HEURISTIC_LINK_ACTIVE</span>
+            </div>
+          </div>
+        </DoubleBorderPanel>
+      </div>
+
+      {/* CONSOLA DE INTERACCIÓN */}
+      <div className="flex-[3] flex flex-col gap-3 min-h-0">
+        <DoubleBorderPanel title="COMM_LINK" className="flex-1 flex flex-col bg-black/60">
+          <div className="flex-1 p-2 overflow-y-auto terminal-scroll space-y-3">
+            <AnimatePresence mode="popLayout">
+              {history.map((msg, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, x: msg.role === 'ai' ? -10 : 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className={`flex flex-col ${msg.role === 'ai' ? 'items-start' : 'items-end'}`}
+                >
+                  <div className={`max-w-[85%] p-2 border ${
+                    msg.role === 'ai' 
+                    ? 'border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff]' 
+                    : 'border-[#f43f5e]/30 bg-[#f43f5e]/5 text-[#f43f5e]'
+                  } fui-corner-brackets relative`}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[5px] font-black uppercase tracking-widest opacity-40">
+                        {msg.role === 'ai' ? 'AEGIS_INTELLIGENCE' : 'OPERATOR_SIGNAL'}
+                      </span>
+                      <span className="text-[4px] opacity-30 ml-4">[{msg.timestamp}]</span>
+                    </div>
+                    <p className="text-[8px] leading-relaxed font-mono tracking-tight uppercase">
+                      {msg.text}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+            {isLoading && (
+              <div className="flex items-center gap-2 text-[#00f2ff]/40 p-2 border border-[#00f2ff]/10 bg-[#00f2ff]/5">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                <span className="text-[7px] font-black tracking-widest animate-pulse">RAZONANDO_RESPUESTA_TÁCTICA...</span>
+              </div>
+            )}
+          </div>
+
+          <div className="p-2 border-t border-[#00f2ff]/10 bg-[#00f2ff]/2 flex gap-2 shrink-0 items-center">
+            <div className="w-6 h-6 border border-[#00f2ff]/20 bg-[#00f2ff]/5 flex items-center justify-center shrink-0">
+              <Mic className="w-3 h-3 opacity-30 hover:opacity-100 cursor-pointer transition-opacity" />
+            </div>
+            <input 
+              type="text" 
+              value={input} 
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="INTRODUCIR_COMANDO_O_CONSULTA..." 
+              disabled={isLoading}
+              className="flex-1 bg-black/40 border border-[#00f2ff]/20 px-3 py-1.5 text-[8px] outline-none text-[#00f2ff] placeholder:text-[#00f2ff]/10 uppercase font-mono tracking-widest" 
+            />
+            <button 
+              onClick={handleSend}
+              disabled={isLoading || !input.trim()}
+              className="px-4 py-1.5 bg-[#00f2ff] text-black font-black text-[8px] uppercase tracking-[0.2em] hover:bg-[#00f2ff]/80 transition-all disabled:opacity-20 flex items-center gap-2"
+            >
+              <Send className="w-3 h-3" />
+              EJECUTAR
+            </button>
+          </div>
+        </DoubleBorderPanel>
+      </div>
+    </div>
+  );
+}
 
 function SecurityManagementModule({ currentClearance, onLevelChange }: { currentClearance: number, onLevelChange: (l: number) => void }) {
   return (
@@ -256,54 +438,6 @@ function StrategicIntelligenceModule() {
               </div>
             ))}
          </div>
-      </DoubleBorderPanel>
-    </div>
-  );
-}
-
-function AIAdvisorModule({ currentLevel }: { currentLevel: number }) {
-  const [input, setInput] = useState('');
-  const [history, setHistory] = useState([{ role: 'ai', text: 'SISTEMA AEGIS ACTIVO. LISTO PARA ASESORÍA.' }]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
-    const userMsg = { role: 'operator', text: input.toUpperCase() };
-    setHistory(prev => [...prev, userMsg]);
-    setInput('');
-    setIsLoading(true);
-    try {
-      const result = await sendTacticalCommand({
-        message: userMsg.text,
-        systemStatus: { threatLevel: "ADVANCED_ZONE", activeNodes: 12, throughput: "2.4 Gb/s" }
-      });
-      setHistory(prev => [...prev, { role: 'ai', text: result.response }]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <div className="flex flex-col h-full gap-2 min-h-0 overflow-hidden">
-      <DoubleBorderPanel title="AI_ADVISOR" className="flex-1 flex flex-col">
-        <div className="flex-1 p-2 overflow-y-auto terminal-scroll space-y-2 text-[8px]">
-          {history.map((msg, i) => (
-            <div key={i} className={`p-1.5 border border-[#00f2ff]/20 ${msg.role === 'ai' ? 'bg-[#00f2ff]/5' : 'text-right'}`}>
-              <span className="text-[4px] block opacity-40">{msg.role.toUpperCase()}</span>
-              {msg.text}
-            </div>
-          ))}
-          {isLoading && <Loader2 className="w-2.5 h-2.5 animate-spin mx-auto opacity-40" />}
-        </div>
-        <div className="p-1.5 border-t border-[#00f2ff]/10 flex gap-1.5 shrink-0">
-          <input 
-            type="text" value={input} onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="CMD..." 
-            className="flex-1 bg-black/60 border border-[#00f2ff]/20 px-2 py-1 text-[7px] outline-none text-[#00f2ff]" 
-          />
-          <button onClick={handleSend} className="px-2 bg-[#00f2ff] text-black font-black text-[7px] uppercase">RUN</button>
-        </div>
       </DoubleBorderPanel>
     </div>
   );

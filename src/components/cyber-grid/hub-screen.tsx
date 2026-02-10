@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -133,8 +134,8 @@ export default function AegisHubScreen({ onSelectDashboard, onSelectAdvanced, on
         />
 
         <HubOption 
-          title="AI_Advisor" id="NEURAL_CORE" icon={Sparkles}
-          onClick={() => onSelectAdvanced('AI_ADVISOR')} color="primary"
+          title="AEGIS_IA" id="NEURAL_CORE" icon={Sparkles}
+          onClick={() => onSelectAdvanced('AEGIS_IA')} color="primary"
         />
 
         <HubOption 
