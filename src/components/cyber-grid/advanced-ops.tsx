@@ -5,7 +5,7 @@
  * @fileOverview AdvancedOpsScreen - Rediseño de alta fidelidad basado en la estética Aegis Command.
  * 
  * Versión compactada para evitar desbordamientos en pantalla.
- * Actualizado: AEGIS_IA ahora con soporte de VOZ (Micrófono + Audio) e instrucciones de BACKEND.
+ * Actualizado: AEGIS_IA ahora con el núcleo visual J.A.R.V.I.S Style y soporte de VOZ.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -20,7 +20,9 @@ import {
   Database, Terminal as TerminalIcon,
   Mic, Send, Power, ShieldAlert,
   ArrowLeft, Cloud, Thermometer,
-  Wind, Gauge, MicOff, Volume2
+  Wind, Gauge, MicOff, Volume2,
+  ChevronRight,
+  Target
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
@@ -222,7 +224,7 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
 function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   const [input, setInput] = useState('');
   const [history, setHistory] = useState([
-    { role: 'ai', text: 'AEGIS_TACTICAL_AI_CONNECTED. STANDING BY FOR OPERATOR COMMANDS.', timestamp: '00:00:00' }
+    { role: 'ai', text: 'SISTEMA AEGIS EN LÍNEA. NÚCLEO NEURONAL ESTABILIZADO.', timestamp: '00:00:00' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -232,37 +234,29 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   // --- CONFIGURACIÓN DE VOZ (TTS) ---
   const speak = (text: string) => {
     if ('speechSynthesis' in window) {
-      // Detener cualquier audio previo
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'es-ES'; // Configura el idioma de la IA
-      utterance.rate = 1.1;     // Velocidad ligeramente más rápida para toque tech
-      utterance.pitch = 0.8;    // Tono más bajo para sonar más serio/militar
+      utterance.lang = 'es-ES';
+      utterance.rate = 1.1;
+      utterance.pitch = 0.8;
       window.speechSynthesis.speak(utterance);
     }
   };
 
   // --- RECONOCIMIENTO DE VOZ (STT) ---
   const startListening = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
       recognition.lang = 'es-ES';
       recognition.interimResults = false;
-      
       recognition.onstart = () => setIsListening(true);
       recognition.onend = () => setIsListening(false);
-      
       recognition.onresult = (event: any) => {
         const transcript = event.results[0][0].transcript;
         setInput(transcript.toUpperCase());
-        // Enviar automáticamente si se desea
-        // handleSend(transcript.toUpperCase()); 
       };
-      
       recognition.start();
-    } else {
-      alert("Tu navegador no soporta reconocimiento de voz.");
     }
   };
 
@@ -273,12 +267,12 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   useEffect(() => {
     const interval = setInterval(() => {
       setMetrics({
-        cpu: Math.floor(10 + Math.random() * 20),
-        ram: Math.floor(40 + Math.random() * 10),
-        load: Math.floor(20 + Math.random() * 15),
-        sync: 99.8 + Math.random() * 0.2
+        cpu: Math.floor(15 + Math.random() * 15),
+        ram: Math.floor(40 + Math.random() * 8),
+        load: Math.floor(18 + Math.random() * 12),
+        sync: 99.85 + Math.random() * 0.15
       });
-    }, 2000);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -301,17 +295,12 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
        * --- CONEXIÓN A BACKEND ---
        * Aquí es donde tu frontend se comunica con el servidor.
        * Actualmente usa una Server Action de Next.js (sendTacticalCommand).
-       * 
-       * Puedes reemplazar 'sendTacticalCommand' por:
-       * 1. Una llamada fetch a tu API: fetch('/api/tactical', { method: 'POST', body: JSON.stringify(...) })
-       * 2. Un socket: socket.emit('command', userMsg)
-       * 3. Conexión directa a base de datos (si usas Firestore/Firebase SDK)
        */
       const result = await sendTacticalCommand({
         message: userMsg.text,
         systemStatus: { 
-          threatLevel: "ALPHA_ZONE", 
-          activeNodes: 14, 
+          threatLevel: "STABLE_ZONE", 
+          activeNodes: 18, 
           throughput: `${metrics.load} Mb/s` 
         }
       });
@@ -323,14 +312,12 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
       };
 
       setHistory(prev => [...prev, aiResponse]);
-      
-      // La IA habla después de recibir la respuesta del backend
       speak(aiResponse.text);
 
     } catch (error) {
-      console.error("Critical System Failure:", error);
-      const errorMsg = "ERROR_CRÍTICO: FALLO EN EL NÚCLEO DE PROCESAMIENTO.";
-      setHistory(prev => [...prev, { role: 'ai', text: errorMsg, timestamp: 'ERROR' }]);
+      console.error("AI Link Failure:", error);
+      const errorMsg = "ERROR: INTERRUPCIÓN EN EL ENLACE NEURONAL.";
+      setHistory(prev => [...prev, { role: 'ai', text: errorMsg, timestamp: 'ERR' }]);
       speak(errorMsg);
     } finally {
       setIsLoading(false);
@@ -339,96 +326,115 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
 
   return (
     <div className="flex h-full gap-4 min-h-0 overflow-hidden relative">
-      {/* HUD CIRCULAR CENTRAL (STARK STYLE) */}
+      {/* HUD CENTRAL - ESTILO J.A.R.V.I.S */}
       <div className="flex-1 flex flex-col items-center justify-center relative p-8">
         
-        {/* ELEMENTOS PERIFÉRICOS (TOP LEFT) */}
-        <div className="absolute top-4 left-4 flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-[8px] font-black text-[#00f2ff]">
-            <Cpu className="w-3 h-3" />
-            <span>CPU: {metrics.cpu}%</span>
+        {/* TELEMETRÍA IZQUIERDA */}
+        <div className="absolute top-4 left-4 flex flex-col gap-3">
+          <div className="flex items-center gap-3 p-1.5 border-l-2 border-[#00f2ff] bg-[#00f2ff]/5">
+             <div className="flex flex-col">
+                <span className="text-[5px] opacity-40 uppercase tracking-[0.2em]">Neural_Sync</span>
+                <span className="text-[9px] font-black">{metrics.sync.toFixed(2)}%</span>
+             </div>
           </div>
-          <div className="flex items-center gap-2 text-[8px] font-black text-[#00f2ff]">
-            <Database className="w-3 h-3" />
-            <span>RAM: {metrics.ram}%</span>
-          </div>
-          <div className="mt-4 flex flex-col gap-1">
-             <span className="text-[6px] opacity-40 uppercase tracking-widest">Neural_Sync</span>
-             <div className="w-24 h-1 bg-[#00f2ff]/10">
-                <motion.div animate={{ width: `${metrics.sync}%` }} className="h-full bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]" />
+          <div className="flex items-center gap-3 p-1.5 border-l-2 border-[#00f2ff]/40 bg-[#00f2ff]/2">
+             <div className="flex flex-col">
+                <span className="text-[5px] opacity-40 uppercase tracking-[0.2em]">Proc_Load</span>
+                <span className="text-[9px] font-black">{metrics.cpu}%</span>
              </div>
           </div>
         </div>
 
-        {/* ELEMENTOS PERIFÉRICOS (TOP RIGHT - WEATHER/SECTOR) */}
-        <div className="absolute top-4 right-4 flex flex-col items-end gap-2 text-[#00f2ff]/80">
-          <div className="text-[12px] font-black tracking-tighter">13°C</div>
-          <div className="flex items-center gap-2 text-[6px] uppercase font-bold tracking-widest">
-            <Cloud className="w-3 h-3" />
-            <span>Clear_Sky</span>
-          </div>
-          <div className="text-[5px] opacity-40 uppercase tracking-widest mt-2">Sector_9_Russia</div>
-          <div className="flex flex-col gap-1 mt-4">
-            <div className="flex justify-between w-24 text-[5px] uppercase"><span>Humidity</span><span>77%</span></div>
-            <div className="flex justify-between w-24 text-[5px] uppercase"><span>Visibility</span><span>10km</span></div>
+        {/* TELEMETRÍA DERECHA */}
+        <div className="absolute top-4 right-4 text-right flex flex-col gap-1">
+          <span className="text-[12px] font-black tracking-tighter text-[#00f2ff] flex items-center gap-2 justify-end">
+             <Cloud className="w-3 h-3" /> 22.4°C
+          </span>
+          <span className="text-[5px] opacity-40 uppercase tracking-widest">Sector_Grid_Gamma</span>
+          <div className="flex gap-1 justify-end mt-2">
+             {[1,2,3,4,5,6].map(i => (
+               <div key={i} className={`w-1 h-3 border border-[#00f2ff]/20 ${i < 4 ? 'bg-[#00f2ff]/60' : ''}`} />
+             ))}
           </div>
         </div>
 
-        {/* NÚCLEO CENTRAL ANIMADO */}
-        <div className="relative w-[320px] h-[320px] flex items-center justify-center pointer-events-none">
-          {/* Anillos SVG */}
-          <svg className="absolute w-full h-full animate-spin-slow opacity-20" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="48" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="5,10" />
-          </svg>
-          <svg className="absolute w-[80%] h-[80%] animate-spin-reverse-slow opacity-40" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="45" fill="none" stroke="#00f2ff" strokeWidth="1" strokeDasharray="30,150" />
-          </svg>
-          <svg className="absolute w-[60%] h-[60%] animate-spin-slow" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="1,2" />
+        {/* NÚCLEO COMPLEJO SVG (J.A.R.V.I.S STYLE) */}
+        <div className="relative w-[400px] h-[400px] flex items-center justify-center pointer-events-none">
+          {/* Anillos concéntricos con diferentes patrones */}
+          <svg className="absolute w-full h-full animate-spin-slow opacity-10" viewBox="0 0 200 200">
+             <circle cx="100" cy="100" r="98" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="2,4" />
           </svg>
           
-          {/* Centro del núcleo */}
-          <div className="relative w-32 h-32 rounded-full border border-[#00f2ff]/40 bg-[#00f2ff]/5 flex flex-col items-center justify-center backdrop-blur-sm">
-             <Brain className={`w-10 h-10 text-[#00f2ff] ${isLoading || isListening ? 'animate-pulse' : ''}`} />
-             <div className="mt-2 text-[7px] font-black text-[#00f2ff] tracking-[0.3em] uppercase">
-               {isListening ? 'LISTENING...' : isLoading ? 'THINKING...' : 'Core_Alpha'}
-             </div>
+          <svg className="absolute w-[90%] h-[90%] animate-spin-reverse-slow opacity-30" viewBox="0 0 200 200">
+             <circle cx="100" cy="100" r="88" fill="none" stroke="#00f2ff" strokeWidth="1" strokeDasharray="30,10,5,10" />
+             <circle cx="100" cy="100" r="86" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="1,15" />
+          </svg>
+
+          <svg className="absolute w-[75%] h-[75%] animate-spin-slow opacity-50" viewBox="0 0 200 200">
+             <path d="M 100 30 A 70 70 0 0 1 170 100" fill="none" stroke="#00f2ff" strokeWidth="3" />
+             <path d="M 30 100 A 70 70 0 0 1 100 170" fill="none" stroke="#00f2ff" strokeWidth="3" />
+             <circle cx="100" cy="100" r="68" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="2,8" />
+          </svg>
+
+          {/* Anillo de datos (Puntos) */}
+          <svg className="absolute w-[60%] h-[60%] animate-spin-reverse-slow" viewBox="0 0 200 200">
+             {Array.from({ length: 36 }).map((_, i) => (
+               <circle key={i} cx={100 + 55 * Math.cos(i * 10 * Math.PI / 180)} cy={100 + 55 * Math.sin(i * 10 * Math.PI / 180)} r="0.8" fill="#00f2ff" opacity={i % 4 === 0 ? 1 : 0.2} />
+             ))}
+          </svg>
+
+          {/* Círculo Central con Nombre AEGIS */}
+          <div className="relative w-36 h-36 rounded-full border-2 border-[#00f2ff]/60 bg-[#00f2ff]/5 flex flex-col items-center justify-center backdrop-blur-md shadow-[0_0_30px_rgba(0,242,255,0.2)]">
+             <motion.div 
+               animate={{ opacity: [0.4, 1, 0.4] }}
+               transition={{ repeat: Infinity, duration: 3 }}
+               className="flex flex-col items-center"
+             >
+                <h1 className="text-xl font-black tracking-[0.5em] text-[#00f2ff] ml-[0.5em] drop-shadow-[0_0_10px_#00f2ff]">AEGIS</h1>
+                <span className="text-[6px] font-bold text-[#00f2ff]/40 tracking-[0.3em] uppercase mt-1">
+                   {isListening ? 'LISTENING...' : isLoading ? 'PROCESSING...' : 'CORE_ACTIVE'}
+                </span>
+             </motion.div>
+
+             {/* Indicadores de rotación internos */}
+             <div className="absolute inset-0 border-[3px] border-[#00f2ff]/10 rounded-full border-dashed animate-spin-slow" />
           </div>
 
-          {/* Brackets flotantes */}
+          {/* Brackets flotantes externos */}
           <motion.div 
-            animate={{ scale: [1, 1.05, 1], rotate: [0, 5, 0] }}
+            animate={{ scale: [1, 1.05, 1] }}
             transition={{ repeat: Infinity, duration: 4 }}
-            className="absolute inset-0 border-[4px] border-[#00f2ff]/10 rounded-full border-dashed"
+            className="absolute inset-[-10%] border-2 border-[#00f2ff]/5 rounded-full border-dotted"
           />
         </div>
 
-        {/* MÉTRICAS DE CARGA (BOTTOM) */}
-        <div className="absolute bottom-12 w-full px-24 flex justify-between items-end">
-           <div className="flex flex-col gap-1">
-              <span className="text-[6px] opacity-40 uppercase tracking-widest">Active_Taskbar</span>
-              <div className="flex gap-2">
-                 <div className="w-2 h-2 border border-[#00f2ff] bg-[#00f2ff]/20" />
-                 <div className="w-2 h-2 border border-[#00f2ff] bg-[#00f2ff]/20" />
-                 <div className="w-2 h-2 border border-[#00f2ff] bg-transparent" />
+        {/* BARRA DE TAREAS TÁCTICA (BOTTOM) */}
+        <div className="absolute bottom-12 w-full px-32 flex justify-between items-center text-[#00f2ff]/60">
+           <div className="flex gap-4">
+              <div className="flex flex-col">
+                 <span className="text-[5px] uppercase">Heuristic_Node</span>
+                 <span className="text-[8px] font-bold">ALPHA_SEC_01</span>
+              </div>
+              <div className="flex flex-col">
+                 <span className="text-[5px] uppercase">Latency</span>
+                 <span className="text-[8px] font-bold">0.04ms</span>
               </div>
            </div>
-           <div className="text-right">
-              <span className="text-[12px] font-black tracking-tighter text-[#00f2ff]">{metrics.load} Gb/s</span>
-              <span className="text-[5px] opacity-40 uppercase block">Data_Throughput</span>
+           <div className="flex flex-col items-end">
+              <span className="text-[5px] uppercase">Logic_Throughput</span>
+              <span className="text-[14px] font-black text-[#00f2ff]">{metrics.load} TFlops</span>
            </div>
         </div>
       </div>
 
-      {/* CONSOLA DE COMANDOS (DERECHA - DENSITY) */}
-      <div className="w-[300px] flex flex-col gap-3 h-full min-h-0 bg-black/40 border-l border-[#00f2ff]/10 z-10">
-        <div className="p-3 border-b border-[#00f2ff]/10 flex justify-between items-center">
+      {/* TERMINAL DE COMANDO (SIDEBAR) */}
+      <div className="w-[320px] flex flex-col gap-3 h-full min-h-0 bg-black/40 border-l border-[#00f2ff]/10 z-10 backdrop-blur-md">
+        <div className="p-3 border-b border-[#00f2ff]/10 flex justify-between items-center bg-[#00f2ff]/5">
            <div className="flex items-center gap-3">
-             <TerminalIcon className="w-4 h-4 text-[#00f2ff]" />
-             <span className="text-[8px] font-black tracking-widest uppercase">Comm_Interface</span>
+             <Brain className="w-4 h-4 text-[#00f2ff]" />
+             <span className="text-[8px] font-black tracking-widest uppercase">Aegis_Comm_Link</span>
            </div>
-           {/* Indicador visual de voz activa */}
-           {isListening && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_red]" />}
+           {isListening && <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse shadow-[0_0_10px_red]" />}
         </div>
 
         <div className="flex-1 overflow-y-auto terminal-scroll p-4 space-y-4">
@@ -436,24 +442,24 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
               {history.map((msg, i) => (
                 <motion.div 
                   key={i}
-                  initial={{ opacity: 0, x: msg.role === 'ai' ? -5 : 5 }}
-                  animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   className={`flex flex-col ${msg.role === 'ai' ? 'items-start' : 'items-end'}`}
                 >
-                  <div className={`max-w-[90%] p-2 border ${
+                  <div className={`max-w-[95%] p-2.5 border transition-all ${
                     msg.role === 'ai' 
                     ? 'border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff]' 
                     : 'border-[#f43f5e]/30 bg-[#f43f5e]/5 text-[#f43f5e]'
-                  } fui-corner-brackets relative`}>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[5px] font-black uppercase tracking-widest opacity-40">
-                        {msg.role === 'ai' ? 'AEGIS_SYSTEM' : 'OPERATOR'}
+                  } fui-corner-brackets`}>
+                    <div className="flex justify-between items-center mb-1.5 opacity-40">
+                      <span className="text-[5px] font-black uppercase tracking-widest">
+                        {msg.role === 'ai' ? 'AEGIS_INTEL' : 'OPERATOR_COM'}
                       </span>
                       {msg.role === 'ai' && (
-                        <Volume2 className="w-2.5 h-2.5 opacity-40 cursor-pointer hover:opacity-100" onClick={() => speak(msg.text)} />
+                        <Volume2 className="w-3 h-3 cursor-pointer hover:text-white" onClick={() => speak(msg.text)} />
                       )}
                     </div>
-                    <p className="text-[8px] font-mono uppercase leading-tight tracking-tight">
+                    <p className="text-[8px] font-mono uppercase leading-relaxed tracking-tight">
                       {msg.text}
                     </p>
                   </div>
@@ -461,9 +467,9 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
               ))}
             </AnimatePresence>
             {isLoading && (
-              <div className="flex items-center gap-2 text-[#00f2ff]/40 p-2">
+              <div className="flex items-center gap-3 text-[#00f2ff]/40 p-2">
                 <Loader2 className="w-3 h-3 animate-spin" />
-                <span className="text-[7px] font-black tracking-widest animate-pulse">PROCESSING...</span>
+                <span className="text-[7px] font-black tracking-[0.3em] animate-pulse">SYNCHRONIZING...</span>
               </div>
             )}
             <div ref={chatEndRef} />
@@ -471,18 +477,16 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
 
         <div className="p-3 bg-black/60 border-t border-[#00f2ff]/10">
            <div className="flex gap-2">
-              {/* Botón de Micrófono */}
               <button 
                 onClick={startListening}
                 disabled={isLoading}
-                className={`w-8 h-8 flex items-center justify-center border ${
+                className={`w-9 h-9 flex items-center justify-center border transition-all ${
                   isListening 
-                  ? 'border-red-500 bg-red-500/20 text-red-500 animate-pulse' 
+                  ? 'border-red-500 bg-red-500/20 text-red-500' 
                   : 'border-[#00f2ff]/30 bg-[#00f2ff]/5 text-[#00f2ff] hover:bg-[#00f2ff]/20'
-                } transition-all`}
-                title="Dictar Comando (VOZ)"
+                }`}
               >
-                {isListening ? <Mic className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
+                <Mic className="w-3.5 h-3.5" />
               </button>
 
               <input 
@@ -490,16 +494,16 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
                 value={input} 
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={isListening ? "ESCUCHANDO..." : "INPUT_COMMAND..."} 
+                placeholder={isListening ? "RECORDING..." : "ENTER_QUERY..."} 
                 disabled={isLoading}
-                className="flex-1 bg-[#00f2ff]/5 border border-[#00f2ff]/20 px-3 py-1.5 text-[8px] outline-none text-[#00f2ff] placeholder:text-[#00f2ff]/10 uppercase" 
+                className="flex-1 bg-[#00f2ff]/5 border border-[#00f2ff]/20 px-3 py-1.5 text-[8px] outline-none text-[#00f2ff] placeholder:text-[#00f2ff]/20 uppercase font-mono" 
               />
               <button 
                 onClick={() => handleSend()}
                 disabled={isLoading}
-                className="w-8 h-8 flex items-center justify-center bg-[#00f2ff] text-black hover:bg-[#00f2ff]/80 transition-all"
+                className="w-9 h-9 flex items-center justify-center bg-[#00f2ff] text-black hover:bg-[#00f2ff]/80 transition-all"
               >
-                <Send className="w-3 h-3" />
+                <Send className="w-3.5 h-3.5" />
               </button>
            </div>
         </div>
