@@ -1,21 +1,22 @@
-
 'use client';
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Radar, Zap, Power, LayoutDashboard, Settings2, Database, ShieldAlert } from 'lucide-react';
+import { Shield, Radar, Zap, Power, LayoutDashboard, Settings2, Database, ShieldAlert, Users } from 'lucide-react';
 
 interface AegisHubScreenProps {
   onSelectDashboard: () => void;
   onSelectAdvanced: () => void;
+  onSelectUsers: () => void;
   onLogout: () => void;
 }
 
-const HubOption = ({ title, description, icon: Icon, onClick, color = "primary", disabled = false }: { title: string, description: string, icon: any, onClick: () => void, color?: "primary" | "accent" | "amber", disabled?: boolean }) => {
+const HubOption = ({ title, description, icon: Icon, onClick, color = "primary", disabled = false }: { title: string, description: string, icon: any, onClick: () => void, color?: "primary" | "accent" | "amber" | "emerald", disabled?: boolean }) => {
   const colorClasses = {
     primary: "border-[#00f2ff]/30 text-[#00f2ff] hover:bg-[#00f2ff]/5",
     accent: "border-[#f43f5e]/30 text-[#f43f5e] hover:bg-[#f43f5e]/5",
-    amber: "border-amber-400/30 text-amber-400 hover:bg-amber-400/5"
+    amber: "border-amber-400/30 text-amber-400 hover:bg-amber-400/5",
+    emerald: "border-emerald-400/30 text-emerald-400 hover:bg-emerald-400/5"
   };
 
   return (
@@ -48,7 +49,7 @@ const HubOption = ({ title, description, icon: Icon, onClick, color = "primary",
   );
 };
 
-export default function AegisHubScreen({ onSelectDashboard, onSelectAdvanced, onLogout }: AegisHubScreenProps) {
+export default function AegisHubScreen({ onSelectDashboard, onSelectAdvanced, onSelectUsers, onLogout }: AegisHubScreenProps) {
   return (
     <div className="relative w-screen h-screen flex flex-col bg-[#020617] overflow-hidden dot-matrix p-12">
       <div className="scanline-effect opacity-10" />
@@ -74,7 +75,7 @@ export default function AegisHubScreen({ onSelectDashboard, onSelectAdvanced, on
         </button>
       </header>
 
-      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 z-20 items-center max-w-7xl mx-auto w-full">
+      <main className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 z-20 items-center max-w-7xl mx-auto w-full">
         <HubOption 
           title="Tactical_Grid"
           description="Live network monitoring, traffic analysis and core terminal access."
@@ -89,6 +90,14 @@ export default function AegisHubScreen({ onSelectDashboard, onSelectAdvanced, on
           icon={ShieldAlert}
           onClick={onSelectAdvanced}
           color="amber"
+        />
+
+        <HubOption 
+          title="Personnel"
+          description="Operator database, access hierarchy and status monitoring."
+          icon={Users}
+          onClick={onSelectUsers}
+          color="emerald"
         />
 
         <HubOption 

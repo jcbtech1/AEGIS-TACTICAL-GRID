@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,8 +6,9 @@ import AegisUltimateDashboard from '@/components/cyber-grid/dashboard';
 import AegisLoginScreen from '@/components/cyber-grid/login-screen';
 import AdvancedOpsScreen from '@/components/cyber-grid/advanced-ops';
 import AegisHubScreen from '@/components/cyber-grid/hub-screen';
+import AegisUsersScreen from '@/components/cyber-grid/users-screen';
 
-type ViewState = 'login' | 'hub' | 'dashboard' | 'advanced';
+type ViewState = 'login' | 'hub' | 'dashboard' | 'advanced' | 'users';
 
 export default function Home() {
   const [currentView, setCurrentView] = useState<ViewState | null>(null);
@@ -49,6 +49,7 @@ export default function Home() {
             key="hub"
             onSelectDashboard={() => setCurrentView('dashboard')}
             onSelectAdvanced={() => setCurrentView('advanced')}
+            onSelectUsers={() => setCurrentView('users')}
             onLogout={handleLogout}
           />
         )}
@@ -64,6 +65,13 @@ export default function Home() {
         {currentView === 'advanced' && (
           <AdvancedOpsScreen 
             key="advanced" 
+            onBack={() => setCurrentView('hub')}
+          />
+        )}
+
+        {currentView === 'users' && (
+          <AegisUsersScreen
+            key="users"
             onBack={() => setCurrentView('hub')}
           />
         )}
