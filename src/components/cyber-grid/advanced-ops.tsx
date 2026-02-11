@@ -22,7 +22,10 @@ import {
   ChevronRight,
   Target,
   Link2,
-  Link2Off
+  Link2Off,
+  Hash,
+  Server,
+  Layers
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
@@ -163,6 +166,146 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
 }
 
 // --- MÓDULOS (Componentes Internos) ---
+
+function SystemLogsModule() {
+  const [logs, setLogs] = useState<string[]>([]);
+  const [memoryBlocks, setMemoryBlocks] = useState<number[]>([]);
+
+  useEffect(() => {
+    // Initial logs
+    const initialLogs = Array.from({ length: 25 }).map((_, i) => 
+      `[${new Date().toLocaleTimeString()}] NODE_BOOT_SEQ_${i.toString(16).toUpperCase()} // OK`
+    );
+    setLogs(initialLogs);
+
+    // Initial memory map
+    setMemoryBlocks(Array.from({ length: 64 }).map(() => Math.random()));
+
+    const interval = setInterval(() => {
+      const types = ["SYSTEM", "SECURITY", "NETWORK", "KERNEL", "ACCESS"];
+      const type = types[Math.floor(Math.random() * types.length)];
+      const codes = ["0x88AF", "0x22BC", "0x9900", "0xFA12", "0x00FF"];
+      const code = codes[Math.floor(Math.random() * codes.length)];
+      
+      const newLog = `[${new Date().toLocaleTimeString()}] ${type} // ${code} // STATUS_OK_ACK`;
+      setLogs(prev => [...prev.slice(-50), newLog]);
+      
+      setMemoryBlocks(prev => {
+        const next = [...prev];
+        next[Math.floor(Math.random() * 64)] = Math.random();
+        return next;
+      });
+    }, 600);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex h-full gap-4 min-h-0 overflow-hidden relative">
+      {/* TERMINAL PRINCIPAL */}
+      <div className="flex-[3] flex flex-col min-h-0">
+        <DoubleBorderPanel title="TACTICAL_AUDIT_STREAM" className="flex-1 min-h-0 bg-black/60">
+          <div className="flex-1 overflow-y-auto terminal-scroll p-4 font-mono text-[8px] space-y-1.5 leading-relaxed">
+             {logs.map((log, i) => (
+               <motion.div 
+                 initial={{ opacity: 0, x: -5 }}
+                 animate={{ opacity: 1, x: 0 }}
+                 key={i} 
+                 className="flex gap-4 group"
+               >
+                 <span className="opacity-20 shrink-0 font-bold tracking-widest">{i.toString().padStart(4, '0')}</span>
+                 <span className={`
+                   ${log.includes('SECURITY') ? 'text-amber-500' : 
+                     log.includes('KERNEL') ? 'text-[#00f2ff]' : 
+                     log.includes('NETWORK') ? 'text-blue-400' : 'text-[#00f2ff]/60'}
+                   group-hover:text-white transition-colors
+                 `}>
+                   {log}
+                 </span>
+               </motion.div>
+             ))}
+             <div className="flex items-center gap-2 pt-2 text-[#00f2ff] animate-pulse">
+                <span className="text-[10px]">{">"}</span>
+                <span className="w-2 h-4 bg-[#00f2ff]" />
+             </div>
+          </div>
+          
+          <div className="p-2 border-t border-[#00f2ff]/10 bg-[#00f2ff]/5 flex justify-between items-center">
+             <div className="flex gap-4">
+                <span className="text-[6px] font-black tracking-widest uppercase">Buffer_Status: OPTIMAL</span>
+                <span className="text-[6px] font-black tracking-widest uppercase">Encryption: AES_X64</span>
+             </div>
+             <span className="text-[6px] font-black tracking-widest uppercase opacity-40">Live_Capture_Active</span>
+          </div>
+        </DoubleBorderPanel>
+      </div>
+
+      {/* MONITOR LATERAL */}
+      <div className="flex-1 flex flex-col gap-4 min-h-0">
+        <DoubleBorderPanel title="MEMORY_FRAGMENTATION" className="h-64 shrink-0 bg-black/40">
+           <div className="p-3 grid grid-cols-8 gap-1.5">
+              {memoryBlocks.map((val, i) => (
+                <motion.div 
+                  key={i}
+                  animate={{ 
+                    opacity: val > 0.8 ? [0.4, 1, 0.4] : 1,
+                    scale: val > 0.9 ? [1, 1.1, 1] : 1
+                  }}
+                  transition={{ duration: 1 + val, repeat: Infinity }}
+                  className={`
+                    aspect-square border border-[#00f2ff]/20 
+                    ${val > 0.7 ? 'bg-[#00f2ff]' : 
+                      val > 0.4 ? 'bg-[#00f2ff]/40' : 
+                      val > 0.2 ? 'bg-[#00f2ff]/10' : 'bg-transparent'}
+                  `}
+                />
+              ))}
+           </div>
+           <div className="mt-auto p-3 space-y-2 bg-[#00f2ff]/5 border-t border-[#00f2ff]/10">
+              <div className="flex justify-between items-center">
+                 <span className="text-[6px] opacity-40 uppercase">Total_Allocated</span>
+                 <span className="text-[8px] font-black">256.4 TB</span>
+              </div>
+              <div className="flex justify-between items-center">
+                 <span className="text-[6px] opacity-40 uppercase">Page_Faults</span>
+                 <span className="text-[8px] font-black text-emerald-400">0.00%</span>
+              </div>
+           </div>
+        </DoubleBorderPanel>
+
+        <DoubleBorderPanel title="KERNEL_PROCESSES" className="flex-1 min-h-0 bg-black/40">
+           <div className="flex-1 overflow-y-auto terminal-scroll p-3 space-y-4">
+              {[
+                { name: 'Neural_Synapse', load: 42, color: 'text-[#00f2ff]' },
+                { name: 'Grid_Topology', load: 12, color: 'text-[#00f2ff]' },
+                { name: 'Shield_Protocol', load: 88, color: 'text-amber-500' },
+                { name: 'DPI_Inference', load: 24, color: 'text-[#00f2ff]' },
+                { name: 'I/O_Multiplex', load: 5, color: 'text-[#00f2ff]' },
+              ].map((proc, i) => (
+                <div key={i} className="space-y-1.5">
+                   <div className="flex justify-between items-center">
+                      <span className="text-[7px] font-black tracking-widest uppercase">{proc.name}</span>
+                      <span className={`text-[7px] font-black ${proc.color}`}>{proc.load}%</span>
+                   </div>
+                   <div className="h-1 bg-white/5 w-full relative overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${proc.load}%` }}
+                        transition={{ duration: 1.5, delay: i * 0.1 }}
+                        className={`h-full ${proc.load > 80 ? 'bg-amber-500' : 'bg-[#00f2ff]'} shadow-[0_0_5px_currentColor]`}
+                      />
+                   </div>
+                </div>
+              ))}
+           </div>
+           <div className="p-2 text-center border-t border-[#00f2ff]/10">
+              <span className="text-[5px] opacity-20 uppercase tracking-[0.5em]">System_Integrity_Verified</span>
+           </div>
+        </DoubleBorderPanel>
+      </div>
+    </div>
+  );
+}
 
 function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   const [input, setInput] = useState('');
@@ -506,18 +649,6 @@ function StrategicIntelligenceModule() {
          </div>
       </DoubleBorderPanel>
     </div>
-  );
-}
-
-function SystemLogsModule() {
-  return (
-    <DoubleBorderPanel title="TACTICAL_AUDIT" className="h-full">
-      <div className="flex-1 overflow-y-auto terminal-scroll p-2 font-mono text-[6px] space-y-1">
-        {Array.from({ length: 30 }).map((_, i) => (
-          <div key={i} className="opacity-50 truncate">[{new Date().toISOString().slice(11, 19)}] NODE_SYNC_OK_0x{i}</div>
-        ))}
-      </div>
-    </DoubleBorderPanel>
   );
 }
 
