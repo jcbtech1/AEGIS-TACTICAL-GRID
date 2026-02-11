@@ -31,7 +31,8 @@ import {
   RefreshCw,
   AlertTriangle,
   Wifi,
-  History
+  History,
+  Crosshair
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
@@ -195,7 +196,6 @@ function SecurityManagementModule({ currentClearance, onLevelChange }: { current
 
   return (
     <div className="flex h-full gap-4 min-h-0 overflow-hidden relative">
-      {/* PANEL IZQUIERDO: MATRIZ Y CAPAS */}
       <div className="flex-[2] flex flex-col gap-4 min-h-0">
         <DoubleBorderPanel title="AUTHENTICATION_MATRIX" className="flex-1 bg-black/60">
            <div className="flex-1 overflow-hidden p-4 font-mono text-[8px] text-[#00f2ff]/40 space-y-2">
@@ -240,7 +240,6 @@ function SecurityManagementModule({ currentClearance, onLevelChange }: { current
         </DoubleBorderPanel>
       </div>
 
-      {/* PANEL CENTRAL: INTEGRIDAD Y CLEARANCE */}
       <div className="flex-[3] flex flex-col gap-4 min-h-0">
         <DoubleBorderPanel title="SYSTEM_INTEGRITY_INDEX" className="h-64 flex items-center justify-center bg-black/80 relative">
            <div className="relative w-48 h-48 flex items-center justify-center">
@@ -308,7 +307,6 @@ function SecurityManagementModule({ currentClearance, onLevelChange }: { current
         </DoubleBorderPanel>
       </div>
 
-      {/* PANEL DERECHO: BIOMETRÍA Y ALERTAS */}
       <div className="flex-[2] flex flex-col gap-4 min-h-0">
         <DoubleBorderPanel title="BIOMETRIC_IDENTITY_FEED" className="flex-[3] bg-black/60 relative">
            <div className="flex-1 flex flex-col items-center justify-center p-4">
@@ -405,7 +403,6 @@ function SystemLogsModule() {
 
   return (
     <div className="flex h-full gap-4 min-h-0 overflow-hidden relative">
-      {/* TERMINAL PRINCIPAL */}
       <div className="flex-[3] flex flex-col min-h-0">
         <DoubleBorderPanel title="TACTICAL_AUDIT_STREAM" className="flex-1 min-h-0 bg-black/60">
           <div className="flex-1 overflow-y-auto terminal-scroll p-4 font-mono text-[8px] space-y-1.5 leading-relaxed">
@@ -443,7 +440,6 @@ function SystemLogsModule() {
         </DoubleBorderPanel>
       </div>
 
-      {/* MONITOR LATERAL */}
       <div className="flex-1 flex flex-col gap-4 min-h-0">
         <DoubleBorderPanel title="MEMORY_FRAGMENTATION" className="h-64 shrink-0 bg-black/40">
            <div className="p-3 grid grid-cols-8 gap-1.5">
@@ -826,16 +822,165 @@ function StrategicIntelligenceModule() {
 }
 
 function ReconModule() {
+  const [pings, setPings] = useState<{ x: number, y: number, id: string, type: string }[]>([]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const types = ['THREAT', 'NODE', 'UNKNOWN'];
+      setPings(prev => {
+        const newPings = [...prev];
+        if (newPings.length > 5) newPings.shift();
+        newPings.push({
+          x: 20 + Math.random() * 60,
+          y: 20 + Math.random() * 60,
+          id: Math.random().toString(36).substr(2, 4).toUpperCase(),
+          type: types[Math.floor(Math.random() * types.length)]
+        });
+        return newPings;
+      });
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="flex flex-col h-full gap-2">
-       <DoubleBorderPanel title="RECON_MAP" className="flex-[3] flex items-center justify-center bg-black/40">
-          <Radar className="w-12 h-12 text-[#00f2ff]/10 animate-spin-slow" />
-       </DoubleBorderPanel>
-       <DoubleBorderPanel title="DATA_STREAM" className="flex-[2] overflow-y-auto terminal-scroll p-1 text-[5px] opacity-40">
-          {Array.from({ length: 20 }).map((_, i) => (
-            <div key={i}>PACKET_NODE_{i}_0x{Math.random().toString(16).slice(2,6).toUpperCase()}</div>
-          ))}
-       </DoubleBorderPanel>
+    <div className="flex h-full gap-4 min-h-0 overflow-hidden">
+      {/* LEFT: SIGNAL & TELEMETRY */}
+      <div className="flex-1 flex flex-col gap-4">
+        <DoubleBorderPanel title="SIGNAL_SPECTRUM" className="flex-1 bg-black/40">
+           <div className="flex-1 flex items-end gap-[2px] p-4">
+              {Array.from({ length: 30 }).map((_, i) => (
+                <motion.div
+                   key={i}
+                   animate={{ height: [`${20 + Math.random() * 60}%`, `${20 + Math.random() * 60}%`] }}
+                   transition={{ duration: 0.5, repeat: Infinity, repeatType: 'reverse' }}
+                   className="flex-1 bg-[#00f2ff]/30 min-h-[2px]"
+                />
+              ))}
+           </div>
+           <div className="p-2 border-t border-[#00f2ff]/10 text-center">
+              <span className="text-[5px] opacity-40 uppercase tracking-[0.4em]">Frequency_Scan_Active</span>
+           </div>
+        </DoubleBorderPanel>
+        
+        <DoubleBorderPanel title="ATMOSPHERIC_SENSORS" className="flex-1 bg-black/40">
+           <div className="p-4 grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                 <span className="text-[6px] opacity-40 uppercase">Ambient_Temp</span>
+                 <div className="flex items-center gap-2">
+                    <Thermometer className="w-4 h-4 text-[#00f2ff]" />
+                    <span className="text-xl font-black">24.2°C</span>
+                 </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                 <span className="text-[6px] opacity-40 uppercase">Humidity_Idx</span>
+                 <div className="flex items-center gap-2">
+                    <Wind className="w-4 h-4 text-[#00f2ff]" />
+                    <span className="text-xl font-black">44%</span>
+                 </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                 <span className="text-[6px] opacity-40 uppercase">Pressure_hPa</span>
+                 <div className="flex items-center gap-2">
+                    <Gauge className="w-4 h-4 text-[#00f2ff]" />
+                    <span className="text-xl font-black">1012</span>
+                 </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                 <span className="text-[6px] opacity-40 uppercase">O3_Levels</span>
+                 <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xl font-black text-emerald-400">LOW</span>
+                 </div>
+              </div>
+           </div>
+        </DoubleBorderPanel>
+      </div>
+
+      {/* CENTER: ORBITAL RADAR */}
+      <div className="flex-[3] flex flex-col min-h-0">
+        <DoubleBorderPanel title="ORBITAL_RECON_RADAR" className="flex-1 bg-black/60 relative flex items-center justify-center">
+           {/* Radar circles */}
+           <div className="relative w-[400px] h-[400px] flex items-center justify-center border border-[#00f2ff]/10 rounded-full">
+              <div className="absolute w-[300px] h-[300px] border border-[#00f2ff]/10 rounded-full" />
+              <div className="absolute w-[200px] h-[200px] border border-[#00f2ff]/10 rounded-full" />
+              <div className="absolute w-[100px] h-[100px] border border-[#00f2ff]/10 rounded-full" />
+              
+              {/* Grid lines */}
+              <div className="absolute w-full h-[1px] bg-[#00f2ff]/10" />
+              <div className="absolute h-full w-[1px] bg-[#00f2ff]/10" />
+
+              {/* Sweep line */}
+              <motion.div 
+                animate={{ rotate: 360 }}
+                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                className="absolute w-full h-[150px] bg-gradient-to-t from-transparent via-[#00f2ff]/10 to-transparent top-1/2 origin-top"
+              />
+
+              {/* Central crosshair */}
+              <Crosshair className="w-6 h-6 text-[#00f2ff] opacity-40" />
+
+              {/* Pings */}
+              {pings.map((p, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 1, scale: 0 }}
+                  animate={{ opacity: 0, scale: 1.5 }}
+                  transition={{ duration: 3 }}
+                  className={`absolute w-3 h-3 rounded-full border-2 ${p.type === 'THREAT' ? 'border-red-500' : 'border-[#00f2ff]'}`}
+                  style={{ left: `${p.x}%`, top: `${p.y}%` }}
+                >
+                   <div className="absolute -top-4 left-0 text-[5px] font-bold text-white bg-black/60 px-1 whitespace-nowrap">
+                      {p.id} // {p.type}
+                   </div>
+                </motion.div>
+              ))}
+           </div>
+           
+           <div className="absolute bottom-6 right-6 text-right">
+              <span className="text-[10px] font-black text-[#00f2ff] block">COORD: 34.0522° N, 118.2437° W</span>
+              <span className="text-[6px] opacity-40 uppercase tracking-[0.3em]">Satellite_Reference: AEGIS_SAT_7</span>
+           </div>
+
+           <div className="absolute top-6 left-6">
+              <div className="flex items-center gap-2 mb-2">
+                 <div className="w-2 h-2 bg-red-500 animate-pulse" />
+                 <span className="text-[8px] font-black text-white uppercase tracking-widest">Live_Orbital_Feed</span>
+              </div>
+              <span className="text-[6px] opacity-40 uppercase block">Resolving_Sector_Gamma...</span>
+           </div>
+        </DoubleBorderPanel>
+      </div>
+
+      {/* RIGHT: TRACKING OBJECTS */}
+      <div className="flex-1 flex flex-col gap-4">
+        <DoubleBorderPanel title="TRACKING_OBJECTS" className="flex-1 bg-black/40">
+           <div className="p-3 space-y-2 overflow-y-auto terminal-scroll h-full">
+              {[
+                { id: 'OBJ-001', type: 'THREAT', dist: '14.2km', status: 'LOCKED' },
+                { id: 'SAT-X9', type: 'NODE', dist: '442km', status: 'ACTIVE' },
+                { id: 'UNC-44', type: 'UNKNOWN', dist: '2.1km', status: 'TRACKING' },
+                { id: 'COM-08', type: 'NODE', dist: '12.4km', status: 'STANDBY' },
+                { id: 'BOG-12', type: 'THREAT', dist: '5.8km', status: 'INTERCEPT' },
+              ].map((obj, i) => (
+                <div key={i} className={`p-2 border ${obj.type === 'THREAT' ? 'border-red-500/30' : 'border-[#00f2ff]/10'} bg-[#00f2ff]/5 flex flex-col gap-1`}>
+                   <div className="flex justify-between items-center">
+                      <span className="text-[8px] font-black text-white">{obj.id}</span>
+                      <span className={`text-[6px] font-bold px-1 ${obj.type === 'THREAT' ? 'bg-red-500/20 text-red-500' : 'text-[#00f2ff]'}`}>{obj.type}</span>
+                   </div>
+                   <div className="flex justify-between text-[6px] opacity-40">
+                      <span>DIST: {obj.dist}</span>
+                      <span className={obj.status === 'LOCKED' ? 'text-red-500 animate-pulse' : 'text-emerald-400'}>{obj.status}</span>
+                   </div>
+                </div>
+              ))}
+           </div>
+           <div className="p-2 border-t border-[#00f2ff]/10 bg-[#00f2ff]/5">
+              <button className="w-full py-2 bg-[#00f2ff]/10 border border-[#00f2ff]/30 text-[7px] font-black uppercase hover:bg-[#00f2ff]/20 transition-all">
+                 Clear_Stale_Tracks
+              </button>
+           </div>
+        </DoubleBorderPanel>
+      </div>
     </div>
   );
 }
