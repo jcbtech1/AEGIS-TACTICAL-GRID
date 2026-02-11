@@ -3,6 +3,7 @@
 
 /**
  * @fileOverview AdvancedOpsScreen - Rediseño de alta fidelidad basado en la estética Aegis Command.
+ * Se ha eliminado la barra lateral para permitir una experiencia de pantalla completa en todos los módulos.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -81,145 +82,92 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
 
   if (!isMounted) return null;
 
-  // Ocultar sidebar para módulos inmersivos
-  const showSidebar = activeModule !== 'AEGIS_IA' && activeModule !== 'VISUAL_SCAN';
-
-  const NavButton = ({ type, label, icon: Icon }: { type: ModuleType, label: string, icon: any }) => (
-    <button
-      onClick={() => setActiveModule(type)}
-      className={`relative w-full flex items-center gap-2 px-3 py-1.5 text-[7px] font-bold tracking-[0.15em] uppercase transition-all overflow-hidden group scan-hover-item ${
-        activeModule === type 
-          ? 'text-[#00f2ff] bg-[#00f2ff]/5' 
-          : 'text-[#00f2ff]/40 hover:text-[#00f2ff]/80'
-      }`}
-    >
-      <Icon className={`w-3 h-3 ${activeModule === type ? 'text-[#00f2ff]' : 'text-[#00f2ff]/40'}`} />
-      <span className="flex-1 text-left truncate">{label}</span>
-      {activeModule === type && (
-        <motion.div 
-          layoutId="active-nav-indicator"
-          className="absolute left-0 w-0.5 h-3/4 bg-[#00f2ff] shadow-[0_0_10px_#00f2ff]"
-        />
-      )}
-    </button>
-  );
-
   return (
-    <div className="w-screen h-screen overflow-hidden bg-[#000508] text-[#00f2ff] p-3 flex gap-4 font-mono relative box-border">
+    <div className="w-screen h-screen overflow-hidden bg-[#000508] text-[#00f2ff] p-3 flex flex-col gap-3 font-mono relative box-border">
       <div className="scanline-effect opacity-5 pointer-events-none" />
       <div className="vignette" />
 
-      {showSidebar && (
-        <aside className="w-[160px] flex flex-col gap-3 z-20 h-full shrink-0">
-          <DoubleBorderPanel className="flex-none py-2 px-3">
-            <h1 className="text-[9px] font-black tracking-[0.3em] uppercase text-[#00f2ff] leading-none">AEGIS:MODULE</h1>
-          </DoubleBorderPanel>
+      <header className="flex justify-between items-center shrink-0 z-30">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={onBack}
+            className="p-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 transition-all group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          </button>
+          <div>
+            <h2 className="text-[10px] font-black tracking-widest uppercase text-[#00f2ff]">
+              AEGIS_MODULE // [{activeModule.replace('_', ' ')}]
+            </h2>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+           <div className="flex flex-col items-end">
+             <span className="text-[5px] opacity-40 uppercase tracking-widest">Operator_Status</span>
+             <span className="text-[8px] font-bold text-emerald-400">AUTHORIZED_L_{currentClearance}</span>
+           </div>
+           <div className="w-8 h-8 border border-[#00f2ff]/30 bg-[#00f2ff]/5 flex items-center justify-center">
+              <Shield className="w-4 h-4" />
+           </div>
+        </div>
+      </header>
 
-          <DoubleBorderPanel className="flex-1 p-0 flex flex-col">
-            <nav className="flex-1 py-1 overflow-y-auto terminal-scroll">
-              <NavButton type="STRATEGIC_INTELLIGENCE" label="STRATEGIC_INTEL" icon={Radar} />
-              <NavButton type="SECURITY_MANAGEMENT" label="SECURITY_MGMT" icon={ShieldCheck} />
-              <NavButton type="RECONNAISSANCE" label="RECON_GRID" icon={Globe} />
-              <NavButton type="VISUAL_SCAN" label="VISUAL_SCAN" icon={Eye} />
-              <NavButton type="COUNTERMEASURES" label="COUNTERMEASURES" icon={Shield} />
-              <NavButton type="DATA_PURGE" label="DATA_PURGE" icon={Trash2} />
-              <NavButton type="AEGIS_IA" label="AEGIS_IA" icon={Brain} />
-              <NavButton type="INFRASTRUCTURE" label="INFRASTRUCTURE" icon={HardDrive} />
-              <NavButton type="SYSTEM_LOGS" label="SYSTEM_LOGS" icon={List} />
-            </nav>
-
-            <div className="mt-auto border-t border-[#00f2ff]/10 p-2">
-              <button 
-                onClick={onBack}
-                className="w-full flex items-center justify-center gap-2 py-1.5 text-[7px] font-black text-[#00f2ff] uppercase border border-[#00f2ff]/30 bg-[#00f2ff]/5 hover:bg-[#00f2ff]/10 transition-all tactic-clip"
-              >
-                <Undo2 className="w-3 h-3" />
-                <span>RETURN_HUB</span>
-              </button>
-            </div>
-          </DoubleBorderPanel>
-        </aside>
-      )}
-
-      <main className="flex-1 flex flex-col gap-3 z-20 overflow-hidden h-full">
-        <header className="flex justify-between items-center shrink-0">
-          <div className="flex items-center gap-4">
-            {!showSidebar && (
-              <button 
-                onClick={onBack}
-                className="p-1.5 border border-[#00f2ff]/30 bg-[#00f2ff]/10 hover:bg-[#00f2ff]/20 transition-all"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </button>
+      <main className="flex-1 min-h-0 relative overflow-hidden z-20">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeModule}
+            initial={{ opacity: 0, scale: 0.99 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.99 }}
+            transition={{ duration: 0.2 }}
+            className="w-full h-full flex flex-col min-h-0"
+          >
+            {activeModule === 'STRATEGIC_INTELLIGENCE' && <StrategicIntelligenceModule />}
+            {activeModule === 'SECURITY_MANAGEMENT' && <SecurityManagementModule currentClearance={currentClearance} onLevelChange={setCurrentClearance} />}
+            {activeModule === 'RECONNAISSANCE' && <ReconModule />}
+            {activeModule === 'VISUAL_SCAN' && <VisualScanModule />}
+            {activeModule === 'COUNTERMEASURES' && (
+              <ClearanceOverlay requiredLevel={4} currentLevel={currentClearance}>
+                <CountermeasuresModule />
+              </ClearanceOverlay>
             )}
-            <div>
-              <h2 className="text-[10px] font-black tracking-widest uppercase text-[#00f2ff]">
-                [{activeModule.replace('_', ' ')}]
-              </h2>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-             <div className="w-5 h-5 border border-[#00f2ff]/30 bg-[#00f2ff]/5 flex items-center justify-center">
-                <Shield className="w-3 h-3" />
-             </div>
-          </div>
-        </header>
-
-        <section className="flex-1 min-h-0 relative overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeModule}
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.1 }}
-              className="w-full h-full flex flex-col min-h-0"
-            >
-              {activeModule === 'STRATEGIC_INTELLIGENCE' && <StrategicIntelligenceModule />}
-              {activeModule === 'SECURITY_MANAGEMENT' && <SecurityManagementModule currentClearance={currentClearance} onLevelChange={setCurrentClearance} />}
-              {activeModule === 'RECONNAISSANCE' && <ReconModule />}
-              {activeModule === 'VISUAL_SCAN' && <VisualScanModule />}
-              {activeModule === 'COUNTERMEASURES' && (
-                <ClearanceOverlay requiredLevel={4} currentLevel={currentClearance}>
-                  <CountermeasuresModule />
-                </ClearanceOverlay>
-              )}
-              {activeModule === 'DATA_PURGE' && (
-                <ClearanceOverlay requiredLevel={5} currentLevel={currentClearance}>
-                  <DataPurgeModule />
-                </ClearanceOverlay>
-              )}
-              {activeModule === 'AEGIS_IA' && <AegisIAModule currentLevel={currentClearance} />}
-              {activeModule === 'SYSTEM_LOGS' && <SystemLogsModule />}
-              {activeModule === 'INFRASTRUCTURE' && <InfrastructureModule />}
-            </motion.div>
-          </AnimatePresence>
-        </section>
-
-        <footer className="h-4 shrink-0 bg-black/80 border border-[#00f2ff]/20 overflow-hidden flex items-center">
-          <div className="flex-1 overflow-hidden whitespace-nowrap flex items-center">
-            <motion.div 
-              animate={{ x: [0, -500] }}
-              transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
-              className="flex gap-12 text-[5px] font-bold text-[#00f2ff]/60 uppercase tracking-[0.2em]"
-            >
-              <span>PROTOCOL_7B_ACTIVE... STATUS: SECURE</span>
-              <span>SCANNING_SECTOR_9... NO_INTRUSIONS_DETECTION</span>
-              <span>ENCRYPTION_LAYER_8_REINFORCED</span>
-            </motion.div>
-          </div>
-        </footer>
+            {activeModule === 'DATA_PURGE' && (
+              <ClearanceOverlay requiredLevel={5} currentLevel={currentClearance}>
+                <DataPurgeModule />
+              </ClearanceOverlay>
+            )}
+            {activeModule === 'AEGIS_IA' && <AegisIAModule currentLevel={currentClearance} />}
+            {activeModule === 'SYSTEM_LOGS' && <SystemLogsModule />}
+            {activeModule === 'INFRASTRUCTURE' && <InfrastructureModule />}
+          </motion.div>
+        </AnimatePresence>
       </main>
+
+      <footer className="h-5 shrink-0 bg-black/80 border border-[#00f2ff]/20 overflow-hidden flex items-center z-30">
+        <div className="flex-1 overflow-hidden whitespace-nowrap flex items-center">
+          <motion.div 
+            animate={{ x: [0, -500] }}
+            transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
+            className="flex gap-12 text-[6px] font-bold text-[#00f2ff]/60 uppercase tracking-[0.2em]"
+          >
+            <span>PROTOCOL_7B_ACTIVE... STATUS: SECURE</span>
+            <span>SCANNING_SECTOR_9... NO_INTRUSIONS_DETECTION</span>
+            <span>ENCRYPTION_LAYER_8_REINFORCED</span>
+            <span>NEURAL_LINK_STABLE</span>
+            <span>GRID_INTEGRITY_99.9%</span>
+          </motion.div>
+        </div>
+      </footer>
     </div>
   );
 }
 
-// --- MÓDULOS ---
+// --- MÓDULOS (Componentes Internos) ---
 
 function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   const [input, setInput] = useState('');
   const [history, setHistory] = useState([
-    { role: 'ai', text: 'SISTEMA AEGIS EN LÍNEA. NÚCLEO NEURONAL ESTABILIZADO.', timestamp: '00:00:00', source: 'LOCAL' }
+    { role: 'ai', text: 'SISTEMA AEGIS EN LÍNEA. NÚCLEO NEURONAL ESTABILIZADO. ESPERANDO COMANDOS.', timestamp: '00:00:00', source: 'LOCAL' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
