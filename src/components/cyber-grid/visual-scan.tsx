@@ -16,7 +16,8 @@ import {
   UserCheck, Target, Database,
   Search, Fingerprint, Lock,
   RefreshCw, Camera, Scan,
-  Crosshair, Zap, AlertCircle
+  Crosshair, Zap, AlertCircle,
+  Radio
 } from 'lucide-react';
 import { useCollection } from '@/firebase';
 
@@ -34,12 +35,10 @@ export default function VisualScanModule() {
   const [scanStatus, setScanStatus] = useState<'IDLE' | 'SCANNING' | 'MATCH_FOUND'>('SCANNING');
   const [telemetry, setTelemetry] = useState({ alt: 450, zoom: 2.4, temp: 36.5 });
   
-  // Obtenemos operadores reales de Firestore para la simulación
   const { data: operators } = useCollection<any>('operators');
 
   useEffect(() => {
     const interval = setInterval(() => {
-      // Movimiento aleatorio del tracking box (simulando seguimiento de rostro)
       setTargetPos(prev => ({
         x: Math.max(15, Math.min(65, prev.x + (Math.random() - 0.5) * 8)),
         y: Math.max(15, Math.min(45, prev.y + (Math.random() - 0.5) * 8)),
@@ -47,14 +46,12 @@ export default function VisualScanModule() {
         h: 30 + Math.random() * 8
       }));
 
-      // Telemetría cambiante
       setTelemetry({
         alt: 440 + Math.random() * 20,
         zoom: 2.4 + (Math.random() * 0.2),
         temp: 36.4 + (Math.random() * 0.4)
       });
 
-      // Simulación de comparación cíclica
       if (operators && operators.length > 0) {
         setScanStatus('SCANNING');
         setTimeout(() => {
@@ -77,8 +74,6 @@ export default function VisualScanModule() {
 
   return (
     <div className="flex h-full gap-4 min-h-0 overflow-hidden relative p-2 bg-[#000810]/40">
-      
-      {/* PANEL IZQUIERDO: ANÁLISIS BIOMÉTRICO Y BASE DE DATOS */}
       <div className="flex-[2] flex flex-col gap-3 min-w-0 h-full overflow-hidden">
         <div className="relative flex-1 border border-[#00f2ff]/30 bg-[#050b1a]/95 backdrop-blur-md p-4 flex flex-col fui-corner-brackets overflow-hidden shadow-[0_0_30px_rgba(0,242,255,0.05)]">
           <div className="fui-corner-brackets-inner" />
@@ -107,7 +102,6 @@ export default function VisualScanModule() {
                   className="w-full space-y-6"
                 >
                   <div className="flex items-center justify-center gap-10">
-                    {/* Imagen de Referencia de Archivo */}
                     <div className="relative group flex flex-col items-center">
                        <div className="w-28 h-28 border-2 border-[#00f2ff]/40 bg-black p-1 relative overflow-hidden shadow-[0_0_20px_rgba(0,242,255,0.1)]">
                           <img src={activeMatch.image} alt="DB" className="w-full h-full object-cover grayscale opacity-70" />
@@ -121,7 +115,6 @@ export default function VisualScanModule() {
                        <span className="mt-2 text-[6px] text-[#00f2ff]/60 uppercase tracking-widest font-black">Archive_Record_{activeMatch.id}</span>
                     </div>
 
-                    {/* Nucleo de Comparación */}
                     <div className="flex flex-col items-center justify-center gap-2">
                        <div className="relative w-12 h-12 flex items-center justify-center">
                           <RefreshCw className="w-full h-full text-[#00f2ff] animate-spin opacity-20" style={{ animationDuration: '3s' }} />
@@ -133,7 +126,6 @@ export default function VisualScanModule() {
                        </div>
                     </div>
 
-                    {/* Captura de Video Táctico */}
                     <div className="relative group flex flex-col items-center">
                        <div className="w-28 h-28 border-2 border-[#f43f5e]/40 bg-black p-1 relative overflow-hidden shadow-[0_0_20px_rgba(244,63,94,0.1)]">
                           <img src={activeMatch.image} alt="Live" className="w-full h-full object-cover contrast-150 saturate-0 brightness-110" />
@@ -241,11 +233,8 @@ export default function VisualScanModule() {
         </div>
       </div>
 
-      {/* PANEL DERECHO: FEED DE VIGILANCIA TÁCTICA */}
       <div className="flex-[3] relative bg-[#000508] border border-[#00f2ff]/40 fui-corner-brackets shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden h-full group">
         <div className="fui-corner-brackets-inner" />
-        
-        {/* Background Video Simulada */}
         <div 
           className="w-full h-full bg-cover bg-center grayscale contrast-[1.8] saturate-[1.5] brightness-[0.7]"
           style={{ 
@@ -254,21 +243,18 @@ export default function VisualScanModule() {
           }}
         />
 
-        {/* Overlay de Interferencia Digital */}
         <div className="absolute inset-0 pointer-events-none z-10">
           <div className="w-full h-full dot-matrix opacity-20" />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00f2ff]/5 to-transparent animate-scan" />
           <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
         </div>
 
-        {/* LÁSER DE ESCANEO VERTICAL (ACTIVO) */}
         <motion.div 
           animate={{ top: ['0%', '100%', '0%'] }}
           transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
           className="absolute left-0 right-0 h-1 bg-[#f43f5e] shadow-[0_0_30px_#f43f5e] z-30 opacity-40"
         />
 
-        {/* HUD DE TELEMETRÍA SUPERIOR */}
         <div className="absolute top-6 left-6 right-6 flex justify-between items-start z-40">
            <div className="flex flex-col gap-2">
               <div className="flex items-center gap-3 bg-black/60 px-3 py-1.5 border-l-4 border-[#f43f5e] backdrop-blur-md">
@@ -298,7 +284,6 @@ export default function VisualScanModule() {
            </div>
         </div>
 
-        {/* RETÍCULA DE SEGUIMIENTO (TRACKING BOX) */}
         <motion.div 
           animate={{ 
             left: `${targetPos.x}%`, 
@@ -309,20 +294,17 @@ export default function VisualScanModule() {
           transition={{ duration: 1.2, ease: "easeInOut" }}
           className="absolute z-50 pointer-events-none"
         >
-          {/* Esquinas de Tracking Reforzadas */}
           <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#00f2ff] shadow-[0_0_20px_#00f2ff]" />
           <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#00f2ff] shadow-[0_0_20px_#00f2ff]" />
           <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#00f2ff] shadow-[0_0_20px_#00f2ff]" />
           <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#00f2ff] shadow-[0_0_20px_#00f2ff]" />
 
-          {/* Marcador Central (Crosshair) */}
           <div className="absolute inset-0 flex items-center justify-center opacity-60">
              <div className="w-10 h-[1px] bg-[#00f2ff]/80" />
              <div className="h-10 w-[1px] bg-[#00f2ff]/80 absolute" />
              <div className="w-2 h-2 rounded-full border border-[#00f2ff] animate-ping" />
           </div>
 
-          {/* Etiqueta Flotante de Objetivo */}
           <div className="absolute -top-10 left-0 flex flex-col gap-1 min-w-[120px]">
              <div className="bg-[#00f2ff] text-black px-2 py-0.5 text-[8px] font-black uppercase tracking-widest flex justify-between items-center">
                 <span>LOCK: ESTABLISHED</span>
@@ -334,14 +316,12 @@ export default function VisualScanModule() {
              </div>
           </div>
 
-          {/* Telemetría Dinámica del Objetivo */}
           <div className="absolute -bottom-12 right-0 text-right flex flex-col gap-0.5">
              <span className="text-[7px] text-[#f43f5e] font-black">THREAT: STABLE</span>
              <span className="text-[6px] text-white/40 font-mono">X: {targetPos.x.toFixed(2)} Y: {targetPos.y.toFixed(2)}</span>
           </div>
         </motion.div>
 
-        {/* HUD INFERIOR: METADATOS Y ESTADO GLOBAL */}
         <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end z-40">
            <div className="flex items-center gap-4 bg-black/60 backdrop-blur-md border border-[#00f2ff]/20 p-3">
               <div className="flex flex-col">
@@ -373,7 +353,6 @@ export default function VisualScanModule() {
            </div>
         </div>
 
-        {/* Viñeta HUD Interna */}
         <div className="absolute inset-0 pointer-events-none border-[20px] border-black/10 shadow-[inset_0_0_100px_rgba(0,0,0,0.8)]" />
       </div>
 
