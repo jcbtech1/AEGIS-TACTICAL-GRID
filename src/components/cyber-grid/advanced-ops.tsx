@@ -1,10 +1,12 @@
+
 "use client";
 
 /**
  * @fileOverview AdvancedOpsScreen - Rediseño de alta fidelidad basado en la estética Aegis Command.
  * 
  * Versión compactada para evitar desbordamientos en pantalla.
- * Actualizado: AEGIS_IA ahora con el núcleo visual J.A.R.V.I.S Style y soporte de VOZ.
+ * Actualizado: AEGIS_IA ahora con el núcleo visual J.A.RV.I.S Style y soporte de VOZ.
+ * Incluye indicador de LINK_STATUS para confirmar conexión con backend.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -21,7 +23,9 @@ import {
   ArrowLeft, Cloud, Thermometer,
   Wind, Gauge, MicOff, Volume2,
   ChevronRight,
-  Target
+  Target,
+  Link2,
+  Link2Off
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
@@ -223,10 +227,11 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
 function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   const [input, setInput] = useState('');
   const [history, setHistory] = useState([
-    { role: 'ai', text: 'SISTEMA AEGIS EN LÍNEA. NÚCLEO NEURONAL ESTABILIZADO.', timestamp: '00:00:00' }
+    { role: 'ai', text: 'SISTEMA AEGIS EN LÍNEA. NÚCLEO NEURONAL ESTABILIZADO.', timestamp: '00:00:00', source: 'LOCAL' }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [linkStatus, setLinkStatus] = useState<'LOCAL' | 'EXTERNAL' | 'WAITING'>('LOCAL');
   const [metrics, setMetrics] = useState({ cpu: 12, ram: 45, load: 22, sync: 99.9 });
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -285,9 +290,10 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
       timestamp: new Date().toLocaleTimeString().slice(0, 8)
     };
     
-    setHistory(prev => [...prev, userMsg]);
+    setHistory(prev => [...prev, userMsg as any]);
     setInput('');
     setIsLoading(true);
+    setLinkStatus('WAITING');
 
     try {
       const result = await sendTacticalCommand({
@@ -302,16 +308,19 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
       const aiResponse = { 
         role: 'ai', 
         text: result.response,
-        timestamp: new Date().toLocaleTimeString().slice(0, 8)
+        timestamp: new Date().toLocaleTimeString().slice(0, 8),
+        source: (result as any).source || 'LOCAL'
       };
 
-      setHistory(prev => [...prev, aiResponse]);
+      setHistory(prev => [...prev, aiResponse as any]);
+      setLinkStatus((result as any).source || 'LOCAL');
       speak(aiResponse.text);
 
     } catch (error) {
       console.error("AI Link Failure:", error);
       const errorMsg = "ERROR: INTERRUPCIÓN EN EL ENLACE NEURONAL.";
-      setHistory(prev => [...prev, { role: 'ai', text: errorMsg, timestamp: 'ERR' }]);
+      setHistory(prev => [...prev, { role: 'ai', text: errorMsg, timestamp: 'ERR', source: 'ERROR' } as any]);
+      setLinkStatus('LOCAL');
       speak(errorMsg);
     } finally {
       setIsLoading(false);
@@ -337,6 +346,20 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
                 <span className="text-[9px] font-black">{metrics.cpu}%</span>
              </div>
           </div>
+        </div>
+
+        {/* INDICADOR DE ENLACE DE DATOS (CONFIRMACIÓN BACKEND) */}
+        <div className="absolute bottom-4 left-4 flex flex-col gap-1">
+           <span className="text-[5px] opacity-40 uppercase tracking-[0.4em]">Data_Link_Status</span>
+           <div className={`flex items-center gap-2 px-2 py-1 border text-[7px] font-black tracking-widest ${
+             linkStatus === 'EXTERNAL' ? 'border-[#00f2ff] text-[#00f2ff] bg-[#00f2ff]/10' : 
+             linkStatus === 'WAITING' ? 'border-amber-500 text-amber-500 animate-pulse' :
+             'border-[#00f2ff]/20 text-[#00f2ff]/40'
+           }`}>
+             {linkStatus === 'EXTERNAL' ? <Link2 className="w-3 h-3" /> : <Link2Off className="w-3 h-3" />}
+             {linkStatus === 'EXTERNAL' ? 'EXTERNAL_LINK_ACTIVE' : 
+              linkStatus === 'WAITING' ? 'ESTABLISHING_LINK...' : 'LOCAL_CORE_ONLY'}
+           </div>
         </div>
 
         {/* TELEMETRÍA DERECHA */}
@@ -443,7 +466,7 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
                   } fui-corner-brackets`}>
                     <div className="flex justify-between items-center mb-1.5 opacity-40">
                       <span className="text-[5px] font-black uppercase tracking-widest">
-                        {msg.role === 'ai' ? 'AEGIS_INTEL' : 'OPERATOR_COM'}
+                        {msg.role === 'ai' ? `AEGIS_INTEL [${(msg as any).source}]` : 'OPERATOR_COM'}
                       </span>
                       {msg.role === 'ai' && (
                         <Volume2 className="w-3 h-3 cursor-pointer hover:text-white" onClick={() => speak(msg.text)} />
@@ -486,7 +509,7 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder={isListening ? "RECORDING..." : "ENTER_QUERY..."} 
                 disabled={isLoading}
-                className="flex-1 bg-[#00f2ff]/5 border border-[#00f2ff]/20 px-3 py-1.5 text-[8px] outline-none text-[#00f2ff] placeholder:text-[#00f2ff]/20 uppercase font-mono" 
+                className="flex-1 bg-[#00f2ff]/5 border border-[#00f2ff]/20 px-3 py-1.5 text-[8px] outline-none text-[#00f2ff] placeholder:text-[#00f2ff]/10 uppercase font-mono" 
               />
               <button 
                 onClick={() => handleSend()}

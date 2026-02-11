@@ -1,3 +1,4 @@
+
 "use server";
 
 import { generateColorPalette, GenerateColorPaletteInput } from '@/ai/flows/generate-color-palette';
@@ -12,23 +13,30 @@ import { fetchExternalAIResponse } from '@/lib/api-bridge';
  */
 export async function sendTacticalCommand(input: TacticalChatInput) {
   try {
-    // 1. INTENTO DE CONEXIÓN CON BACKEND EXTERNO (Definido en .env)
+    // 1. INTENTO DE CONEXIÓN CON BACKEND EXTERNO
     const externalResponse = await fetchExternalAIResponse(input.message, input.systemStatus);
     
     if (externalResponse) {
-      console.log("AEGIS_LOG: Respuesta obtenida de BACKEND_EXTERNO.");
-      return { response: externalResponse };
+      console.log(">>> AEGIS_SUCCESS: Conectado exitosamente con BACKEND_EXTERNO.");
+      return { 
+        response: externalResponse,
+        source: 'EXTERNAL' as const
+      };
     }
 
     // 2. RESPALDO LOCAL: Si no hay backend externo o falla, usamos Genkit
-    console.log("AEGIS_LOG: Usando núcleo local (Genkit/Gemini) para procesamiento.");
+    console.log(">>> AEGIS_FALLBACK: Usando núcleo local (Genkit/Gemini).");
     const result = await tacticalChat(input);
-    return result;
+    return {
+      ...result,
+      source: 'LOCAL' as const
+    };
 
   } catch (error) {
-    console.error("CRITICAL_LINK_FAILURE:", error);
+    console.error(">>> AEGIS_CRITICAL_FAILURE:", error);
     return { 
-      response: "ERROR_CRÍTICO: FALLO EN EL ENLACE DE DATOS. ACTIVANDO PROTOCOLO DE EMERGENCIA LOCAL." 
+      response: "ERROR_CRÍTICO: FALLO EN EL ENLACE DE DATOS. ACTIVANDO PROTOCOLO DE EMERGENCIA LOCAL.",
+      source: 'ERROR' as const
     };
   }
 }
