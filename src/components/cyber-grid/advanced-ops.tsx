@@ -25,7 +25,13 @@ import {
   Link2Off,
   Hash,
   Server,
-  Layers
+  Layers,
+  Unlock,
+  Key,
+  RefreshCw,
+  AlertTriangle,
+  Wifi,
+  History
 } from 'lucide-react';
 import VisualScanModule from './visual-scan';
 import { sendTacticalCommand } from '@/app/actions';
@@ -166,6 +172,203 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
 }
 
 // --- MÓDULOS (Componentes Internos) ---
+
+function SecurityManagementModule({ currentClearance, onLevelChange }: { currentClearance: number, onLevelChange: (l: number) => void }) {
+  const [matrix, setMatrix] = useState<string[]>([]);
+  const [integrity, setIntegrity] = useState(99.4);
+  const [activeLayers, setActiveLayers] = useState([
+    { id: 'FW-01', name: 'NEURAL_FIREWALL', status: 'ACTIVE' },
+    { id: 'ENC-X', name: 'PACKET_SHREDDER', status: 'ACTIVE' },
+    { id: 'ID-7', name: 'HEURISTIC_IDS', status: 'STANDBY' },
+  ]);
+
+  useEffect(() => {
+    const generateRow = () => Array.from({ length: 4 }).map(() => Math.random().toString(16).slice(2, 6).toUpperCase()).join(' ');
+    setMatrix(Array.from({ length: 8 }).map(generateRow));
+
+    const interval = setInterval(() => {
+      setMatrix(prev => [...prev.slice(1), generateRow()]);
+      setIntegrity(99.2 + Math.random() * 0.6);
+    }, 800);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex h-full gap-4 min-h-0 overflow-hidden relative">
+      {/* PANEL IZQUIERDO: MATRIZ Y CAPAS */}
+      <div className="flex-[2] flex flex-col gap-4 min-h-0">
+        <DoubleBorderPanel title="AUTHENTICATION_MATRIX" className="flex-1 bg-black/60">
+           <div className="flex-1 overflow-hidden p-4 font-mono text-[8px] text-[#00f2ff]/40 space-y-2">
+              {matrix.map((row, i) => (
+                <div key={i} className="flex justify-between items-center opacity-60">
+                  <span className="text-[#00f2ff]/20">0x{i.toString(16).padStart(4, '0')}</span>
+                  <span className="tracking-[0.5em]">{row}</span>
+                  <span className="text-emerald-500/40">VALID</span>
+                </div>
+              ))}
+              <div className="border-t border-[#00f2ff]/10 pt-2 mt-4">
+                 <div className="flex justify-between items-center">
+                    <span className="text-[6px] uppercase tracking-widest">Key_Rotation_Sequence</span>
+                    <RefreshCw className="w-3 h-3 animate-spin text-[#00f2ff]/40" />
+                 </div>
+              </div>
+           </div>
+        </DoubleBorderPanel>
+
+        <DoubleBorderPanel title="ACTIVE_SECURITY_LAYERS" className="flex-1 bg-black/40">
+           <div className="p-3 space-y-3">
+              {activeLayers.map((layer, i) => (
+                <div key={i} className="flex items-center justify-between p-2 border border-[#00f2ff]/10 bg-[#00f2ff]/5">
+                   <div className="flex items-center gap-3">
+                      <ShieldCheck className={`w-4 h-4 ${layer.status === 'ACTIVE' ? 'text-emerald-400' : 'text-amber-500'}`} />
+                      <div className="flex flex-col">
+                         <span className="text-[8px] font-black uppercase tracking-widest">{layer.name}</span>
+                         <span className="text-[5px] opacity-40 uppercase">{layer.id}</span>
+                      </div>
+                   </div>
+                   <div className={`text-[7px] font-bold px-2 py-0.5 border ${layer.status === 'ACTIVE' ? 'border-emerald-400 text-emerald-400' : 'border-amber-500 text-amber-500'}`}>
+                      {layer.status}
+                   </div>
+                </div>
+              ))}
+           </div>
+           <div className="mt-auto p-3 border-t border-[#00f2ff]/10">
+              <button className="w-full py-2 bg-[#00f2ff]/10 border border-[#00f2ff]/30 text-[7px] font-black uppercase tracking-widest hover:bg-[#00f2ff]/20 transition-all">
+                 REINFORCE_ALL_LAYERS
+              </button>
+           </div>
+        </DoubleBorderPanel>
+      </div>
+
+      {/* PANEL CENTRAL: INTEGRIDAD Y CLEARANCE */}
+      <div className="flex-[3] flex flex-col gap-4 min-h-0">
+        <DoubleBorderPanel title="SYSTEM_INTEGRITY_INDEX" className="h-64 flex items-center justify-center bg-black/80 relative">
+           <div className="relative w-48 h-48 flex items-center justify-center">
+              <svg className="absolute inset-0 w-full h-full rotate-[-90deg]">
+                 <circle cx="96" cy="96" r="80" fill="none" stroke="#00f2ff" strokeWidth="1" strokeDasharray="502" strokeDashoffset={502 - (502 * integrity / 100)} className="transition-all duration-1000" />
+                 <circle cx="96" cy="96" r="88" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="2, 8" className="opacity-20" />
+              </svg>
+              <div className="flex flex-col items-center">
+                 <span className="text-4xl font-black text-[#00f2ff] drop-shadow-[0_0_15px_rgba(0,242,255,0.4)]">{integrity.toFixed(1)}%</span>
+                 <span className="text-[6px] font-bold opacity-40 uppercase tracking-[0.4em]">Grid_Stability</span>
+              </div>
+           </div>
+           
+           <div className="absolute bottom-4 w-full px-8 flex justify-between items-center">
+              <div className="flex flex-col items-start">
+                 <span className="text-[5px] opacity-40 uppercase">Threat_Level</span>
+                 <span className="text-[10px] font-black text-emerald-400">NOMINAL</span>
+              </div>
+              <div className="flex flex-col items-end">
+                 <span className="text-[5px] opacity-40 uppercase">Enc_Strength</span>
+                 <span className="text-[10px] font-black text-[#00f2ff]">MIL_SPEC_AES</span>
+              </div>
+           </div>
+        </DoubleBorderPanel>
+
+        <DoubleBorderPanel title="OPERATOR_CLEARANCE_CONTROL" className="flex-1 bg-[#00f2ff]/5">
+           <div className="flex-1 flex flex-col items-center justify-center gap-6 p-4">
+              <div className="flex items-center gap-12">
+                 <div className="flex flex-col items-center gap-2">
+                    <span className="text-[6px] opacity-40 uppercase tracking-[0.3em]">Current_Level</span>
+                    <div className="w-16 h-16 rounded-full border-2 border-[#00f2ff] flex items-center justify-center bg-[#00f2ff]/10 shadow-[0_0_20px_rgba(0,242,255,0.2)]">
+                       <span className="text-3xl font-black">{currentClearance}</span>
+                    </div>
+                 </div>
+                 
+                 <div className="grid grid-cols-5 gap-2">
+                    {[1, 2, 3, 4, 5].map(l => (
+                      <button 
+                        key={l} 
+                        onClick={() => onLevelChange(l)}
+                        className={`
+                          w-8 h-8 flex items-center justify-center border font-black text-[10px] transition-all
+                          ${currentClearance === l 
+                            ? 'bg-[#00f2ff] text-black border-[#00f2ff] shadow-[0_0_10px_#00f2ff]' 
+                            : 'border-[#00f2ff]/30 text-[#00f2ff]/60 hover:bg-[#00f2ff]/10'}
+                        `}
+                      >
+                        L{l}
+                      </button>
+                    ))}
+                 </div>
+              </div>
+              
+              <div className="w-full flex gap-4">
+                 <button className="flex-1 py-3 border border-[#f43f5e] bg-[#f43f5e]/10 text-[#f43f5e] text-[8px] font-black uppercase tracking-[0.3em] hover:bg-[#f43f5e]/20 transition-all flex items-center justify-center gap-3">
+                    <Lock className="w-3 h-3" />
+                    TOTAL_LOCKDOWN
+                 </button>
+                 <button className="flex-1 py-3 border border-[#00f2ff] bg-[#00f2ff]/10 text-[#00f2ff] text-[8px] font-black uppercase tracking-[0.3em] hover:bg-[#00f2ff]/20 transition-all flex items-center justify-center gap-3">
+                    <RefreshCw className="w-3 h-3" />
+                    REAUTHORIZE_SESSION
+                 </button>
+              </div>
+           </div>
+        </DoubleBorderPanel>
+      </div>
+
+      {/* PANEL DERECHO: BIOMETRÍA Y ALERTAS */}
+      <div className="flex-[2] flex flex-col gap-4 min-h-0">
+        <DoubleBorderPanel title="BIOMETRIC_IDENTITY_FEED" className="flex-[3] bg-black/60 relative">
+           <div className="flex-1 flex flex-col items-center justify-center p-4">
+              <div className="relative w-32 h-32 border border-[#00f2ff]/20 bg-black p-2 overflow-hidden">
+                 <Fingerprint className="w-full h-full text-[#00f2ff]/20" />
+                 <motion.div 
+                   animate={{ top: ['0%', '100%', '0%'] }}
+                   transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                   className="absolute left-0 right-0 h-0.5 bg-[#00f2ff] shadow-[0_0_15px_#00f2ff]"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#00f2ff]/5 to-transparent animate-scan" />
+              </div>
+              <div className="mt-6 w-full space-y-3">
+                 <div className="flex justify-between text-[7px] border-b border-[#00f2ff]/10 pb-1">
+                    <span className="opacity-40 uppercase">Genetic_Auth</span>
+                    <span className="text-emerald-400 font-bold uppercase">MATCH_OK</span>
+                 </div>
+                 <div className="flex justify-between text-[7px] border-b border-[#00f2ff]/10 pb-1">
+                    <span className="opacity-40 uppercase">Iris_Scan</span>
+                    <span className="text-emerald-400 font-bold uppercase">MATCH_OK</span>
+                 </div>
+                 <div className="flex justify-between text-[7px] border-b border-[#00f2ff]/10 pb-1">
+                    <span className="opacity-40 uppercase">Heart_Rate</span>
+                    <span className="text-[#00f2ff] font-bold">72 BPM</span>
+                 </div>
+              </div>
+           </div>
+        </DoubleBorderPanel>
+
+        <DoubleBorderPanel title="SECURITY_AUDIT_ALERTS" className="flex-[2] bg-black/60" isAccent>
+           <div className="flex-1 overflow-y-auto terminal-scroll p-3 space-y-2">
+              {[
+                { time: '14:22:01', msg: 'ACCESS_DENIED_SECTOR_7', type: 'CRITICAL' },
+                { time: '14:18:45', msg: 'HEURISTIC_IDS_ANOMALY', type: 'WARNING' },
+                { time: '14:05:12', msg: 'OPERATOR_AUTH_SUCCESS', type: 'INFO' },
+                { time: '13:58:22', msg: 'ENCRYPTION_KEY_ROTATED', type: 'INFO' },
+              ].map((alert, i) => (
+                <div key={i} className={`flex flex-col p-1.5 border-l-2 ${
+                  alert.type === 'CRITICAL' ? 'border-[#f43f5e] bg-[#f43f5e]/5' : 
+                  alert.type === 'WARNING' ? 'border-amber-500 bg-amber-500/5' : 'border-[#00f2ff]/40 bg-[#00f2ff]/5'
+                }`}>
+                   <div className="flex justify-between items-center mb-1">
+                      <span className="text-[5px] opacity-40">{alert.time}</span>
+                      <span className={`text-[5px] font-bold ${
+                        alert.type === 'CRITICAL' ? 'text-[#f43f5e]' : 
+                        alert.type === 'WARNING' ? 'text-amber-500' : 'text-[#00f2ff]'
+                      }`}>{alert.type}</span>
+                   </div>
+                   <span className="text-[7px] font-black uppercase tracking-tight truncate">{alert.msg}</span>
+                </div>
+              ))}
+           </div>
+           <div className="p-2 border-t border-[#f43f5e]/20 flex justify-center">
+              <span className="text-[5px] text-[#f43f5e] font-black uppercase animate-pulse">Live_Security_Watchdog_Active</span>
+           </div>
+        </DoubleBorderPanel>
+      </div>
+    </div>
+  );
+}
 
 function SystemLogsModule() {
   const [logs, setLogs] = useState<string[]>([]);
@@ -583,36 +786,6 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
            </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function SecurityManagementModule({ currentClearance, onLevelChange }: { currentClearance: number, onLevelChange: (l: number) => void }) {
-  return (
-    <div className="flex flex-col h-full gap-3 min-h-0 overflow-hidden">
-      <div className="flex-[2] grid grid-cols-12 gap-3 min-h-0">
-        <DoubleBorderPanel title="[ CLEARANCE ]" className="col-span-5 flex flex-col items-center justify-center p-2">
-            <span className="text-2xl font-black text-[#00f2ff]">{currentClearance}</span>
-            <div className="mt-2 flex gap-1">
-              {[1,2,3,4,5].map(l => (
-                <button key={l} onClick={() => onLevelChange(l)} className={`w-5 h-5 border ${currentClearance === l ? 'bg-[#00f2ff] text-black' : 'bg-black text-[#00f2ff]'} text-[7px] font-bold`}>{l}</button>
-              ))}
-            </div>
-        </DoubleBorderPanel>
-        <DoubleBorderPanel title="[ BIOMETRIC_FEED ]" className="col-span-7 bg-black/40">
-           <div className="w-full h-full bg-black/80 flex items-center justify-center border border-[#00f2ff]/10">
-              <Fingerprint className="w-8 h-8 text-[#00f2ff]/20" />
-           </div>
-        </DoubleBorderPanel>
-      </div>
-
-      <DoubleBorderPanel title="[ SECURITY_LOGS ]" className="flex-[3] bg-black/60" isAccent>
-          <div className="flex-1 overflow-y-auto terminal-scroll p-2 space-y-1 font-mono text-[6px]">
-            {Array.from({ length: 15 }).map((_, i) => (
-              <div key={i} className="opacity-40 truncate">[{10+i}:00:00] SYSTEM_CHECK_SECTOR_{i}_OK</div>
-            ))}
-          </div>
-      </DoubleBorderPanel>
     </div>
   );
 }
