@@ -7,25 +7,28 @@ import { fetchExternalAIResponse } from '@/lib/api-bridge';
 
 /**
  * Server Action Principal para la IA Táctica AEGIS.
- * Gestiona la prioridad entre tu Backend Externo y el núcleo local de Genkit.
+ * Orquestador de inteligencia: Intenta primero el Backend Externo, 
+ * luego usa Genkit/Gemini como respaldo.
  */
 export async function sendTacticalCommand(input: TacticalChatInput) {
   try {
-    // 1. INTENTO DE CONEXIÓN CON TU BACKEND EXTERNO (Python/Go/etc)
+    // 1. INTENTO DE CONEXIÓN CON BACKEND EXTERNO (Definido en .env)
     const externalResponse = await fetchExternalAIResponse(input.message, input.systemStatus);
     
     if (externalResponse) {
+      console.log("AEGIS_LOG: Respuesta obtenida de BACKEND_EXTERNO.");
       return { response: externalResponse };
     }
 
-    // 2. BACKUP: Si no hay backend externo, usamos Genkit (Gemini)
+    // 2. RESPALDO LOCAL: Si no hay backend externo o falla, usamos Genkit
+    console.log("AEGIS_LOG: Usando núcleo local (Genkit/Gemini) para procesamiento.");
     const result = await tacticalChat(input);
     return result;
 
   } catch (error) {
     console.error("CRITICAL_LINK_FAILURE:", error);
     return { 
-      response: "ERROR_CRÍTICO: FALLO EN EL ENLACE DE DATOS EXTERNO. ACTIVANDO PROTOCOLO DE CONTENCIÓN LOCAL." 
+      response: "ERROR_CRÍTICO: FALLO EN EL ENLACE DE DATOS. ACTIVANDO PROTOCOLO DE EMERGENCIA LOCAL." 
     };
   }
 }

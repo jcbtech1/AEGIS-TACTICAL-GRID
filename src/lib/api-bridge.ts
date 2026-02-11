@@ -1,50 +1,75 @@
 /**
  * @fileOverview AEGIS API Bridge - Central de Conexión de Backend
  * 
- * Este archivo es el punto único de contacto para servidores externos.
- * Aquí es donde debes configurar tus endpoints de Python, Go o Node.js.
+ * Este archivo gestiona la comunicación con tu servidor externo (Python, Go, etc.).
+ * El sistema busca automáticamente la variable BACKEND_URL en tu archivo .env.
  */
 
-// URL base de tu servidor backend (ej. "https://api.tu-servidor.com")
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+// Intentamos obtener la URL desde el entorno. 
+// Si usas Replit, añádela en "Secrets" como BACKEND_URL.
+const BACKEND_URL = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL;
 
 /**
- * Función principal para enviar comandos al cerebro de la IA en tu servidor.
- * SUSTITUYE ESTO: Cambia la lógica interna por un fetch() a tu API.
+ * Envía comandos al cerebro de la IA en tu servidor externo.
+ * @param message El comando del operador.
+ * @param context El estado actual del sistema para que la IA tenga contexto.
  */
 export async function fetchExternalAIResponse(message: string, context: any) {
+  if (!BACKEND_URL) {
+    console.info("AEGIS_BRIDGE: No se detectó BACKEND_URL en .env. Usando AEGIS_IA local.");
+    return null;
+  }
+
   try {
-    // --- PUNTO DE CONEXIÓN DE BACKEND ---
-    // Descomenta las líneas de abajo para conectar con tu API real:
-    /*
-    const response = await fetch(`${BACKEND_URL}/v1/tactical/chat`, {
+    console.log(`AEGIS_BRIDGE: Intentando conexión con ${BACKEND_URL}...`);
+    
+    // --- ESTRUCTURA DE PETICIÓN ---
+    // Ajusta la ruta '/api/chat' según como esté configurado tu servidor.
+    const response = await fetch(`${BACKEND_URL}/api/chat`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.BACKEND_SECRET_KEY}`
+        // 'Authorization': `Bearer ${process.env.BACKEND_SECRET_KEY}` // Descomenta si usas token
       },
-      body: JSON.stringify({ message, context })
+      body: JSON.stringify({ 
+        message, 
+        system_context: context,
+        timestamp: new Date().toISOString()
+      }),
+      // Timeout de 10 segundos para no bloquear la UI si el servidor está lento
+      signal: AbortSignal.timeout(10000) 
     });
     
-    if (!response.ok) throw new Error('BACKEND_OFFLINE');
-    const data = await response.json();
-    return data.response; 
-    */
+    if (!response.ok) {
+      console.warn(`AEGIS_BRIDGE: El servidor respondió con error (${response.status}).`);
+      return null;
+    }
 
-    // Simulación de respuesta mientras conectas tu servidor
-    console.warn("AEGIS_BRIDGE: Usando modo simulación. Configura BACKEND_URL en .env");
-    return null; // Retornamos null para que el sistema use Genkit por defecto
+    const data = await response.json();
+    
+    // El sistema espera que tu JSON tenga un campo 'response' o 'text'
+    return data.response || data.text || null;
+
   } catch (error) {
-    console.error("AEGIS_BRIDGE_ERROR:", error);
-    throw error;
+    console.error("AEGIS_BRIDGE_CONNECTION_FAILED:", error);
+    // Retornamos null para que actions.ts use el respaldo de Genkit automáticamente
+    return null; 
   }
 }
 
 /**
- * Función para sincronizar datos de telemetría o logs con tu base de datos central.
+ * Función para sincronizar datos de telemetría con tu base de datos central.
  */
 export async function syncTacticalData(payload: any) {
-  // --- PUNTO DE CONEXIÓN DE DATOS ---
-  // Aquí puedes enviar métricas de red a tu panel de control centralizado.
-  console.log("SYNC_DATA_STREAM:", payload);
+  if (!BACKEND_URL) return;
+
+  try {
+    await fetch(`${BACKEND_URL}/api/telemetry`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) {
+    // Silencioso para no interrumpir la experiencia de usuario
+  }
 }
