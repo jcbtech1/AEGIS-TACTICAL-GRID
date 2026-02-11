@@ -3,10 +3,6 @@
 
 /**
  * @fileOverview AdvancedOpsScreen - Rediseño de alta fidelidad basado en la estética Aegis Command.
- * 
- * Versión compactada para evitar desbordamientos en pantalla.
- * Actualizado: AEGIS_IA ahora con el núcleo visual J.A.RV.I.S Style y soporte de VOZ.
- * Incluye indicador de LINK_STATUS para confirmar conexión con backend.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -85,7 +81,8 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
 
   if (!isMounted) return null;
 
-  const showSidebar = activeModule !== 'AEGIS_IA';
+  // Ocultar sidebar para módulos inmersivos
+  const showSidebar = activeModule !== 'AEGIS_IA' && activeModule !== 'VISUAL_SCAN';
 
   const NavButton = ({ type, label, icon: Icon }: { type: ModuleType, label: string, icon: any }) => (
     <button
@@ -159,11 +156,6 @@ export default function AdvancedOpsScreen({ onBack, initialModule }: AdvancedOps
               <h2 className="text-[10px] font-black tracking-widest uppercase text-[#00f2ff]">
                 [{activeModule.replace('_', ' ')}]
               </h2>
-              {showSidebar && (
-                <div className="flex gap-3 text-[5px] uppercase tracking-widest opacity-40">
-                  <span>Auth: OPERATOR_LEVEL_{currentClearance}</span>
-                </div>
-              )}
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -235,7 +227,6 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
   const [metrics, setMetrics] = useState({ cpu: 12, ram: 45, load: 22, sync: 99.9 });
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // --- CONFIGURACIÓN DE VOZ (TTS) ---
   const speak = (text: string) => {
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -247,7 +238,6 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
     }
   };
 
-  // --- RECONOCIMIENTO DE VOZ (STT) ---
   const startListening = () => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitRecognition;
     if (SpeechRecognition) {
@@ -329,10 +319,7 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
 
   return (
     <div className="flex h-full gap-4 min-h-0 overflow-hidden relative">
-      {/* HUD CENTRAL - ESTILO J.A.R.V.I.S */}
       <div className="flex-1 flex flex-col items-center justify-center relative p-8">
-        
-        {/* TELEMETRÍA IZQUIERDA */}
         <div className="absolute top-4 left-4 flex flex-col gap-3">
           <div className="flex items-center gap-3 p-1.5 border-l-2 border-[#00f2ff] bg-[#00f2ff]/5">
              <div className="flex flex-col">
@@ -348,7 +335,6 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
           </div>
         </div>
 
-        {/* INDICADOR DE ENLACE DE DATOS (CONFIRMACIÓN BACKEND) */}
         <div className="absolute bottom-4 left-4 flex flex-col gap-1">
            <span className="text-[5px] opacity-40 uppercase tracking-[0.4em]">Data_Link_Status</span>
            <div className={`flex items-center gap-2 px-2 py-1 border text-[7px] font-black tracking-widest ${
@@ -362,7 +348,6 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
            </div>
         </div>
 
-        {/* TELEMETRÍA DERECHA */}
         <div className="absolute top-4 right-4 text-right flex flex-col gap-1">
           <span className="text-[12px] font-black tracking-tighter text-[#00f2ff] flex items-center gap-2 justify-end">
              <Cloud className="w-3 h-3" /> 22.4°C
@@ -375,32 +360,24 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
           </div>
         </div>
 
-        {/* NÚCLEO COMPLEJO SVG (J.A.R.V.I.S STYLE) */}
         <div className="relative w-[400px] h-[400px] flex items-center justify-center pointer-events-none">
-          {/* Anillos concéntricos con diferentes patrones */}
           <svg className="absolute w-full h-full animate-spin-slow opacity-10" viewBox="0 0 200 200">
              <circle cx="100" cy="100" r="98" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="2,4" />
           </svg>
-          
           <svg className="absolute w-[90%] h-[90%] animate-spin-reverse-slow opacity-30" viewBox="0 0 200 200">
              <circle cx="100" cy="100" r="88" fill="none" stroke="#00f2ff" strokeWidth="1" strokeDasharray="30,10,5,10" />
              <circle cx="100" cy="100" r="86" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="1,15" />
           </svg>
-
           <svg className="absolute w-[75%] h-[75%] animate-spin-slow opacity-50" viewBox="0 0 200 200">
              <path d="M 100 30 A 70 70 0 0 1 170 100" fill="none" stroke="#00f2ff" strokeWidth="3" />
              <path d="M 30 100 A 70 70 0 0 1 100 170" fill="none" stroke="#00f2ff" strokeWidth="3" />
              <circle cx="100" cy="100" r="68" fill="none" stroke="#00f2ff" strokeWidth="0.5" strokeDasharray="2,8" />
           </svg>
-
-          {/* Anillo de datos (Puntos) */}
           <svg className="absolute w-[60%] h-[60%] animate-spin-reverse-slow" viewBox="0 0 200 200">
              {Array.from({ length: 36 }).map((_, i) => (
                <circle key={i} cx={100 + 55 * Math.cos(i * 10 * Math.PI / 180)} cy={100 + 55 * Math.sin(i * 10 * Math.PI / 180)} r="0.8" fill="#00f2ff" opacity={i % 4 === 0 ? 1 : 0.2} />
              ))}
           </svg>
-
-          {/* Círculo Central con Nombre AEGIS */}
           <div className="relative w-36 h-36 rounded-full border-2 border-[#00f2ff]/60 bg-[#00f2ff]/5 flex flex-col items-center justify-center backdrop-blur-md shadow-[0_0_30px_rgba(0,242,255,0.2)]">
              <div className="flex flex-col items-center">
                 <h1 className="text-xl font-black tracking-[0.5em] text-[#00f2ff] ml-[0.5em] drop-shadow-[0_0_10px_#00f2ff]">AEGIS</h1>
@@ -408,12 +385,8 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
                    {isListening ? 'LISTENING...' : isLoading ? 'PROCESSING...' : 'CORE_ACTIVE'}
                 </span>
              </div>
-
-             {/* Indicadores de rotación internos */}
              <div className="absolute inset-0 border-[3px] border-[#00f2ff]/10 rounded-full border-dashed animate-spin-slow" />
           </div>
-
-          {/* Brackets flotantes externos */}
           <motion.div 
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ repeat: Infinity, duration: 4 }}
@@ -421,7 +394,6 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
           />
         </div>
 
-        {/* BARRA DE TAREAS TÁCTICA (BOTTOM) */}
         <div className="absolute bottom-12 w-full px-32 flex justify-between items-center text-[#00f2ff]/60">
            <div className="flex gap-4">
               <div className="flex flex-col">
@@ -440,7 +412,6 @@ function AegisIAModule({ currentLevel }: { currentLevel: number }) {
         </div>
       </div>
 
-      {/* TERMINAL DE COMANDO (SIDEBAR) */}
       <div className="w-[320px] flex flex-col gap-3 h-full min-h-0 bg-black/40 border-l border-[#00f2ff]/10 z-10 backdrop-blur-md">
         <div className="p-3 border-b border-[#00f2ff]/10 flex justify-between items-center bg-[#00f2ff]/5">
            <div className="flex items-center gap-3">
